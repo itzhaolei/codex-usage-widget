@@ -15,6 +15,16 @@
 - 支持深色和浅色模式。
 - 自动跟随系统语言。
 
+## 通过安装器安装
+
+如果不想使用终端命令，可以直接从 Release 页面下载安装器：
+
+[下载 CodexUsageWidget-1.0.0-Installer.zip](https://github.com/itzhaolei/codex-usage-widget/releases/download/v1.0.0/CodexUsageWidget-1.0.0-Installer.zip)
+
+解压后，双击 `Install Codex Usage Widget.app` 即可安装。安装器会复制预编译好的悬浮窗和 Dock 启动器，注册后台自启动任务，把启动器放入 Dock，并打开工具。
+
+使用前需要已经安装并登录 Codex Desktop。安装完成后，工具会读取当前用户本机的 Codex 配额数据并自动显示。
+
 ## 一行安装
 
 ```bash
