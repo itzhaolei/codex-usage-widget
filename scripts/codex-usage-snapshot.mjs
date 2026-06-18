@@ -97,6 +97,20 @@ function toWindow(limit) {
   };
 }
 
+function keepMonotonicUsage(existingWindow, nextWindow) {
+  if (!nextWindow) return null;
+  if (!existingWindow || typeof existingWindow.used_percentage !== "number") return nextWindow;
+  if (existingWindow.resets_at == null || nextWindow.resets_at == null) return nextWindow;
+  if (existingWindow.resets_at !== nextWindow.resets_at) return nextWindow;
+  if (nextWindow.used_percentage < existingWindow.used_percentage) {
+    return {
+      ...nextWindow,
+      used_percentage: existingWindow.used_percentage,
+    };
+  }
+  return nextWindow;
+}
+
 function readJson(filePath) {
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -188,16 +202,20 @@ for (const filePath of listJsonlFiles(searchDirs)) {
 }
 
 const resetCredits = await fetchResetCredits();
+const existingSnapshot = readJson(outputPath);
 
 if (latestLimits) {
+  const sameAccount = (existingSnapshot?.account_id ?? null) === currentAccountId;
+  const fiveHour = keepMonotonicUsage(sameAccount ? existingSnapshot?.five_hour : null, toWindow(latestLimits.primary));
+  const sevenDay = keepMonotonicUsage(sameAccount ? existingSnapshot?.seven_day : null, toWindow(latestLimits.secondary));
   const snapshot = {
     updated_at: new Date().toISOString(),
     account_id: currentAccountId,
     auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
     source_file: latestLimits.filePath,
     source_timestamp: latestLimits.timestampMs ? new Date(latestLimits.timestampMs).toISOString() : null,
-    five_hour: toWindow(latestLimits.primary),
-    seven_day: toWindow(latestLimits.secondary),
+    five_hour: fiveHour,
+    seven_day: sevenDay,
     reset_credits: resetCredits,
   };
 
@@ -206,7 +224,7 @@ if (latestLimits) {
 }
 
 try {
-  const existing = readJson(outputPath);
+  const existing = existingSnapshot;
   const sameAccount = (existing?.account_id ?? null) === currentAccountId;
   if (sameAccount && (existing?.five_hour || existing?.seven_day || existing?.reset_credits || resetCredits)) {
     const snapshot = {
