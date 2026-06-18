@@ -1,0 +1,28 @@
+{
+  "name": "codex-usage-widget",
+  "version": "0.1.0",
+  "description": "A macOS floating quota widget for Codex usage limits.",
+  "author": {
+    "name": "Local developer"
+  },
+  "license": "MIT",
+  "keywords": ["codex", "usage", "quota", "macos", "widget"],
+  "skills": "./skills/",
+  "apps": "./.app.json",
+  "interface": {
+    "displayName": "Codex Usage Widget",
+    "shortDescription": "Show Codex quota usage in a floating macOS widget.",
+    "longDescription": "Codex Usage Widget installs a local macOS HUD that follows the Codex desktop app lifecycle, stays optionally pinned, remembers its position, and displays 5-hour, weekly, and reset-credit quota information.",
+    "developerName": "Local developer",
+    "category": "Productivity",
+    "capabilities": ["Write", "Automation"],
+    "defaultPrompt": [
+      "Install the Codex usage widget.",
+      "Restart the Codex usage widget.",
+      "Stop the Codex usage widget."
+    ],
+    "brandColor": "#16A34A",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png"
+  }
+}

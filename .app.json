@@ -1,0 +1,8 @@
+{
+  "apps": {
+    "codex-usage-widget-launcher": {
+      "id": "local.codex.usage-widget.launcher",
+      "category": "Productivity"
+    }
+  }
+}
