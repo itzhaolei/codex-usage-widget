@@ -500,14 +500,32 @@ class WindowController: NSWindowController, NSWindowDelegate {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
             process.arguments = ["node", scriptPath, outputPath]
+            process.environment = [
+                "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/sbin:/usr/sbin"
+            ]
             process.standardOutput = Pipe()
             process.standardError = Pipe()
 
             do {
                 try process.run()
                 process.waitUntilExit()
+                if process.terminationStatus != 0 {
+                    let fallback = Process()
+                    fallback.executableURL = URL(fileURLWithPath: "/bin/zsh")
+                    fallback.arguments = ["-lc", "node \"\(scriptPath)\" \"\(outputPath)\""]
+                    fallback.standardOutput = Pipe()
+                    fallback.standardError = Pipe()
+                    try? fallback.run()
+                    fallback.waitUntilExit()
+                }
             } catch {
-                // Keep displaying the previous snapshot if the refresh command cannot run.
+                let fallback = Process()
+                fallback.executableURL = URL(fileURLWithPath: "/bin/zsh")
+                fallback.arguments = ["-lc", "node \"\(scriptPath)\" \"\(outputPath)\""]
+                fallback.standardOutput = Pipe()
+                fallback.standardError = Pipe()
+                try? fallback.run()
+                fallback.waitUntilExit()
             }
 
             DispatchQueue.main.async {
