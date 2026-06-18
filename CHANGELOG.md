@@ -14,6 +14,7 @@ All notable changes to Codex Usage Widget are documented here.
 - Added automatic lifecycle handling so the HUD follows the Codex app.
 - Added Chinese, English, Japanese, Korean, German, French, Spanish, Portuguese, Italian, and Dutch documentation.
 - Added one-line install support and GitHub release packaging.
+- Added a downloadable macOS app installer on the release page for users who prefer not to use Terminal.
 
 ### Fixed
 
