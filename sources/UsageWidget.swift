@@ -570,8 +570,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
                          color: NSColor.systemRed, lineHeight: 20)
         let barBottomSpacer = attrs(font: NSFont.monospacedSystemFont(ofSize: 10, weight: .regular),
                                     color: NSColor.clear, lineHeight: 10)
-        let fiveBarTopSpacer = attrs(font: NSFont.monospacedSystemFont(ofSize: 3, weight: .regular),
-                                     color: NSColor.clear, lineHeight: 3)
+        let barTopSpacer = attrs(font: NSFont.monospacedSystemFont(ofSize: 4, weight: .regular),
+                                 color: NSColor.clear, lineHeight: 4)
         let dim = attrs(font: NSFont.monospacedSystemFont(ofSize: 10, weight: .regular),
                         color: secondaryTextColor, lineHeight: 16)
         let rowLabel = attrs(font: NSFont.monospacedSystemFont(ofSize: 13, weight: .bold),
@@ -584,13 +584,14 @@ class WindowController: NSWindowController, NSWindowDelegate {
         mas.append(NSAttributedString(string: "5h", attributes: rowLabel))
         mas.append(NSAttributedString(string: "  ┃  ", attributes: separator))
         mas.append(NSAttributedString(string: "\(language.reset) \(fiveReset)\n", attributes: dim))
-        mas.append(NSAttributedString(string: " \n", attributes: fiveBarTopSpacer))
+        mas.append(NSAttributedString(string: " \n", attributes: barTopSpacer))
         mas.append(NSAttributedString(string: fiveBar, attributes: fivePct <= 20 ? warn : green))
         mas.append(NSAttributedString(string: "  \(fivePct >= 0 ? "\(fivePct)%" : "—")\n", attributes: percent))
         mas.append(NSAttributedString(string: " \n", attributes: barBottomSpacer))
         mas.append(NSAttributedString(string: language.week, attributes: rowLabel))
         mas.append(NSAttributedString(string: "   ┃  ", attributes: separator))
         mas.append(NSAttributedString(string: "\(language.reset) \(sevenReset)\n", attributes: dim))
+        mas.append(NSAttributedString(string: " \n", attributes: barTopSpacer))
         mas.append(NSAttributedString(string: sevenBar, attributes: sevenPct <= 20 ? warn : green))
         mas.append(NSAttributedString(string: "  \(sevenPct >= 0 ? "\(sevenPct)%" : "—")\n", attributes: percent))
         mas.append(NSAttributedString(string: " \n", attributes: barBottomSpacer))

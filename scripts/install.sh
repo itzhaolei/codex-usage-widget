@@ -103,7 +103,10 @@ mkdir -p "$INSTALL_DIR" "$SCRIPTS_DIR" "$MACOS_DIR" "$RESOURCES_DIR" "$USER_APPS
 cp "$PLUGIN_DIR/scripts/codex-usage-snapshot.mjs" "$SCRIPTS_DIR/codex-usage-snapshot.mjs"
 cp "$PLUGIN_DIR/scripts/ensure-usage-widget.sh" "$INSTALL_DIR/ensure-usage-widget.sh"
 cp "$PLUGIN_DIR/scripts/start-usage-widget.sh" "$INSTALL_DIR/start-usage-widget.sh"
-chmod +x "$SCRIPTS_DIR/codex-usage-snapshot.mjs" "$INSTALL_DIR/ensure-usage-widget.sh" "$INSTALL_DIR/start-usage-widget.sh"
+cp "$PLUGIN_DIR/scripts/restart.sh" "$INSTALL_DIR/restart.sh"
+cp "$PLUGIN_DIR/scripts/status.sh" "$INSTALL_DIR/status.sh"
+cp "$PLUGIN_DIR/scripts/uninstall.sh" "$INSTALL_DIR/uninstall.sh"
+chmod +x "$SCRIPTS_DIR/codex-usage-snapshot.mjs" "$INSTALL_DIR/ensure-usage-widget.sh" "$INSTALL_DIR/start-usage-widget.sh" "$INSTALL_DIR/restart.sh" "$INSTALL_DIR/status.sh" "$INSTALL_DIR/uninstall.sh"
 
 swiftc -parse-as-library -o "$MACOS_DIR/UsageWidget" "$PLUGIN_DIR/sources/UsageWidget.swift" -framework Cocoa
 chmod +x "$MACOS_DIR/UsageWidget"
