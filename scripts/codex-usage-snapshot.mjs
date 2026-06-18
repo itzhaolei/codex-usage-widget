@@ -111,6 +111,11 @@ function keepMonotonicUsage(existingWindow, nextWindow) {
   return nextWindow;
 }
 
+function mergeWindow(existingWindow, nextWindow, canKeepExisting) {
+  if (!nextWindow && canKeepExisting) return existingWindow ?? null;
+  return keepMonotonicUsage(canKeepExisting ? existingWindow : null, nextWindow);
+}
+
 function readJson(filePath) {
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -189,31 +194,42 @@ async function fetchResetCredits() {
   }
 }
 
+const existingSnapshot = readJson(outputPath);
+const existingSameAccount = (existingSnapshot?.account_id ?? null) === currentAccountId;
+
 let latestLimits = null;
+let latestStaleLimits = null;
 for (const filePath of listJsonlFiles(searchDirs)) {
   const limits = readLatestRateLimits(filePath);
   if (!limits) continue;
-  if (Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 && limits.timestampMs < authLastRefreshMs) {
+
+  const isFreshForCurrentLogin = !(Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 && limits.timestampMs < authLastRefreshMs);
+  if (!isFreshForCurrentLogin) {
+    if (!latestStaleLimits || limits.timestampMs > latestStaleLimits.timestampMs) {
+      latestStaleLimits = limits;
+    }
     continue;
   }
+
   if (!latestLimits || limits.timestampMs > latestLimits.timestampMs) {
     latestLimits = limits;
   }
 }
 
 const resetCredits = await fetchResetCredits();
-const existingSnapshot = readJson(outputPath);
+const selectedLimits = latestLimits ?? (existingSameAccount ? latestStaleLimits : null);
+const selectedLimitsAreStale = selectedLimits != null && latestLimits == null;
 
-if (latestLimits) {
-  const sameAccount = (existingSnapshot?.account_id ?? null) === currentAccountId;
-  const fiveHour = keepMonotonicUsage(sameAccount ? existingSnapshot?.five_hour : null, toWindow(latestLimits.primary));
-  const sevenDay = keepMonotonicUsage(sameAccount ? existingSnapshot?.seven_day : null, toWindow(latestLimits.secondary));
+if (selectedLimits) {
+  const fiveHour = mergeWindow(existingSnapshot?.five_hour, toWindow(selectedLimits.primary), existingSameAccount);
+  const sevenDay = mergeWindow(existingSnapshot?.seven_day, toWindow(selectedLimits.secondary), existingSameAccount);
   const snapshot = {
     updated_at: new Date().toISOString(),
     account_id: currentAccountId,
     auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
-    source_file: latestLimits.filePath,
-    source_timestamp: latestLimits.timestampMs ? new Date(latestLimits.timestampMs).toISOString() : null,
+    source_file: selectedLimits.filePath,
+    source_timestamp: selectedLimits.timestampMs ? new Date(selectedLimits.timestampMs).toISOString() : null,
+    stale_source: selectedLimitsAreStale,
     five_hour: fiveHour,
     seven_day: sevenDay,
     reset_credits: resetCredits,
@@ -225,8 +241,7 @@ if (latestLimits) {
 
 try {
   const existing = existingSnapshot;
-  const sameAccount = (existing?.account_id ?? null) === currentAccountId;
-  if (sameAccount && (existing?.five_hour || existing?.seven_day || existing?.reset_credits || resetCredits)) {
+  if (existingSameAccount && (existing?.five_hour || existing?.seven_day || existing?.reset_credits || resetCredits)) {
     const snapshot = {
       ...existing,
       updated_at: new Date().toISOString(),

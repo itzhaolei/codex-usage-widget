@@ -453,15 +453,19 @@ class WindowController: NSWindowController, NSWindowDelegate {
     }
 
     func startRefresh() {
-        refresh()
+        refreshSnapshotIfNeeded(force: true, redrawAfterCompletion: true)
+        renderSnapshot()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             self?.refresh()
         }
     }
 
     func refresh() {
-        refreshSnapshotIfNeeded()
+        refreshSnapshotIfNeeded(redrawAfterCompletion: true)
+        renderSnapshot()
+    }
 
+    func renderSnapshot() {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: snapshotPath)),
               let snap = try? JSONDecoder().decode(UsageSnapshot.self, from: data) else {
             updateText("⚠ \(language.unableToReadSnapshot):\n\(snapshotPath)")
@@ -488,9 +492,9 @@ class WindowController: NSWindowController, NSWindowDelegate {
         )
     }
 
-    func refreshSnapshotIfNeeded() {
+    func refreshSnapshotIfNeeded(force: Bool = false, redrawAfterCompletion: Bool = false) {
         guard !snapshotRefreshInFlight,
-              -lastSnapshotRefresh.timeIntervalSinceNow >= 1,
+              (force || -lastSnapshotRefresh.timeIntervalSinceNow >= 1),
               FileManager.default.fileExists(atPath: snapshotScriptPath) else { return }
 
         snapshotRefreshInFlight = true
@@ -529,7 +533,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
             }
 
             DispatchQueue.main.async {
-                self?.snapshotRefreshInFlight = false
+                guard let self else { return }
+                self.snapshotRefreshInFlight = false
+                if redrawAfterCompletion {
+                    self.renderSnapshot()
+                }
             }
         }
     }
