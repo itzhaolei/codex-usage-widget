@@ -2,6 +2,8 @@
 
 A local macOS floating widget for watching Codex usage limits without opening settings.
 
+![Codex Usage Widget preview](assets/preview.png)
+
 ## Features
 
 - Floating quota HUD for Codex desktop.
