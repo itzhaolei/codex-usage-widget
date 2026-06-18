@@ -641,7 +641,8 @@ func remainingPercent(fromUsedPercent usedPercent: Int?) -> Int {
 func appVersionText() -> String {
     let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     let value = version?.trimmingCharacters(in: .whitespacesAndNewlines)
-    return "v\((value?.isEmpty == false ? value : nil) ?? "1.0.0")"
+    guard let value, !value.isEmpty else { return "" }
+    return "v\(value)"
 }
 
 // MARK: — App Delegate
