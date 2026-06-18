@@ -22,11 +22,14 @@ func launcherLanguage() -> LauncherLanguage {
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let installDir = NSString(string: "~/.codex/usage-widget").expandingTildeInPath
+    private let widgetExecutablePath = NSString(string: "~/.codex/usage-widget/UsageWidget.app/Contents/MacOS/UsageWidget").expandingTildeInPath
     private let launcherBundleIdentifier = "local.codex.usage-widget.launcher"
     private let widgetBundleIdentifier = "local.codex.usage-widget"
     private let language = launcherLanguage()
     private var monitorTimer: Timer?
     private var isStartingWidget = false
+    private var hasObservedWidget = false
+    private var startGraceUntil = Date.distantPast
     private var isExitingAfterWidgetClosed = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -55,10 +58,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func startWidget() {
         isStartingWidget = true
+        startGraceUntil = Date().addingTimeInterval(10.0)
         let markerPath = "\(installDir)/.closed-by-user"
         try? FileManager.default.removeItem(atPath: markerPath)
 
-        let scriptPath = "\(installDir)/ensure-usage-widget.sh"
+        let restartPath = "\(installDir)/restart.sh"
+        let ensurePath = "\(installDir)/ensure-usage-widget.sh"
+        let scriptPath = FileManager.default.fileExists(atPath: restartPath) ? restartPath : ensurePath
         guard FileManager.default.fileExists(atPath: scriptPath) else {
             isStartingWidget = false
             showAlert(message: language.notInstalled, info: language.installHint)
@@ -73,7 +79,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         do {
             try process.run()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
                 self.isStartingWidget = false
             }
         } catch {
@@ -97,8 +103,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         monitorTimer?.invalidate()
         monitorTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self else { return }
-            if self.isStartingWidget { return }
-            if !self.widgetIsRunning() {
+            if self.widgetIsRunning() {
+                self.hasObservedWidget = true
+                self.isStartingWidget = false
+                return
+            }
+            if self.isStartingWidget || Date() < self.startGraceUntil { return }
+            if self.hasObservedWidget {
                 self.isExitingAfterWidgetClosed = true
                 NSApp.terminate(nil)
             }
@@ -106,7 +117,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func widgetIsRunning() -> Bool {
-        !NSRunningApplication.runningApplications(withBundleIdentifier: widgetBundleIdentifier).isEmpty
+        if !NSRunningApplication.runningApplications(withBundleIdentifier: widgetBundleIdentifier).isEmpty {
+            return true
+        }
+        return processExists(matching: widgetExecutablePath)
     }
 
     private func closeWidgetFromLauncher() {
@@ -116,12 +130,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         for app in NSRunningApplication.runningApplications(withBundleIdentifier: widgetBundleIdentifier) {
             app.terminate()
         }
+        terminateWidgetByPath(force: false)
 
         DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 0.5) {
             for app in NSRunningApplication.runningApplications(withBundleIdentifier: self.widgetBundleIdentifier) {
                 app.forceTerminate()
             }
+            self.terminateWidgetByPath(force: true)
         }
+    }
+
+    private func processExists(matching pattern: String) -> Bool {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/pgrep")
+        process.arguments = ["-f", pattern]
+        process.standardOutput = Pipe()
+        process.standardError = Pipe()
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+            return process.terminationStatus == 0
+        } catch {
+            return false
+        }
+    }
+
+    private func terminateWidgetByPath(force: Bool) {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
+        process.arguments = force ? ["-9", "-f", widgetExecutablePath] : ["-f", widgetExecutablePath]
+        process.standardOutput = Pipe()
+        process.standardError = Pipe()
+        try? process.run()
     }
 
     private func showAlert(message: String, info: String) {
