@@ -41,6 +41,16 @@ The installer builds:
 bash scripts/uninstall.sh
 ```
 
+## Git Workflow
+
+This repository is intended to be managed with git. After each change, commit and push:
+
+```bash
+bash scripts/git-sync.sh "Describe the change"
+```
+
+The script stages changed files, creates a commit, and pushes to `origin`.
+
 ## Privacy
 
 This plugin runs locally. It reads Codex local session metadata and the current Codex auth token from `~/.codex/auth.json` only on the user's machine to request that user's reset-credit count from the Codex backend. No personal credentials or account data are included in this repository.

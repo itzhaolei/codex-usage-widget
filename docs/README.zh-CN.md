@@ -33,6 +33,14 @@ bash scripts/install.sh
 bash scripts/uninstall.sh
 ```
 
+## Git 管理
+
+每次调整后提交并推送：
+
+```bash
+bash scripts/git-sync.sh "描述这次改动"
+```
+
 ## 隐私
 
 插件只在本机运行。它会读取用户本机的 Codex 会话元数据和 `~/.codex/auth.json` 中的当前 Codex token，用于向 Codex 后端请求该用户自己的可用重置次数。仓库中不包含个人凭据或账号数据。
