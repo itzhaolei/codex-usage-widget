@@ -20,6 +20,107 @@ struct ResetCredits: Codable {
     var available_count: Int?
 }
 
+// MARK: — Localization
+struct AppLanguage {
+    let title: String
+    let week: String
+    let reset: String
+    let availableReset: String
+    let times: String
+    let alreadyReset: String
+    let unableToReadSnapshot: String
+    let switchToDark: String
+    let switchToLight: String
+    let pin: String
+    let unpin: String
+    let close: String
+    let separator: String
+    let afterSuffix: String
+    let day: (Int) -> String
+    let hour: (Int) -> String
+    let minute: (Int) -> String
+    let second: (Int) -> String
+}
+
+func plural(_ value: Int, _ one: String, _ other: String) -> String {
+    "\(value) \(value == 1 ? one : other)"
+}
+
+let zhLanguage = AppLanguage(
+    title: "Codex 额度", week: "周", reset: "重置", availableReset: "可用重置", times: "次",
+    alreadyReset: "已重置", unableToReadSnapshot: "无法读取快照",
+    switchToDark: "切换到黑色模式", switchToLight: "切换到白色模式",
+    pin: "置顶", unpin: "取消置顶", close: "关闭窗口", separator: " ",
+    afterSuffix: "后",
+    day: { "\($0)天" }, hour: { "\($0)小时" }, minute: { "\($0)分钟" }, second: { "\($0)秒" }
+)
+
+func localizedLanguage() -> AppLanguage {
+    let code = Locale.preferredLanguages.first?.lowercased() ?? "en"
+    if code.hasPrefix("zh") { return zhLanguage }
+    if code.hasPrefix("ja") {
+        return AppLanguage(title: "Codex 使用量", week: "週", reset: "リセット", availableReset: "利用可能なリセット", times: "回",
+            alreadyReset: "リセット済み", unableToReadSnapshot: "スナップショットを読み込めません",
+            switchToDark: "ダークモードに切り替え", switchToLight: "ライトモードに切り替え",
+            pin: "最前面に固定", unpin: "固定を解除", close: "ウィンドウを閉じる", separator: " ",
+            afterSuffix: "後", day: { "\($0)日" }, hour: { "\($0)時間" }, minute: { "\($0)分" }, second: { "\($0)秒" })
+    }
+    if code.hasPrefix("ko") {
+        return AppLanguage(title: "Codex 사용량", week: "주", reset: "재설정", availableReset: "사용 가능 재설정", times: "회",
+            alreadyReset: "재설정됨", unableToReadSnapshot: "스냅샷을 읽을 수 없음",
+            switchToDark: "다크 모드로 전환", switchToLight: "라이트 모드로 전환",
+            pin: "항상 위", unpin: "항상 위 해제", close: "창 닫기", separator: " ",
+            afterSuffix: " 후", day: { "\($0)일" }, hour: { "\($0)시간" }, minute: { "\($0)분" }, second: { "\($0)초" })
+    }
+    if code.hasPrefix("de") {
+        return AppLanguage(title: "Codex Limit", week: "Woche", reset: "Reset", availableReset: "Verfügbare Resets", times: "Mal",
+            alreadyReset: "Zurückgesetzt", unableToReadSnapshot: "Snapshot kann nicht gelesen werden",
+            switchToDark: "Zu Dunkel wechseln", switchToLight: "Zu Hell wechseln",
+            pin: "Anheften", unpin: "Lösen", close: "Fenster schließen", separator: " ",
+            afterSuffix: " später", day: { plural($0, "Tag", "Tage") }, hour: { plural($0, "Stunde", "Stunden") }, minute: { plural($0, "Minute", "Minuten") }, second: { plural($0, "Sekunde", "Sekunden") })
+    }
+    if code.hasPrefix("fr") {
+        return AppLanguage(title: "Quota Codex", week: "Semaine", reset: "Réinit.", availableReset: "Réinitialisations dispo.", times: "fois",
+            alreadyReset: "Réinitialisé", unableToReadSnapshot: "Impossible de lire l’instantané",
+            switchToDark: "Passer en mode sombre", switchToLight: "Passer en mode clair",
+            pin: "Épingler", unpin: "Détacher", close: "Fermer la fenêtre", separator: " ",
+            afterSuffix: " plus tard", day: { plural($0, "jour", "jours") }, hour: { plural($0, "heure", "heures") }, minute: { plural($0, "minute", "minutes") }, second: { plural($0, "seconde", "secondes") })
+    }
+    if code.hasPrefix("es") {
+        return AppLanguage(title: "Cuota Codex", week: "Semana", reset: "Reinicio", availableReset: "Reinicios disponibles", times: "veces",
+            alreadyReset: "Reiniciado", unableToReadSnapshot: "No se puede leer la instantánea",
+            switchToDark: "Cambiar a modo oscuro", switchToLight: "Cambiar a modo claro",
+            pin: "Fijar", unpin: "Desfijar", close: "Cerrar ventana", separator: " ",
+            afterSuffix: " después", day: { plural($0, "día", "días") }, hour: { plural($0, "hora", "horas") }, minute: { plural($0, "minuto", "minutos") }, second: { plural($0, "segundo", "segundos") })
+    }
+    if code.hasPrefix("pt") {
+        return AppLanguage(title: "Cota Codex", week: "Semana", reset: "Redefinir", availableReset: "Redefinições disponíveis", times: "vezes",
+            alreadyReset: "Redefinido", unableToReadSnapshot: "Não foi possível ler o snapshot",
+            switchToDark: "Alternar para modo escuro", switchToLight: "Alternar para modo claro",
+            pin: "Fixar", unpin: "Desafixar", close: "Fechar janela", separator: " ",
+            afterSuffix: " depois", day: { plural($0, "dia", "dias") }, hour: { plural($0, "hora", "horas") }, minute: { plural($0, "minuto", "minutos") }, second: { plural($0, "segundo", "segundos") })
+    }
+    if code.hasPrefix("it") {
+        return AppLanguage(title: "Quota Codex", week: "Settimana", reset: "Ripristino", availableReset: "Ripristini disponibili", times: "volte",
+            alreadyReset: "Ripristinato", unableToReadSnapshot: "Impossibile leggere lo snapshot",
+            switchToDark: "Passa alla modalità scura", switchToLight: "Passa alla modalità chiara",
+            pin: "Fissa", unpin: "Rimuovi fissaggio", close: "Chiudi finestra", separator: " ",
+            afterSuffix: " dopo", day: { plural($0, "giorno", "giorni") }, hour: { plural($0, "ora", "ore") }, minute: { plural($0, "minuto", "minuti") }, second: { plural($0, "secondo", "secondi") })
+    }
+    if code.hasPrefix("nl") {
+        return AppLanguage(title: "Codex-limiet", week: "Week", reset: "Reset", availableReset: "Beschikbare resets", times: "keer",
+            alreadyReset: "Gereset", unableToReadSnapshot: "Kan snapshot niet lezen",
+            switchToDark: "Schakel naar donker", switchToLight: "Schakel naar licht",
+            pin: "Vastzetten", unpin: "Losmaken", close: "Venster sluiten", separator: " ",
+            afterSuffix: " later", day: { plural($0, "dag", "dagen") }, hour: { plural($0, "uur", "uur") }, minute: { plural($0, "minuut", "minuten") }, second: { plural($0, "seconde", "seconden") })
+    }
+    return AppLanguage(title: "Codex Quota", week: "Week", reset: "Reset", availableReset: "Available resets", times: "times",
+        alreadyReset: "Reset", unableToReadSnapshot: "Unable to read snapshot",
+        switchToDark: "Switch to dark mode", switchToLight: "Switch to light mode",
+        pin: "Pin", unpin: "Unpin", close: "Close window", separator: " ",
+        afterSuffix: " later", day: { plural($0, "day", "days") }, hour: { plural($0, "hour", "hours") }, minute: { plural($0, "minute", "minutes") }, second: { plural($0, "second", "seconds") })
+}
+
 // MARK: — 时间工具
 func secondsUntil(_ timestamp: TimeInterval?) -> Int? {
     guard let t = timestamp, t > 0 else { return nil }
@@ -27,9 +128,9 @@ func secondsUntil(_ timestamp: TimeInterval?) -> Int? {
     return Int(ceil(date.timeIntervalSinceNow))
 }
 
-func formatFiveHourReset(_ timestamp: TimeInterval?) -> String {
+func formatFiveHourReset(_ timestamp: TimeInterval?, language: AppLanguage) -> String {
     guard let rawInterval = secondsUntil(timestamp) else { return "—" }
-    if rawInterval <= 0 { return "已重置" }
+    if rawInterval <= 0 { return language.alreadyReset }
 
     let normalized = rawInterval - 1
     let d = normalized / 86400
@@ -38,30 +139,30 @@ func formatFiveHourReset(_ timestamp: TimeInterval?) -> String {
     let s = (normalized % 60) + 1
 
     var parts: [String] = []
-    if d > 0 { parts.append("\(d)天") }
-    if h > 0 { parts.append("\(h)小时") }
-    if m > 0 { parts.append("\(m)分钟") }
-    parts.append("\(s)秒后")
-    return parts.joined(separator: " ")
+    if d > 0 { parts.append(language.day(d)) }
+    if h > 0 { parts.append(language.hour(h)) }
+    if m > 0 { parts.append(language.minute(m)) }
+    parts.append(language.second(s))
+    return "\(parts.joined(separator: language.separator))\(language.afterSuffix)"
 }
 
-func formatSevenDayReset(_ timestamp: TimeInterval?) -> String {
+func formatSevenDayReset(_ timestamp: TimeInterval?, language: AppLanguage) -> String {
     guard let interval = secondsUntil(timestamp) else { return "—" }
-    if interval <= 0 { return "已重置" }
-    if interval < 60 { return "\(interval)秒后" }
+    if interval <= 0 { return language.alreadyReset }
+    if interval < 60 { return "\(language.second(interval))\(language.afterSuffix)" }
 
     let d = interval / 86400
     let h = (interval % 86400) / 3600
     let m = (interval % 3600) / 60
 
     var parts: [String] = []
-    if d > 0 { parts.append("\(d)天") }
-    if h > 0 { parts.append("\(h)小时") }
-    if m > 0 { parts.append("\(m)分钟") }
+    if d > 0 { parts.append(language.day(d)) }
+    if h > 0 { parts.append(language.hour(h)) }
+    if m > 0 { parts.append(language.minute(m)) }
     if parts.isEmpty {
-        return "1分钟后"
+        return "\(language.minute(1))\(language.afterSuffix)"
     }
-    return "\(parts.joined(separator: " "))后"
+    return "\(parts.joined(separator: language.separator))\(language.afterSuffix)"
 }
 
 func progressBar(percent: Int, width: Int = 15) -> String {
@@ -85,6 +186,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
     var snapshotRefreshInFlight = false
     var isPinned = true
     var isLightMode = false
+    let language = localizedLanguage()
     let savedFrameKey = "CodexUsageWidget.savedFrame"
     let pinnedKey = "CodexUsageWidget.isPinned"
     let lightModeKey = "CodexUsageWidget.isLightMode"
@@ -193,21 +295,21 @@ class WindowController: NSWindowController, NSWindowDelegate {
                                         symbolName: "circle.lefthalf.filled",
                                         fallbackTitle: "◐",
                                         action: #selector(toggleTheme))
-        themeButton.toolTip = "黑白模式"
+        themeButton.toolTip = isLightMode ? language.switchToDark : language.switchToLight
         capsule.addSubview(themeButton)
 
         pinButton = makeCapsuleButton(frame: NSRect(x: segmentWidth, y: 0, width: segmentWidth, height: frame.height),
                                       symbolName: "pin.fill",
                                       fallbackTitle: "P",
                                       action: #selector(togglePinned))
-        pinButton.toolTip = "置顶/取消置顶"
+        pinButton.toolTip = isPinned ? language.unpin : language.pin
         capsule.addSubview(pinButton)
 
         let closeButton = makeCapsuleButton(frame: NSRect(x: segmentWidth * 2, y: 0, width: segmentWidth, height: frame.height),
                                             symbolName: "xmark",
                                             fallbackTitle: "x",
                                             action: #selector(closeFromButton))
-        closeButton.toolTip = "关闭窗口"
+        closeButton.toolTip = language.close
         capsule.addSubview(closeButton)
 
         return capsule
@@ -269,7 +371,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
             image.isTemplate = true
             themeButton?.image = image
         }
-        themeButton?.toolTip = isLightMode ? "切换到黑色模式" : "切换到白色模式"
+        themeButton?.toolTip = isLightMode ? language.switchToDark : language.switchToLight
     }
 
     func applyPinnedState() {
@@ -280,7 +382,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
             image.isTemplate = true
             pinButton?.image = image
         }
-        pinButton?.toolTip = isPinned ? "取消置顶" : "置顶"
+        pinButton?.toolTip = isPinned ? language.unpin : language.pin
     }
 
     func loadUserPreferences() {
@@ -362,7 +464,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: snapshotPath)),
               let snap = try? JSONDecoder().decode(UsageSnapshot.self, from: data) else {
-            updateText("⚠ 无法读取快照:\n\(snapshotPath)")
+            updateText("⚠ \(language.unableToReadSnapshot):\n\(snapshotPath)")
             return
         }
 
@@ -371,8 +473,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
         let fivePct = remainingPercent(fromUsedPercent: five?.used_percentage)
         let sevenPct = remainingPercent(fromUsedPercent: seven?.used_percentage)
-        let fiveReset = formatFiveHourReset(five?.resets_at)
-        let sevenReset = formatSevenDayReset(seven?.resets_at)
+        let fiveReset = formatFiveHourReset(five?.resets_at, language: language)
+        let sevenReset = formatSevenDayReset(seven?.resets_at, language: language)
         let resetCredits = snap.reset_credits?.available_count
 
         let emptyBar = String(repeating: "░", count: 15)
@@ -458,22 +560,22 @@ class WindowController: NSWindowController, NSWindowDelegate {
                               color: secondaryTextColor, lineHeight: 16, baseline: 2.0)
 
         let mas = NSMutableAttributedString()
-        mas.append(NSAttributedString(string: "Codex 额度\n", attributes: title))
+        mas.append(NSAttributedString(string: "\(language.title)\n", attributes: title))
         mas.append(NSAttributedString(string: "5h", attributes: rowLabel))
         mas.append(NSAttributedString(string: "  ┃  ", attributes: separator))
-        mas.append(NSAttributedString(string: "重置 \(fiveReset)\n", attributes: dim))
+        mas.append(NSAttributedString(string: "\(language.reset) \(fiveReset)\n", attributes: dim))
         mas.append(NSAttributedString(string: fiveBar, attributes: fivePct <= 20 ? warn : green))
         mas.append(NSAttributedString(string: "  \(fivePct >= 0 ? "\(fivePct)%" : "—")\n", attributes: percent))
         mas.append(NSAttributedString(string: " \n", attributes: barBottomSpacer))
-        mas.append(NSAttributedString(string: "周", attributes: rowLabel))
+        mas.append(NSAttributedString(string: language.week, attributes: rowLabel))
         mas.append(NSAttributedString(string: "   ┃  ", attributes: separator))
-        mas.append(NSAttributedString(string: "重置 \(sevenReset)\n", attributes: dim))
+        mas.append(NSAttributedString(string: "\(language.reset) \(sevenReset)\n", attributes: dim))
         mas.append(NSAttributedString(string: sevenBar, attributes: sevenPct <= 20 ? warn : green))
         mas.append(NSAttributedString(string: "  \(sevenPct >= 0 ? "\(sevenPct)%" : "—")\n", attributes: percent))
         mas.append(NSAttributedString(string: " \n", attributes: barBottomSpacer))
-        let resetText = resetCredits.map { "\($0) 次" } ?? "—"
+        let resetText = resetCredits.map { "\($0) \(language.times)" } ?? "—"
         let resetAttributes = (resetCredits ?? 0) > 0 ? greenText : mutedText
-        mas.append(NSAttributedString(string: "可用重置 \(resetText)", attributes: resetAttributes))
+        mas.append(NSAttributedString(string: "\(language.availableReset) \(resetText)", attributes: resetAttributes))
 
         label.textStorage?.setAttributedString(mas)
     }

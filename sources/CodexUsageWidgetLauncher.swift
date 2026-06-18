@@ -1,9 +1,30 @@
 import Cocoa
 
+struct LauncherLanguage {
+    let notInstalled: String
+    let installHint: String
+    let launchFailed: String
+}
+
+func launcherLanguage() -> LauncherLanguage {
+    let code = Locale.preferredLanguages.first?.lowercased() ?? "en"
+    if code.hasPrefix("zh") { return LauncherLanguage(notInstalled: "Codex Usage Widget 尚未安装", installHint: "请先在插件目录执行 bash scripts/install.sh。", launchFailed: "启动失败") }
+    if code.hasPrefix("ja") { return LauncherLanguage(notInstalled: "Codex Usage Widget は未インストールです", installHint: "先にプラグインディレクトリで bash scripts/install.sh を実行してください。", launchFailed: "起動に失敗しました") }
+    if code.hasPrefix("ko") { return LauncherLanguage(notInstalled: "Codex Usage Widget가 설치되지 않았습니다", installHint: "먼저 플러그인 디렉터리에서 bash scripts/install.sh 를 실행하세요.", launchFailed: "시작 실패") }
+    if code.hasPrefix("de") { return LauncherLanguage(notInstalled: "Codex Usage Widget ist nicht installiert", installHint: "Führen Sie zuerst bash scripts/install.sh im Plugin-Ordner aus.", launchFailed: "Start fehlgeschlagen") }
+    if code.hasPrefix("fr") { return LauncherLanguage(notInstalled: "Codex Usage Widget n’est pas installé", installHint: "Exécutez d’abord bash scripts/install.sh dans le dossier du plugin.", launchFailed: "Échec du lancement") }
+    if code.hasPrefix("es") { return LauncherLanguage(notInstalled: "Codex Usage Widget no está instalado", installHint: "Ejecuta primero bash scripts/install.sh en la carpeta del plugin.", launchFailed: "Error al iniciar") }
+    if code.hasPrefix("pt") { return LauncherLanguage(notInstalled: "Codex Usage Widget não está instalado", installHint: "Execute primeiro bash scripts/install.sh na pasta do plugin.", launchFailed: "Falha ao iniciar") }
+    if code.hasPrefix("it") { return LauncherLanguage(notInstalled: "Codex Usage Widget non è installato", installHint: "Esegui prima bash scripts/install.sh nella cartella del plugin.", launchFailed: "Avvio non riuscito") }
+    if code.hasPrefix("nl") { return LauncherLanguage(notInstalled: "Codex Usage Widget is niet geïnstalleerd", installHint: "Voer eerst bash scripts/install.sh uit in de pluginmap.", launchFailed: "Starten mislukt") }
+    return LauncherLanguage(notInstalled: "Codex Usage Widget is not installed", installHint: "Run bash scripts/install.sh in the plugin directory first.", launchFailed: "Launch failed")
+}
+
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let installDir = NSString(string: "~/.codex/usage-widget").expandingTildeInPath
     private let launcherBundleIdentifier = "local.codex.usage-widget.launcher"
     private let widgetBundleIdentifier = "local.codex.usage-widget"
+    private let language = launcherLanguage()
     private var monitorTimer: Timer?
     private var isStartingWidget = false
     private var isExitingAfterWidgetClosed = false
@@ -40,8 +61,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let scriptPath = "\(installDir)/ensure-usage-widget.sh"
         guard FileManager.default.fileExists(atPath: scriptPath) else {
             isStartingWidget = false
-            showAlert(message: "Codex Usage Widget 尚未安装",
-                      info: "请先在插件目录执行 bash scripts/install.sh。")
+            showAlert(message: language.notInstalled, info: language.installHint)
             return
         }
 
@@ -58,7 +78,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         } catch {
             isStartingWidget = false
-            showAlert(message: "启动失败", info: error.localizedDescription)
+            showAlert(message: language.launchFailed, info: error.localizedDescription)
         }
     }
 
