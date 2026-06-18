@@ -251,7 +251,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         versionLabel.frame = NSRect(x: w - 82, y: 8, width: 68, height: 16)
         versionLabel.autoresizingMask = [.minXMargin, .maxYMargin]
         versionLabel.alignment = .right
-        versionLabel.font = NSFont.monospacedSystemFont(ofSize: 10, weight: .regular)
+        versionLabel.font = NSFont.monospacedSystemFont(ofSize: 9, weight: .regular)
         versionLabel.textColor = secondaryTextColor
         versionLabel.backgroundColor = NSColor.clear
         versionLabel.isBezeled = false
