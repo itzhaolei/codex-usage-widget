@@ -12,6 +12,7 @@ Uma janela flutuante para macOS que mostra o uso de 5 horas, o uso semanal e as 
 - Acompanha o ciclo de vida do Codex Desktop.
 - Lembra posição, tema e estado fixado.
 - Mantém apenas um HUD e um lançador no Dock.
+- Adiciona ações de menu para atualizar, desinstalar e trocar idioma.
 - Suporta tema claro e escuro.
 - Segue automaticamente o idioma do sistema.
 

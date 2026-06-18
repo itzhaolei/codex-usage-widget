@@ -12,6 +12,7 @@ Ein schwebendes macOS-Fenster zum Anzeigen des Codex 5-Stunden-Limits, des Woche
 - Folgt dem Lebenszyklus der Codex-Desktop-App.
 - Speichert Fensterposition, Theme und Anheftstatus.
 - Hält jeweils nur ein HUD und einen Dock-Launcher aktiv.
+- Bietet Menüaktionen für Updates, Deinstallation und Sprachwechsel.
 - Unterstützt dunkles und helles Theme.
 - Folgt automatisch der Systemsprache.
 

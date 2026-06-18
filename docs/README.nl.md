@@ -12,6 +12,7 @@ Een zwevend macOS-venster voor Codex-gebruik over 5 uur, weekgebruik en beschikb
 - Volgt de levenscyclus van Codex Desktop.
 - Onthoudt positie, thema en vastzetstatus.
 - Houdt slechts één HUD en één Dock-launcher actief.
+- Biedt menuacties voor bijwerken, verwijderen en taal wisselen.
 - Ondersteunt donker en licht thema.
 - Volgt automatisch de systeemtaal.
 

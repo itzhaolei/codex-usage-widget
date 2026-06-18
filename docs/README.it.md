@@ -12,6 +12,7 @@ Una finestra flottante per macOS che mostra l’uso Codex su 5 ore, l’uso sett
 - Segue il ciclo di vita di Codex Desktop.
 - Ricorda posizione, tema e stato fissato.
 - Mantiene un solo HUD e un solo launcher Dock.
+- Aggiunge azioni di menu per aggiornare, disinstallare e cambiare lingua.
 - Supporta tema chiaro e scuro.
 - Segue automaticamente la lingua di sistema.
 

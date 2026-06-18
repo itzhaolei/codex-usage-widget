@@ -9,6 +9,7 @@ All notable changes to Codex Usage Widget are documented here.
 - Added a macOS floating quota HUD for Codex Desktop.
 - Added 5-hour, weekly, and reset-credit quota display.
 - Added a small version label in the widget's bottom-right corner.
+- Added menu-bar actions for checking updates, uninstalling with confirmation, and switching languages.
 - Added once-per-second refresh with local snapshot updates.
 - Added dark and light modes, pin/unpin, close controls, and saved window position.
 - Added a Dock launcher app with a Codex icon and single-instance behavior.

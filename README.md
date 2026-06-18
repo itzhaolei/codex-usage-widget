@@ -14,6 +14,7 @@ A local macOS floating widget for watching Codex usage limits without opening se
 - Remembers position, theme, and pinned state.
 - Keeps only one HUD and one Dock launcher instance running.
 - Includes a Dock launcher app.
+- Adds menu-bar actions for updates, uninstall, and language switching.
 - Supports dark and light themes.
 - Automatically follows the system language.
 
