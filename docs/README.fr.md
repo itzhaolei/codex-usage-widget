@@ -19,9 +19,9 @@ Une fenêtre flottante macOS pour afficher l’usage Codex sur 5 heures, l’usa
 
 ### Méthode 1 : installateur d’application
 
-Si vous ne souhaitez pas utiliser Terminal, téléchargez l’installateur depuis la page des releases :
+Si vous ne souhaitez pas utiliser Terminal, ouvrez la dernière page de release et téléchargez-y l’installateur :
 
-[Télécharger CodexUsageWidget-1.0.0-Installer.zip](https://github.com/itzhaolei/codex-usage-widget/releases/download/v1.0.0/CodexUsageWidget-1.0.0-Installer.zip)
+[Ouvrir la dernière page de release](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Décompressez-le, puis double-cliquez sur `Install Codex Usage Widget.app`. Codex Desktop doit déjà être installé et connecté.
 

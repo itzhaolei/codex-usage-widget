@@ -19,9 +19,9 @@ Uma janela flutuante para macOS que mostra o uso de 5 horas, o uso semanal e as 
 
 ### Método 1: instalador do app
 
-Se você não quiser usar o Terminal, baixe o instalador na página de releases:
+Se você não quiser usar o Terminal, abra a página da versão mais recente e baixe o instalador ali:
 
-[Baixar CodexUsageWidget-1.0.0-Installer.zip](https://github.com/itzhaolei/codex-usage-widget/releases/download/v1.0.0/CodexUsageWidget-1.0.0-Installer.zip)
+[Abrir a página da versão mais recente](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Descompacte e dê dois cliques em `Install Codex Usage Widget.app`. O Codex Desktop deve estar instalado e com login feito.
 

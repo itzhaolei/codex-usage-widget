@@ -28,6 +28,7 @@ All notable changes to Codex Usage Widget are documented here.
 - Fixed layout collapse when quota fields are missing.
 - Fixed installer-launched apps being translocated by macOS quarantine, which could make the background watcher repeatedly reopen the widget and briefly steal keyboard focus.
 - Fixed README installation sections to clearly separate app installer, one-line command, and local install methods across all supported languages.
+- Fixed README installer links to point to the latest release page instead of a version-specific installer asset.
 
 ### Notes
 

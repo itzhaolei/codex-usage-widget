@@ -19,9 +19,9 @@ Una finestra flottante per macOS che mostra l’uso Codex su 5 ore, l’uso sett
 
 ### Metodo 1: installer app
 
-Se non vuoi usare il Terminale, scarica l’installer dalla pagina delle release:
+Se non vuoi usare il Terminale, apri la pagina dell’ultima release e scarica da lì l’installer:
 
-[Scarica CodexUsageWidget-1.0.0-Installer.zip](https://github.com/itzhaolei/codex-usage-widget/releases/download/v1.0.0/CodexUsageWidget-1.0.0-Installer.zip)
+[Apri la pagina dell’ultima release](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Decomprimi il file e fai doppio clic su `Install Codex Usage Widget.app`. Codex Desktop deve essere già installato e con accesso effettuato.
 

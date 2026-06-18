@@ -21,9 +21,9 @@ A local macOS floating widget for watching Codex usage limits without opening se
 
 ### Method 1: App Installer
 
-For users who do not want to use Terminal, download the latest installer from the Release page:
+For users who do not want to use Terminal, open the latest release page and download the installer asset:
 
-[Download CodexUsageWidget-1.0.0-Installer.zip](https://github.com/itzhaolei/codex-usage-widget/releases/download/v1.0.0/CodexUsageWidget-1.0.0-Installer.zip)
+[Open the latest release page](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Unzip it, then double-click `Install Codex Usage Widget.app`. The installer copies the prebuilt widget and Dock launcher, registers the background launch agent, adds the launcher to Dock, and opens the widget.
 

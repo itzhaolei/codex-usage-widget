@@ -19,9 +19,9 @@ Een zwevend macOS-venster voor Codex-gebruik over 5 uur, weekgebruik en beschikb
 
 ### Methode 1: app-installer
 
-Als je Terminal niet wilt gebruiken, download dan de installer vanaf de releasepagina:
+Als je Terminal niet wilt gebruiken, open dan de nieuwste releasepagina en download daar de installer:
 
-[Download CodexUsageWidget-1.0.0-Installer.zip](https://github.com/itzhaolei/codex-usage-widget/releases/download/v1.0.0/CodexUsageWidget-1.0.0-Installer.zip)
+[Open de nieuwste releasepagina](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Pak het bestand uit en dubbelklik op `Install Codex Usage Widget.app`. Codex Desktop moet al geïnstalleerd zijn en aangemeld zijn.
 

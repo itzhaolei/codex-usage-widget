@@ -19,9 +19,9 @@
 
 ### 方式一：通过安装器安装
 
-如果不想使用终端命令，可以直接从 Release 页面下载安装器：
+如果不想使用终端命令，可以打开最新版本发布页面，然后下载其中的安装器附件：
 
-[下载 CodexUsageWidget-1.0.0-Installer.zip](https://github.com/itzhaolei/codex-usage-widget/releases/download/v1.0.0/CodexUsageWidget-1.0.0-Installer.zip)
+[打开最新版本发布页面](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 解压后，双击 `Install Codex Usage Widget.app` 即可安装。安装器会复制预编译好的悬浮窗和 Dock 启动器，注册后台自启动任务，把启动器放入 Dock，并打开工具。
 

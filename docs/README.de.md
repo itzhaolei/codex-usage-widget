@@ -19,9 +19,9 @@ Ein schwebendes macOS-Fenster zum Anzeigen des Codex 5-Stunden-Limits, des Woche
 
 ### Methode 1: App-Installer
 
-Wenn Sie Terminal nicht verwenden möchten, laden Sie den Installer von der Release-Seite herunter:
+Wenn Sie Terminal nicht verwenden möchten, öffnen Sie die neueste Release-Seite und laden Sie dort den Installer-Anhang herunter:
 
-[CodexUsageWidget-1.0.0-Installer.zip herunterladen](https://github.com/itzhaolei/codex-usage-widget/releases/download/v1.0.0/CodexUsageWidget-1.0.0-Installer.zip)
+[Neueste Release-Seite öffnen](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Entpacken Sie die Datei und doppelklicken Sie auf `Install Codex Usage Widget.app`. Codex Desktop sollte bereits installiert und angemeldet sein.
 
