@@ -5,6 +5,7 @@ CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 INSTALL_DIR="$CODEX_HOME/usage-widget"
 WIDGET_APP="$INSTALL_DIR/UsageWidget.app"
 WIDGET_EXE="$INSTALL_DIR/UsageWidget.app/Contents/MacOS/UsageWidget"
+WIDGET_PATTERN="UsageWidget.app/Contents/MacOS/UsageWidget"
 SNAPSHOT_SCRIPT="$CODEX_HOME/scripts/codex-usage-snapshot.mjs"
 SNAPSHOT_PATH="$CODEX_HOME/codex-usage-snapshot.json"
 LAUNCH_PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/sbin:/usr/sbin"
@@ -19,12 +20,12 @@ run_snapshot() {
 }
 
 rm -f "$INSTALL_DIR/.closed-by-user"
-pkill -f "$WIDGET_EXE" >/dev/null 2>&1 || true
+pkill -f "$WIDGET_PATTERN" >/dev/null 2>&1 || true
 sleep 0.3
 
 run_snapshot
 
 touch "$WIDGET_APP"
-open "$WIDGET_APP"
+open -g "$WIDGET_APP"
 
 echo "Codex Usage Widget restarted."

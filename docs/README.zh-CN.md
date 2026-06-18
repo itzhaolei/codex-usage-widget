@@ -15,7 +15,9 @@
 - 支持深色和浅色模式。
 - 自动跟随系统语言。
 
-## 通过安装器安装
+## 安装
+
+### 方式一：通过安装器安装
 
 如果不想使用终端命令，可以直接从 Release 页面下载安装器：
 
@@ -25,13 +27,13 @@
 
 使用前需要已经安装并登录 Codex Desktop。安装完成后，工具会读取当前用户本机的 Codex 配额数据并自动显示。
 
-## 一行安装
+### 方式二：一行命令安装
 
 ```bash
 CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"
 ```
 
-## 本地安装
+### 方式三：本地安装
 
 ```bash
 bash scripts/install.sh

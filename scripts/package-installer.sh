@@ -142,6 +142,8 @@ LAUNCHER_APP="$USER_APPS_DIR/Codex Usage Widget.app"
 LAUNCH_AGENT_DIR="$HOME/Library/LaunchAgents"
 LAUNCH_AGENT="$LAUNCH_AGENT_DIR/com.codex.usage-widget.autostart.plist"
 LABEL="com.codex.usage-widget.autostart"
+WIDGET_PATTERN="UsageWidget.app/Contents/MacOS/UsageWidget"
+LAUNCHER_PATTERN="Codex Usage Widget.app/Contents/MacOS/Codex Usage Widget"
 
 dedupe_dock_launcher() {
     /usr/bin/python3 - "$LAUNCHER_APP" <<'PY'
@@ -221,8 +223,8 @@ PY
 
 mkdir -p "$INSTALL_DIR" "$SCRIPTS_DIR" "$USER_APPS_DIR" "$LAUNCH_AGENT_DIR"
 
-pkill -f "$INSTALL_DIR/UsageWidget.app/Contents/MacOS/UsageWidget" >/dev/null 2>&1 || true
-pkill -f "$LAUNCHER_APP/Contents/MacOS/Codex Usage Widget" >/dev/null 2>&1 || true
+pkill -f "$WIDGET_PATTERN" >/dev/null 2>&1 || true
+pkill -f "$LAUNCHER_PATTERN" >/dev/null 2>&1 || true
 
 cp "$PAYLOAD_DIR/scripts/codex-usage-snapshot.mjs" "$SCRIPTS_DIR/codex-usage-snapshot.mjs"
 cp "$PAYLOAD_DIR/scripts/ensure-usage-widget.sh" "$INSTALL_DIR/ensure-usage-widget.sh"
@@ -236,6 +238,7 @@ rm -rf "$INSTALL_DIR/UsageWidget.app" "$LAUNCHER_APP"
 cp -R "$PAYLOAD_DIR/apps/UsageWidget.app" "$INSTALL_DIR/UsageWidget.app"
 cp -R "$PAYLOAD_DIR/apps/Codex Usage Widget.app" "$LAUNCHER_APP"
 chmod +x "$INSTALL_DIR/UsageWidget.app/Contents/MacOS/UsageWidget" "$LAUNCHER_APP/Contents/MacOS/Codex Usage Widget"
+xattr -dr com.apple.quarantine "$INSTALL_DIR/UsageWidget.app" "$LAUNCHER_APP" >/dev/null 2>&1 || true
 
 cat > "$LAUNCH_AGENT" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -268,7 +271,7 @@ launchctl kickstart -k "gui/$(id -u)/$LABEL" >/dev/null 2>&1 || true
 rm -f "$INSTALL_DIR/.closed-by-user"
 bash "$INSTALL_DIR/ensure-usage-widget.sh" >/dev/null 2>&1 || true
 dedupe_dock_launcher
-open "$LAUNCHER_APP" >/dev/null 2>&1 || true
+open -g "$LAUNCHER_APP" >/dev/null 2>&1 || true
 
 echo "Codex Usage Widget installed."
 echo "Dock launcher: $LAUNCHER_APP"

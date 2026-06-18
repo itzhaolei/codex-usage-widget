@@ -22,7 +22,7 @@ func launcherLanguage() -> LauncherLanguage {
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let installDir = NSString(string: "~/.codex/usage-widget").expandingTildeInPath
-    private let widgetExecutablePath = NSString(string: "~/.codex/usage-widget/UsageWidget.app/Contents/MacOS/UsageWidget").expandingTildeInPath
+    private let widgetExecutablePattern = "UsageWidget.app/Contents/MacOS/UsageWidget"
     private let launcherBundleIdentifier = "local.codex.usage-widget.launcher"
     private let widgetBundleIdentifier = "local.codex.usage-widget"
     private let language = launcherLanguage()
@@ -33,6 +33,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var isExitingAfterWidgetClosed = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        let previouslyActiveApp = NSWorkspace.shared.frontmostApplication
         if activateExistingLauncherIfNeeded() {
             isExitingAfterWidgetClosed = true
             NSApp.terminate(nil)
@@ -42,6 +43,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.regular)
         startWidget()
         startMonitoringWidget()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            previouslyActiveApp?.activate(options: [])
+        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -62,9 +66,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let markerPath = "\(installDir)/.closed-by-user"
         try? FileManager.default.removeItem(atPath: markerPath)
 
-        let restartPath = "\(installDir)/restart.sh"
         let ensurePath = "\(installDir)/ensure-usage-widget.sh"
-        let scriptPath = FileManager.default.fileExists(atPath: restartPath) ? restartPath : ensurePath
+        let scriptPath = ensurePath
         guard FileManager.default.fileExists(atPath: scriptPath) else {
             isStartingWidget = false
             showAlert(message: language.notInstalled, info: language.installHint)
@@ -120,7 +123,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if !NSRunningApplication.runningApplications(withBundleIdentifier: widgetBundleIdentifier).isEmpty {
             return true
         }
-        return processExists(matching: widgetExecutablePath)
+        return processExists(matching: widgetExecutablePattern)
     }
 
     private func closeWidgetFromLauncher() {
@@ -159,7 +162,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func terminateWidgetByPath(force: Bool) {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
-        process.arguments = force ? ["-9", "-f", widgetExecutablePath] : ["-f", widgetExecutablePath]
+        process.arguments = force ? ["-9", "-f", widgetExecutablePattern] : ["-f", widgetExecutablePattern]
         process.standardOutput = Pipe()
         process.standardError = Pipe()
         try? process.run()

@@ -181,6 +181,8 @@ cat > "$LAUNCHER_APP/Contents/Info.plist" <<'PLIST'
 </plist>
 PLIST
 
+xattr -dr com.apple.quarantine "$APP_DIR" "$LAUNCHER_APP" >/dev/null 2>&1 || true
+
 cat > "$LAUNCH_AGENT" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -216,7 +218,7 @@ if [ "$PIN_TO_DOCK" != "0" ]; then
     dedupe_dock_launcher
 fi
 
-open "$LAUNCHER_APP" >/dev/null 2>&1 || true
+open -g "$LAUNCHER_APP" >/dev/null 2>&1 || true
 
 echo "Codex Usage Widget installed."
 echo "Dock launcher: $LAUNCHER_APP"

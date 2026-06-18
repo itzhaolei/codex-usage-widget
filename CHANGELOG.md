@@ -26,6 +26,8 @@ All notable changes to Codex Usage Widget are documented here.
 - Fixed countdown formatting to avoid `0 seconds` and to use natural localized time text.
 - Fixed quota percentage regressions where remaining usage could briefly increase because of older events.
 - Fixed layout collapse when quota fields are missing.
+- Fixed installer-launched apps being translocated by macOS quarantine, which could make the background watcher repeatedly reopen the widget and briefly steal keyboard focus.
+- Fixed README installation sections to clearly separate app installer, one-line command, and local install methods across all supported languages.
 
 ### Notes
 

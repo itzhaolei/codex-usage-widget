@@ -15,13 +15,23 @@ Une fenêtre flottante macOS pour afficher l’usage Codex sur 5 heures, l’usa
 - Prend en charge les thèmes clair et sombre.
 - Suit automatiquement la langue du système.
 
-## Installation en une ligne
+## Installation
+
+### Méthode 1 : installateur d’application
+
+Si vous ne souhaitez pas utiliser Terminal, téléchargez l’installateur depuis la page des releases :
+
+[Télécharger CodexUsageWidget-1.0.0-Installer.zip](https://github.com/itzhaolei/codex-usage-widget/releases/download/v1.0.0/CodexUsageWidget-1.0.0-Installer.zip)
+
+Décompressez-le, puis double-cliquez sur `Install Codex Usage Widget.app`. Codex Desktop doit déjà être installé et connecté.
+
+### Méthode 2 : installation en une ligne
 
 ```bash
 CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"
 ```
 
-## Installation locale
+### Méthode 3 : installation locale
 
 ```bash
 bash scripts/install.sh

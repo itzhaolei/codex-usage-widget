@@ -6,6 +6,7 @@ CODEX_EXE="/Applications/Codex.app/Contents/MacOS/Codex"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 WIDGET_APP="$SCRIPT_DIR/UsageWidget.app"
 WIDGET_EXE="$WIDGET_APP/Contents/MacOS/UsageWidget"
+WIDGET_PATTERN="UsageWidget.app/Contents/MacOS/UsageWidget"
 CLOSED_MARKER="$SCRIPT_DIR/.closed-by-user"
 LOCK_DIR="/tmp/codex-usage-widget.ensure.lock"
 SNAPSHOT_SCRIPT="$CODEX_HOME/scripts/codex-usage-snapshot.mjs"
@@ -23,11 +24,11 @@ codex_running() {
 }
 
 widget_running() {
-    ps ax -o command= | grep -Fx "$WIDGET_EXE" >/dev/null 2>&1
+    pgrep -f "$WIDGET_PATTERN" >/dev/null 2>&1
 }
 
 widget_pids() {
-    pgrep -f "$WIDGET_EXE" 2>/dev/null | sort -n
+    pgrep -f "$WIDGET_PATTERN" 2>/dev/null | sort -n
 }
 
 keep_single_widget() {
@@ -65,7 +66,7 @@ if codex_running; then
         run_snapshot
         touch "$WIDGET_APP"
         if ! widget_running; then
-            open "$WIDGET_APP"
+            open -g "$WIDGET_APP"
         fi
     fi
 else
