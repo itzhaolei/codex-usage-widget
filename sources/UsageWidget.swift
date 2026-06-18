@@ -174,6 +174,7 @@ func progressBar(percent: Int, width: Int = 15) -> String {
 // MARK: — 主窗口控制器
 class WindowController: NSWindowController, NSWindowDelegate {
     var label: NSTextView!
+    var versionLabel: NSTextField!
     var rootView: NSView!
     var vibrancyView: NSVisualEffectView!
     var capsuleView: NSView!
@@ -245,6 +246,18 @@ class WindowController: NSWindowController, NSWindowDelegate {
         label.textContainer?.lineFragmentPadding = 0
         label.backgroundColor = NSColor.clear
         rootView.addSubview(label)
+
+        versionLabel = NSTextField(labelWithString: appVersionText())
+        versionLabel.frame = NSRect(x: w - 82, y: 8, width: 68, height: 16)
+        versionLabel.autoresizingMask = [.minXMargin, .maxYMargin]
+        versionLabel.alignment = .right
+        versionLabel.font = NSFont.monospacedSystemFont(ofSize: 12, weight: .semibold)
+        versionLabel.textColor = secondaryTextColor
+        versionLabel.backgroundColor = NSColor.clear
+        versionLabel.isBezeled = false
+        versionLabel.isEditable = false
+        versionLabel.isSelectable = false
+        rootView.addSubview(versionLabel)
 
         let controls = makeControlCapsule(frame: NSRect(x: w - 125, y: h - 38, width: 111, height: 28))
         controls.autoresizingMask = [.minXMargin, .minYMargin]
@@ -367,6 +380,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         for button in controlButtons {
             button.contentTintColor = controlTintColor
         }
+        versionLabel?.textColor = secondaryTextColor
         if let image = NSImage(systemSymbolName: isLightMode ? "moon.fill" : "sun.max.fill", accessibilityDescription: nil) {
             image.isTemplate = true
             themeButton?.image = image
@@ -622,6 +636,12 @@ class WindowController: NSWindowController, NSWindowDelegate {
 func remainingPercent(fromUsedPercent usedPercent: Int?) -> Int {
     guard let usedPercent else { return -1 }
     return 100 - max(0, min(100, usedPercent))
+}
+
+func appVersionText() -> String {
+    let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    let value = version?.trimmingCharacters(in: .whitespacesAndNewlines)
+    return "v\((value?.isEmpty == false ? value : nil) ?? "1.0.0")"
 }
 
 // MARK: — App Delegate
