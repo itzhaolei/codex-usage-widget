@@ -11,6 +11,7 @@ const searchDirs = [
 ];
 const outputPath = process.argv[2] || path.join(codexHome, "codex-usage-snapshot.json");
 const resetCreditsCachePath = path.join(codexHome, "codex-rate-limit-reset-credits-cache.json");
+const accountStatePath = path.join(codexHome, "codex-usage-account-state.json");
 const resetCreditsEndpoint = "https://chatgpt.com/backend-api/wham/rate-limit-reset-credits";
 const resetCreditsCacheTtlMs = 30_000;
 const auth = readJson(path.join(codexHome, "auth.json"));
@@ -139,6 +140,29 @@ function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+function readAccountState(existingSnapshot) {
+  const state = readJson(accountStatePath);
+  const hasExistingSnapshot = existingSnapshot && typeof existingSnapshot === "object";
+  const stateFingerprint = state?.account_fingerprint ?? null;
+  const stateMissing = typeof stateFingerprint !== "string";
+  const accountChanged = stateMissing
+    ? hasExistingSnapshot
+    : stateFingerprint !== currentAccountFingerprint;
+  const rateLimitsAfterMs = accountChanged
+    ? Date.now()
+    : typeof state?.rate_limits_after_ms === "number"
+      ? state.rate_limits_after_ms
+      : 0;
+
+  writeJson(accountStatePath, {
+    account_fingerprint: currentAccountFingerprint,
+    rate_limits_after_ms: rateLimitsAfterMs,
+    observed_at: new Date().toISOString(),
+  });
+
+  return { accountChanged, rateLimitsAfterMs };
+}
+
 function sameAccountFingerprint(value) {
   if (value == null && currentAccountFingerprint == null) return true;
   return value === currentAccountFingerprint;
@@ -259,13 +283,15 @@ async function fetchResetCredits() {
 }
 
 const existingSnapshot = readJson(outputPath);
-const existingSameAccount = snapshotMatchesCurrentAccount(existingSnapshot);
+const accountState = readAccountState(existingSnapshot);
+const existingSameAccount = !accountState.accountChanged && snapshotMatchesCurrentAccount(existingSnapshot);
 
 let latestLimits = null;
 let latestStaleLimits = null;
 for (const filePath of listJsonlFiles(searchDirs)) {
   const limits = readLatestRateLimits(filePath);
   if (!limits) continue;
+  if (accountState.rateLimitsAfterMs > 0 && limits.timestampMs < accountState.rateLimitsAfterMs) continue;
 
   const isFreshForCurrentLogin = !(Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 && limits.timestampMs < authLastRefreshMs);
   if (!isFreshForCurrentLogin) {
