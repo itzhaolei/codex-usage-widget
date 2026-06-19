@@ -175,10 +175,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appItem.submenu = appMenu
         mainMenu.addItem(appItem)
 
-        appMenu.addItem(NSMenuItem(title: language.update, action: #selector(updateToLatestVersion), keyEquivalent: ""))
-        appMenu.addItem(NSMenuItem(title: language.uninstall, action: #selector(confirmUninstall), keyEquivalent: ""))
-        appMenu.addItem(.separator())
-
         let languageItem = NSMenuItem(title: language.language, action: nil, keyEquivalent: "")
         let languageMenu = NSMenu(title: language.language)
         languageItem.submenu = languageMenu
@@ -197,6 +193,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             item.state = selected == entry.code ? .on : .off
             languageMenu.addItem(item)
         }
+
+        appMenu.addItem(NSMenuItem(title: language.update, action: #selector(updateToLatestVersion), keyEquivalent: ""))
+        appMenu.addItem(.separator())
+        appMenu.addItem(NSMenuItem(title: language.uninstall, action: #selector(confirmUninstall), keyEquivalent: ""))
 
         NSApp.mainMenu = mainMenu
     }
