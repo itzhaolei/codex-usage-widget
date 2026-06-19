@@ -31,6 +31,11 @@ All notable changes to Codex Usage Widget are documented here.
 - Fixed installer-launched apps being translocated by macOS quarantine, which could make the background watcher repeatedly reopen the widget and briefly steal keyboard focus.
 - Fixed README installation sections to clearly separate app installer, one-line command, and local install methods across all supported languages.
 - Fixed README installer links to point to the latest release page instead of a version-specific installer asset.
+- Fixed the update action so it does not reinstall when the installed version is already the latest release.
+- Fixed the update status popup so it changes to success, already-latest, or failure instead of staying on the downloading state.
+- Fixed HUD clicks so they activate the Dock launcher menu, matching the behavior of clicking the Dock icon.
+- Fixed reset-time text rows to stay on one line and ellipsize when the text is too long.
+- Fixed the title row so it stays clear of the control capsule and ellipsizes instead of wrapping.
 
 ### Notes
 

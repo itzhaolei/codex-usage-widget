@@ -23,6 +23,10 @@ struct LauncherLanguage {
     let followSystem: String
     let updateStarted: String
     let updateStartedInfo: String
+    let upToDate: String
+    let upToDateInfo: String
+    let updateSucceeded: String
+    let updateSucceededInfo: String
     let updateFailed: String
     let uninstallTitle: String
     let uninstallMessage: String
@@ -75,52 +79,52 @@ func launcherLanguage() -> LauncherLanguage {
     case "zh":
         return LauncherLanguage(notInstalled: "Codex Usage Widget 尚未安装", installHint: "请先安装或重新运行安装器。", launchFailed: "启动失败",
             update: "版本更新", uninstall: "卸载", language: "语言", followSystem: "跟随系统",
-            updateStarted: "正在更新", updateStartedInfo: "正在下载并安装最新版本。", updateFailed: "更新失败",
+            updateStarted: "正在更新", updateStartedInfo: "正在下载并安装最新版本。", upToDate: "已是最新版本", upToDateInfo: "当前安装的版本已经是最新版本。", updateSucceeded: "更新成功", updateSucceededInfo: "已安装最新版本。", updateFailed: "更新失败",
             uninstallTitle: "卸载 Codex Usage Widget？", uninstallMessage: "这会关闭窗口并移除启动器、后台任务和本地安装文件。", cancel: "取消", confirmUninstall: "卸载")
     case "ja":
         return LauncherLanguage(notInstalled: "Codex Usage Widget は未インストールです", installHint: "インストーラーを再実行してください。", launchFailed: "起動に失敗しました",
             update: "アップデート", uninstall: "アンインストール", language: "言語", followSystem: "システムに合わせる",
-            updateStarted: "更新中", updateStartedInfo: "最新バージョンをダウンロードしてインストールしています。", updateFailed: "更新に失敗しました",
+            updateStarted: "更新中", updateStartedInfo: "最新バージョンをダウンロードしてインストールしています。", upToDate: "最新バージョンです", upToDateInfo: "現在インストールされているバージョンは最新です。", updateSucceeded: "更新完了", updateSucceededInfo: "最新バージョンがインストールされました。", updateFailed: "更新に失敗しました",
             uninstallTitle: "Codex Usage Widget をアンインストールしますか？", uninstallMessage: "ウィンドウ、ランチャー、バックグラウンドタスク、ローカルファイルを削除します。", cancel: "キャンセル", confirmUninstall: "アンインストール")
     case "ko":
         return LauncherLanguage(notInstalled: "Codex Usage Widget가 설치되지 않았습니다", installHint: "설치 프로그램을 다시 실행하세요.", launchFailed: "시작 실패",
             update: "버전 업데이트", uninstall: "제거", language: "언어", followSystem: "시스템 따르기",
-            updateStarted: "업데이트 중", updateStartedInfo: "최신 버전을 다운로드하고 설치하는 중입니다.", updateFailed: "업데이트 실패",
+            updateStarted: "업데이트 중", updateStartedInfo: "최신 버전을 다운로드하고 설치하는 중입니다.", upToDate: "최신 버전입니다", upToDateInfo: "현재 설치된 버전이 최신 버전입니다.", updateSucceeded: "업데이트 완료", updateSucceededInfo: "최신 버전이 설치되었습니다.", updateFailed: "업데이트 실패",
             uninstallTitle: "Codex Usage Widget을 제거할까요?", uninstallMessage: "창, 런처, 백그라운드 작업 및 로컬 설치 파일을 제거합니다.", cancel: "취소", confirmUninstall: "제거")
     case "de":
         return LauncherLanguage(notInstalled: "Codex Usage Widget ist nicht installiert", installHint: "Führen Sie den Installer erneut aus.", launchFailed: "Start fehlgeschlagen",
             update: "Update", uninstall: "Deinstallieren", language: "Sprache", followSystem: "System folgen",
-            updateStarted: "Update läuft", updateStartedInfo: "Die neueste Version wird heruntergeladen und installiert.", updateFailed: "Update fehlgeschlagen",
+            updateStarted: "Update läuft", updateStartedInfo: "Die neueste Version wird heruntergeladen und installiert.", upToDate: "Bereits aktuell", upToDateInfo: "Die installierte Version ist bereits die neueste.", updateSucceeded: "Update abgeschlossen", updateSucceededInfo: "Die neueste Version wurde installiert.", updateFailed: "Update fehlgeschlagen",
             uninstallTitle: "Codex Usage Widget deinstallieren?", uninstallMessage: "Fenster, Launcher, Hintergrundaufgabe und lokale Dateien werden entfernt.", cancel: "Abbrechen", confirmUninstall: "Deinstallieren")
     case "fr":
         return LauncherLanguage(notInstalled: "Codex Usage Widget n’est pas installé", installHint: "Relancez l’installateur.", launchFailed: "Échec du lancement",
             update: "Mettre à jour", uninstall: "Désinstaller", language: "Langue", followSystem: "Suivre le système",
-            updateStarted: "Mise à jour", updateStartedInfo: "Téléchargement et installation de la dernière version.", updateFailed: "Échec de la mise à jour",
+            updateStarted: "Mise à jour", updateStartedInfo: "Téléchargement et installation de la dernière version.", upToDate: "Déjà à jour", upToDateInfo: "La version installée est déjà la plus récente.", updateSucceeded: "Mise à jour terminée", updateSucceededInfo: "La dernière version a été installée.", updateFailed: "Échec de la mise à jour",
             uninstallTitle: "Désinstaller Codex Usage Widget ?", uninstallMessage: "La fenêtre, le lanceur, la tâche d’arrière-plan et les fichiers locaux seront supprimés.", cancel: "Annuler", confirmUninstall: "Désinstaller")
     case "es":
         return LauncherLanguage(notInstalled: "Codex Usage Widget no está instalado", installHint: "Vuelve a ejecutar el instalador.", launchFailed: "Error al iniciar",
             update: "Actualizar versión", uninstall: "Desinstalar", language: "Idioma", followSystem: "Seguir sistema",
-            updateStarted: "Actualizando", updateStartedInfo: "Descargando e instalando la versión más reciente.", updateFailed: "Error al actualizar",
+            updateStarted: "Actualizando", updateStartedInfo: "Descargando e instalando la versión más reciente.", upToDate: "Ya está actualizado", upToDateInfo: "La versión instalada ya es la más reciente.", updateSucceeded: "Actualización completada", updateSucceededInfo: "Se instaló la versión más reciente.", updateFailed: "Error al actualizar",
             uninstallTitle: "¿Desinstalar Codex Usage Widget?", uninstallMessage: "Se eliminarán la ventana, el lanzador, la tarea en segundo plano y los archivos locales.", cancel: "Cancelar", confirmUninstall: "Desinstalar")
     case "pt":
         return LauncherLanguage(notInstalled: "Codex Usage Widget não está instalado", installHint: "Execute o instalador novamente.", launchFailed: "Falha ao iniciar",
             update: "Atualizar versão", uninstall: "Desinstalar", language: "Idioma", followSystem: "Seguir sistema",
-            updateStarted: "Atualizando", updateStartedInfo: "Baixando e instalando a versão mais recente.", updateFailed: "Falha na atualização",
+            updateStarted: "Atualizando", updateStartedInfo: "Baixando e instalando a versão mais recente.", upToDate: "Já está atualizado", upToDateInfo: "A versão instalada já é a mais recente.", updateSucceeded: "Atualização concluída", updateSucceededInfo: "A versão mais recente foi instalada.", updateFailed: "Falha na atualização",
             uninstallTitle: "Desinstalar Codex Usage Widget?", uninstallMessage: "A janela, o lançador, a tarefa em segundo plano e os arquivos locais serão removidos.", cancel: "Cancelar", confirmUninstall: "Desinstalar")
     case "it":
         return LauncherLanguage(notInstalled: "Codex Usage Widget non è installato", installHint: "Esegui di nuovo l’installer.", launchFailed: "Avvio non riuscito",
             update: "Aggiorna versione", uninstall: "Disinstalla", language: "Lingua", followSystem: "Segui sistema",
-            updateStarted: "Aggiornamento", updateStartedInfo: "Download e installazione dell’ultima versione.", updateFailed: "Aggiornamento non riuscito",
+            updateStarted: "Aggiornamento", updateStartedInfo: "Download e installazione dell’ultima versione.", upToDate: "Già aggiornato", upToDateInfo: "La versione installata è già la più recente.", updateSucceeded: "Aggiornamento completato", updateSucceededInfo: "È stata installata la versione più recente.", updateFailed: "Aggiornamento non riuscito",
             uninstallTitle: "Disinstallare Codex Usage Widget?", uninstallMessage: "La finestra, il launcher, l’attività in background e i file locali saranno rimossi.", cancel: "Annulla", confirmUninstall: "Disinstalla")
     case "nl":
         return LauncherLanguage(notInstalled: "Codex Usage Widget is niet geïnstalleerd", installHint: "Voer de installer opnieuw uit.", launchFailed: "Starten mislukt",
             update: "Versie bijwerken", uninstall: "Verwijderen", language: "Taal", followSystem: "Systeem volgen",
-            updateStarted: "Bijwerken", updateStartedInfo: "De nieuwste versie wordt gedownload en geïnstalleerd.", updateFailed: "Bijwerken mislukt",
+            updateStarted: "Bijwerken", updateStartedInfo: "De nieuwste versie wordt gedownload en geïnstalleerd.", upToDate: "Al bijgewerkt", upToDateInfo: "De geïnstalleerde versie is al de nieuwste.", updateSucceeded: "Bijwerken voltooid", updateSucceededInfo: "De nieuwste versie is geïnstalleerd.", updateFailed: "Bijwerken mislukt",
             uninstallTitle: "Codex Usage Widget verwijderen?", uninstallMessage: "Het venster, de launcher, achtergrondtaak en lokale bestanden worden verwijderd.", cancel: "Annuleren", confirmUninstall: "Verwijderen")
     default:
         return LauncherLanguage(notInstalled: "Codex Usage Widget is not installed", installHint: "Run the installer again.", launchFailed: "Launch failed",
             update: "Check for Updates", uninstall: "Uninstall", language: "Language", followSystem: "Follow System",
-            updateStarted: "Updating", updateStartedInfo: "Downloading and installing the latest version.", updateFailed: "Update failed",
+            updateStarted: "Updating", updateStartedInfo: "Downloading and installing the latest version.", upToDate: "Already up to date", upToDateInfo: "The installed version is already the latest version.", updateSucceeded: "Update complete", updateSucceededInfo: "The latest version has been installed.", updateFailed: "Update failed",
             uninstallTitle: "Uninstall Codex Usage Widget?", uninstallMessage: "This will close the widget and remove the launcher, background task, and local install files.", cancel: "Cancel", confirmUninstall: "Uninstall")
     }
 }
@@ -136,6 +140,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var hasObservedWidget = false
     private var startGraceUntil = Date.distantPast
     private var isExitingAfterWidgetClosed = false
+    private var updateStatusWindow: NSWindow?
+    private var updateTitleLabel: NSTextField?
+    private var updateInfoLabel: NSTextField?
+    private var updateDoneButton: NSButton?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let previouslyActiveApp = NSWorkspace.shared.frontmostApplication
@@ -212,6 +220,57 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return item
     }
 
+    private func showUpdateStatus(message: String, info: String, isFinal: Bool) {
+        if updateStatusWindow == nil {
+            let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 360, height: 132),
+                styleMask: [.titled, .closable],
+                backing: .buffered,
+                defer: false
+            )
+            window.title = language.update
+            window.isReleasedWhenClosed = false
+            window.level = .floating
+            window.center()
+
+            let content = NSView(frame: window.contentView?.bounds ?? .zero)
+            content.autoresizingMask = [.width, .height]
+
+            let titleLabel = NSTextField(labelWithString: "")
+            titleLabel.font = .boldSystemFont(ofSize: 15)
+            titleLabel.textColor = .labelColor
+            titleLabel.frame = NSRect(x: 22, y: 78, width: 316, height: 22)
+            content.addSubview(titleLabel)
+
+            let infoLabel = NSTextField(labelWithString: "")
+            infoLabel.font = .systemFont(ofSize: 13)
+            infoLabel.textColor = .secondaryLabelColor
+            infoLabel.frame = NSRect(x: 22, y: 48, width: 316, height: 20)
+            content.addSubview(infoLabel)
+
+            let button = NSButton(title: "OK", target: self, action: #selector(closeUpdateStatus))
+            button.bezelStyle = .rounded
+            button.frame = NSRect(x: 268, y: 14, width: 70, height: 28)
+            content.addSubview(button)
+
+            window.contentView = content
+            updateStatusWindow = window
+            updateTitleLabel = titleLabel
+            updateInfoLabel = infoLabel
+            updateDoneButton = button
+        }
+
+        updateTitleLabel?.stringValue = message
+        updateInfoLabel?.stringValue = info
+        updateDoneButton?.isHidden = !isFinal
+        updateStatusWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    @objc private func closeUpdateStatus() {
+        updateStatusWindow?.orderOut(nil)
+    }
+
     @objc private func selectLanguage(_ sender: NSMenuItem) {
         let code = sender.representedObject as? String
         writeLanguageOverride(code == "system" ? nil : code)
@@ -220,19 +279,108 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func updateToLatestVersion() {
-        runDetachedShell("""
+        let currentLanguage = language
+        showUpdateStatus(message: currentLanguage.updateStarted, info: currentLanguage.updateStartedInfo, isFinal: false)
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let release = self.fetchLatestRelease(),
+                  let latestVersion = Self.normalizedVersion(release.tagName),
+                  let currentVersion = Self.normalizedVersion(Self.currentVersion()) else {
+                DispatchQueue.main.async {
+                    self.showUpdateStatus(message: currentLanguage.updateFailed, info: "", isFinal: true)
+                }
+                return
+            }
+
+            guard Self.compareVersions(latestVersion, currentVersion) == .orderedDescending else {
+                DispatchQueue.main.async {
+                    self.showUpdateStatus(message: currentLanguage.upToDate, info: currentLanguage.upToDateInfo, isFinal: true)
+                }
+                return
+            }
+
+            guard let assetURL = release.installerAssetURL else {
+                DispatchQueue.main.async {
+                    self.showUpdateStatus(message: currentLanguage.updateFailed, info: "", isFinal: true)
+                }
+                return
+            }
+
+            self.installUpdate(from: assetURL) { succeeded in
+                DispatchQueue.main.async {
+                    if succeeded {
+                        self.showUpdateStatus(message: currentLanguage.updateSucceeded, info: currentLanguage.updateSucceededInfo, isFinal: true)
+                    } else {
+                        self.showUpdateStatus(message: currentLanguage.updateFailed, info: "", isFinal: true)
+                    }
+                }
+            }
+        }
+    }
+
+    private struct ReleaseInfo {
+        let tagName: String
+        let installerAssetURL: String?
+    }
+
+    private func fetchLatestRelease() -> ReleaseInfo? {
+        guard let url = URL(string: "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases/latest"),
+              let data = try? Data(contentsOf: url),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let tagName = json["tag_name"] as? String else {
+            return nil
+        }
+
+        let assets = json["assets"] as? [[String: Any]] ?? []
+        let assetURL = assets.first { asset in
+            let name = asset["name"] as? String ?? ""
+            return name.hasSuffix("Installer.zip")
+        }?["browser_download_url"] as? String
+
+        return ReleaseInfo(tagName: tagName, installerAssetURL: assetURL)
+    }
+
+    private static func currentVersion() -> String? {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    }
+
+    private static func normalizedVersion(_ value: String?) -> [Int]? {
+        guard let value else { return nil }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        let version = trimmed.hasPrefix("v") ? String(trimmed.dropFirst()) : trimmed
+        let parts = version.split(separator: ".")
+        guard !parts.isEmpty else { return nil }
+
+        var numbers: [Int] = []
+        for part in parts {
+            let digits = part.prefix { $0.isNumber }
+            guard let number = Int(digits) else { return nil }
+            numbers.append(number)
+        }
+        return numbers
+    }
+
+    private static func compareVersions(_ lhs: [Int], _ rhs: [Int]) -> ComparisonResult {
+        let count = max(lhs.count, rhs.count)
+        for index in 0..<count {
+            let left = index < lhs.count ? lhs[index] : 0
+            let right = index < rhs.count ? rhs[index] : 0
+            if left > right { return .orderedDescending }
+            if left < right { return .orderedAscending }
+        }
+        return .orderedSame
+    }
+
+    private func installUpdate(from assetURL: String, completion: @escaping (Bool) -> Void) {
+        let escapedAssetURL = assetURL.replacingOccurrences(of: "'", with: "'\\''")
+        runShell("""
         set -e
         TMP_DIR="$(mktemp -d)"
-        API_URL="https://api.github.com/repos/itzhaolei/codex-usage-widget/releases/latest"
-        ASSET_URL="$(/usr/bin/python3 -c 'import json,sys,urllib.request; data=json.load(urllib.request.urlopen(sys.argv[1])); assets=data.get("assets", []); matches=[a.get("browser_download_url") for a in assets if str(a.get("name", "")).endswith("Installer.zip")]; print(matches[0] if matches else "")' "$API_URL")"
-        if [ -z "$ASSET_URL" ]; then
-            exit 2
-        fi
+        ASSET_URL='\(escapedAssetURL)'
         /usr/bin/curl -L -o "$TMP_DIR/installer.zip" "$ASSET_URL"
         /usr/bin/unzip -q "$TMP_DIR/installer.zip" -d "$TMP_DIR"
-        /bin/bash "$TMP_DIR/Install Codex Usage Widget.app/Contents/Resources/install-packaged.sh"
-        """)
-        showAlert(message: language.updateStarted, info: language.updateStartedInfo)
+        CODEX_USAGE_WIDGET_KEEP_LAUNCHER=1 /bin/bash "$TMP_DIR/Install Codex Usage Widget.app/Contents/Resources/install-packaged.sh"
+        """, completion: completion)
     }
 
     @objc private func confirmUninstall() {
@@ -258,12 +406,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func runDetachedShell(_ command: String) {
+        runShell(command) { _ in }
+    }
+
+    private func runShell(_ command: String, completion: @escaping (Bool) -> Void) {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
         process.arguments = ["-lc", command]
         process.standardOutput = Pipe()
         process.standardError = Pipe()
-        try? process.run()
+        process.terminationHandler = { finishedProcess in
+            completion(finishedProcess.terminationStatus == 0)
+        }
+        do {
+            try process.run()
+        } catch {
+            completion(false)
+        }
     }
 
     private func startWidget() {

@@ -224,7 +224,9 @@ PY
 mkdir -p "$INSTALL_DIR" "$SCRIPTS_DIR" "$USER_APPS_DIR" "$LAUNCH_AGENT_DIR"
 
 pkill -f "$WIDGET_PATTERN" >/dev/null 2>&1 || true
-pkill -f "$LAUNCHER_PATTERN" >/dev/null 2>&1 || true
+if [ "${CODEX_USAGE_WIDGET_KEEP_LAUNCHER:-0}" != "1" ]; then
+    pkill -f "$LAUNCHER_PATTERN" >/dev/null 2>&1 || true
+fi
 
 cp "$PAYLOAD_DIR/scripts/codex-usage-snapshot.mjs" "$SCRIPTS_DIR/codex-usage-snapshot.mjs"
 cp "$PAYLOAD_DIR/scripts/ensure-usage-widget.sh" "$INSTALL_DIR/ensure-usage-widget.sh"
@@ -271,7 +273,9 @@ launchctl kickstart -k "gui/$(id -u)/$LABEL" >/dev/null 2>&1 || true
 rm -f "$INSTALL_DIR/.closed-by-user"
 bash "$INSTALL_DIR/ensure-usage-widget.sh" >/dev/null 2>&1 || true
 dedupe_dock_launcher
-open -g "$LAUNCHER_APP" >/dev/null 2>&1 || true
+if [ "${CODEX_USAGE_WIDGET_KEEP_LAUNCHER:-0}" != "1" ]; then
+    open -g "$LAUNCHER_APP" >/dev/null 2>&1 || true
+fi
 
 echo "Codex Usage Widget installed."
 echo "Dock launcher: $LAUNCHER_APP"

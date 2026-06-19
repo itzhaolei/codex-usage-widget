@@ -211,6 +211,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
     var themeButton: NSButton!
     var pinButton: NSButton!
     var timer: Timer!
+    var clickMonitor: Any?
     var lastSnapshotRefresh = Date.distantPast
     var snapshotRefreshInFlight = false
     var isPinned = true
@@ -313,8 +314,31 @@ class WindowController: NSWindowController, NSWindowDelegate {
         }
 
         panel.delegate = self
+        installClickActivationMonitor()
         panel.makeKeyAndOrderFront(nil)
         panel.orderFrontRegardless()
+    }
+
+    func installClickActivationMonitor() {
+        clickMonitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
+            guard let self, event.window === self.window else { return event }
+            self.activateLauncherMenu()
+            return event
+        }
+    }
+
+    func activateLauncherMenu() {
+        let bundleIdentifier = "local.codex.usage-widget.launcher"
+        if let app = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier).first {
+            app.activate(options: [.activateAllWindows])
+            return
+        }
+
+        let launcherPath = NSString(string: "~/Applications/Codex Usage Widget.app").expandingTildeInPath
+        let launcherURL = URL(fileURLWithPath: launcherPath)
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = true
+        NSWorkspace.shared.openApplication(at: launcherURL, configuration: configuration)
     }
 
     func makeControlCapsule(frame: NSRect) -> NSView {
@@ -617,9 +641,31 @@ class WindowController: NSWindowController, NSWindowDelegate {
             }
             return value
         }
+        func textWidth(_ text: String, font: NSFont) -> CGFloat {
+            (text as NSString).size(withAttributes: [.font: font]).width
+        }
+        func ellipsized(_ text: String, font: NSFont, maxWidth: CGFloat) -> String {
+            guard textWidth(text, font: font) > maxWidth else { return text }
+
+            let ellipsis = "…"
+            var low = 0
+            var high = text.count
+            let characters = Array(text)
+            while low < high {
+                let mid = (low + high + 1) / 2
+                let candidate = String(characters.prefix(mid)) + ellipsis
+                if textWidth(candidate, font: font) <= maxWidth {
+                    low = mid
+                } else {
+                    high = mid - 1
+                }
+            }
+            return String(characters.prefix(max(0, low))) + ellipsis
+        }
 
         let title = attrs(font: NSFont.systemFont(ofSize: 15, weight: .bold),
                           color: primaryTextColor, lineHeight: 18, spacing: 20)
+        let dimFont = NSFont.monospacedSystemFont(ofSize: 10, weight: .regular)
         let percent = attrs(font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular),
                             color: primaryTextColor, lineHeight: 20)
         let green = attrs(font: NSFont.monospacedSystemFont(ofSize: 20, weight: .regular),
@@ -634,25 +680,29 @@ class WindowController: NSWindowController, NSWindowDelegate {
                                     color: NSColor.clear, lineHeight: 10)
         let barTopSpacer = attrs(font: NSFont.monospacedSystemFont(ofSize: 4, weight: .regular),
                                  color: NSColor.clear, lineHeight: 4)
-        let dim = attrs(font: NSFont.monospacedSystemFont(ofSize: 10, weight: .regular),
-                        color: secondaryTextColor, lineHeight: 16)
+        let dim = attrs(font: dimFont, color: secondaryTextColor, lineHeight: 16)
         let rowLabel = attrs(font: NSFont.monospacedSystemFont(ofSize: 13, weight: .bold),
                              color: primaryTextColor, lineHeight: 16)
         let separator = attrs(font: NSFont.monospacedSystemFont(ofSize: 8, weight: .bold),
                               color: secondaryTextColor, lineHeight: 16, baseline: 2.0)
+        let titleMaxWidth: CGFloat = 168
+        let titleText = ellipsized(language.title, font: NSFont.systemFont(ofSize: 15, weight: .bold), maxWidth: titleMaxWidth)
+        let resetMaxWidth = max(120, label.bounds.width - 58)
+        let fiveResetText = ellipsized("\(language.reset) \(fiveReset)", font: dimFont, maxWidth: resetMaxWidth)
+        let sevenResetText = ellipsized("\(language.reset) \(sevenReset)", font: dimFont, maxWidth: resetMaxWidth)
 
         let mas = NSMutableAttributedString()
-        mas.append(NSAttributedString(string: "\(language.title)\n", attributes: title))
+        mas.append(NSAttributedString(string: "\(titleText)\n", attributes: title))
         mas.append(NSAttributedString(string: "5h", attributes: rowLabel))
         mas.append(NSAttributedString(string: "  ┃  ", attributes: separator))
-        mas.append(NSAttributedString(string: "\(language.reset) \(fiveReset)\n", attributes: dim))
+        mas.append(NSAttributedString(string: "\(fiveResetText)\n", attributes: dim))
         mas.append(NSAttributedString(string: " \n", attributes: barTopSpacer))
         mas.append(NSAttributedString(string: fiveBar, attributes: fivePct <= 20 ? warn : green))
         mas.append(NSAttributedString(string: "  \(fivePct >= 0 ? "\(fivePct)%" : "—")\n", attributes: percent))
         mas.append(NSAttributedString(string: " \n", attributes: barBottomSpacer))
         mas.append(NSAttributedString(string: language.week, attributes: rowLabel))
         mas.append(NSAttributedString(string: "   ┃  ", attributes: separator))
-        mas.append(NSAttributedString(string: "\(language.reset) \(sevenReset)\n", attributes: dim))
+        mas.append(NSAttributedString(string: "\(sevenResetText)\n", attributes: dim))
         mas.append(NSAttributedString(string: " \n", attributes: barTopSpacer))
         mas.append(NSAttributedString(string: sevenBar, attributes: sevenPct <= 20 ? warn : green))
         mas.append(NSAttributedString(string: "  \(sevenPct >= 0 ? "\(sevenPct)%" : "—")\n", attributes: percent))
