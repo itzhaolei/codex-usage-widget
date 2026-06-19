@@ -39,9 +39,10 @@ All notable changes to Codex Usage Widget are documented here.
 - Fixed account switching so quota snapshots are keyed by a redacted local account fingerprint instead of raw account identifiers.
 - Changed lifecycle handling so the widget no longer exits when Codex Desktop is closed.
 - Fixed account switching so 5-hour and weekly quota rows stop reusing rate-limit events from the previous account.
+- Fixed 5-hour and weekly quota refresh after account switches by reading Codex's current usage endpoint instead of relying on stale session rate-limit events.
 
 ### Notes
 
-- The widget reads local Codex session metadata and local Codex auth tokens only to derive quota state and reset-credit availability.
+- The widget reads local Codex session metadata and local Codex auth tokens only to derive quota state, current usage limits, and reset-credit availability.
 - Snapshot and cache files store only a short irreversible account fingerprint, not raw account IDs, email addresses, or tokens.
 - No personal account data is committed to this repository.

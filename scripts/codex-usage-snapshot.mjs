@@ -12,6 +12,7 @@ const searchDirs = [
 const outputPath = process.argv[2] || path.join(codexHome, "codex-usage-snapshot.json");
 const resetCreditsCachePath = path.join(codexHome, "codex-rate-limit-reset-credits-cache.json");
 const accountStatePath = path.join(codexHome, "codex-usage-account-state.json");
+const usageEndpoint = "https://chatgpt.com/backend-api/wham/usage";
 const resetCreditsEndpoint = "https://chatgpt.com/backend-api/wham/rate-limit-reset-credits";
 const resetCreditsCacheTtlMs = 30_000;
 const auth = readJson(path.join(codexHome, "auth.json"));
@@ -106,6 +107,19 @@ function toWindow(limit) {
   return {
     used_percentage: Math.round(Math.max(0, Math.min(100, limit.used_percent))),
     resets_at: typeof limit.resets_at === "number" ? limit.resets_at : null,
+  };
+}
+
+function toUsageWindow(window) {
+  if (!window || typeof window.used_percent !== "number") return null;
+  const resetAt = typeof window.reset_at === "number"
+    ? window.reset_at
+    : typeof window.resets_at === "number"
+      ? window.resets_at
+      : null;
+  return {
+    used_percentage: Math.round(Math.max(0, Math.min(100, window.used_percent))),
+    resets_at: resetAt,
   };
 }
 
@@ -282,33 +296,82 @@ async function fetchResetCredits() {
   }
 }
 
+async function fetchUsage() {
+  const accessToken = currentAccessToken;
+  if (typeof accessToken !== "string" || accessToken.length === 0) return null;
+
+  try {
+    const response = await fetch(usageEndpoint, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "OAI-Language": "en",
+        originator: "Codex Desktop",
+      },
+      signal: AbortSignal.timeout(5_000),
+    });
+    if (!response.ok) return null;
+
+    const body = await response.json();
+    const rateLimit = body?.rate_limit;
+    const fiveHour = toUsageWindow(rateLimit?.primary_window);
+    const sevenDay = toUsageWindow(rateLimit?.secondary_window);
+    const availableCount = body?.rate_limit_reset_credits?.available_count;
+    const resetCredits = typeof availableCount === "number"
+      ? {
+          available_count: Math.max(0, Math.round(availableCount)),
+          fetched_at: new Date().toISOString(),
+        }
+      : null;
+
+    if (!fiveHour && !sevenDay && !resetCredits) return null;
+    return {
+      five_hour: fiveHour,
+      seven_day: sevenDay,
+      reset_credits: resetCredits,
+    };
+  } catch {
+    return null;
+  }
+}
+
 const existingSnapshot = readJson(outputPath);
 const accountState = readAccountState(existingSnapshot);
 const existingSameAccount = !accountState.accountChanged && snapshotMatchesCurrentAccount(existingSnapshot);
 
 let latestLimits = null;
-let latestStaleLimits = null;
 for (const filePath of listJsonlFiles(searchDirs)) {
   const limits = readLatestRateLimits(filePath);
   if (!limits) continue;
   if (accountState.rateLimitsAfterMs > 0 && limits.timestampMs < accountState.rateLimitsAfterMs) continue;
 
   const isFreshForCurrentLogin = !(Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 && limits.timestampMs < authLastRefreshMs);
-  if (!isFreshForCurrentLogin) {
-    if (!latestStaleLimits || limits.timestampMs > latestStaleLimits.timestampMs) {
-      latestStaleLimits = limits;
-    }
-    continue;
-  }
+  if (!isFreshForCurrentLogin) continue;
 
   if (!latestLimits || limits.timestampMs > latestLimits.timestampMs) {
     latestLimits = limits;
   }
 }
 
-const resetCredits = await fetchResetCredits();
-const selectedLimits = latestLimits ?? (existingSameAccount ? latestStaleLimits : null);
-const selectedLimitsAreStale = selectedLimits != null && latestLimits == null;
+const usage = await fetchUsage();
+const resetCredits = usage?.reset_credits ?? await fetchResetCredits();
+
+if (usage?.five_hour || usage?.seven_day) {
+  const snapshot = {
+    updated_at: new Date().toISOString(),
+    account_fingerprint: currentAccountFingerprint,
+    auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
+    source: "wham_usage",
+    stale_source: false,
+    five_hour: usage.five_hour,
+    seven_day: usage.seven_day,
+    reset_credits: resetCredits,
+  };
+
+  writeJson(outputPath, snapshot);
+  process.exit(0);
+}
+
+const selectedLimits = latestLimits;
 
 if (selectedLimits) {
   const fiveHour = mergeWindow(existingSnapshot?.five_hour, toWindow(selectedLimits.primary), existingSameAccount);
@@ -319,7 +382,7 @@ if (selectedLimits) {
     auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
     source_file: selectedLimits.filePath,
     source_timestamp: selectedLimits.timestampMs ? new Date(selectedLimits.timestampMs).toISOString() : null,
-    stale_source: selectedLimitsAreStale,
+    stale_source: false,
     five_hour: fiveHour,
     seven_day: sevenDay,
     reset_credits: resetCredits,
@@ -330,29 +393,16 @@ if (selectedLimits) {
 }
 
 try {
-  const existing = existingSnapshot;
-  if (existingSameAccount && (existing?.five_hour || existing?.seven_day || existing?.reset_credits || resetCredits)) {
-    const { account_id: _legacyAccountId, ...existingWithoutRawAccount } = existing;
-    const snapshot = {
-      ...existingWithoutRawAccount,
-      updated_at: new Date().toISOString(),
-      account_fingerprint: currentAccountFingerprint,
-      auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
-      stale_source: true,
-      reset_credits: resetCredits ?? existing.reset_credits ?? null,
-    };
-    writeJson(outputPath, snapshot);
-  } else {
-    writeJson(outputPath, {
-      updated_at: new Date().toISOString(),
-      account_fingerprint: currentAccountFingerprint,
-      auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
-      stale_source: true,
-      five_hour: null,
-      seven_day: null,
-      reset_credits: resetCredits,
-    });
-  }
+  writeJson(outputPath, {
+    updated_at: new Date().toISOString(),
+    account_fingerprint: currentAccountFingerprint,
+    auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
+    source: "unavailable",
+    stale_source: true,
+    five_hour: null,
+    seven_day: null,
+    reset_credits: resetCredits,
+  });
 } catch {
   // No usable prior snapshot to keep alive.
 }
