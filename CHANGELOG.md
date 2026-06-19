@@ -36,8 +36,10 @@ All notable changes to Codex Usage Widget are documented here.
 - Fixed HUD clicks so they activate the Dock launcher menu, matching the behavior of clicking the Dock icon.
 - Fixed reset-time text rows to stay on one line and ellipsize when the text is too long.
 - Fixed the title row so it stays clear of the control capsule and ellipsizes instead of wrapping.
+- Fixed account switching so quota snapshots are keyed by a redacted local account fingerprint instead of raw account identifiers.
 
 ### Notes
 
 - The widget reads local Codex session metadata and local Codex auth tokens only to derive quota state and reset-credit availability.
+- Snapshot and cache files store only a short irreversible account fingerprint, not raw account IDs, email addresses, or tokens.
 - No personal account data is committed to this repository.

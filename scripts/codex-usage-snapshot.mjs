@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import crypto from "node:crypto";
 
 const codexHome = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
 const searchDirs = [
@@ -14,7 +15,17 @@ const resetCreditsEndpoint = "https://chatgpt.com/backend-api/wham/rate-limit-re
 const resetCreditsCacheTtlMs = 30_000;
 const auth = readJson(path.join(codexHome, "auth.json"));
 const currentAccountId = typeof auth?.tokens?.account_id === "string" ? auth.tokens.account_id : null;
+const currentAccessToken = typeof auth?.tokens?.access_token === "string" ? auth.tokens.access_token : null;
+const currentAccountFingerprint = currentAccountId
+  ? accountFingerprint("account", currentAccountId)
+  : currentAccessToken
+    ? accountFingerprint("token", currentAccessToken)
+    : null;
 const authLastRefreshMs = typeof auth?.last_refresh === "string" ? Date.parse(auth.last_refresh) : 0;
+
+function accountFingerprint(kind, value) {
+  return `${kind}:${crypto.createHash("sha256").update(value).digest("hex").slice(0, 16)}`;
+}
 
 function listJsonlFiles(dirs) {
   const files = [];
@@ -128,14 +139,64 @@ function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+function sameAccountFingerprint(value) {
+  if (value == null && currentAccountFingerprint == null) return true;
+  return value === currentAccountFingerprint;
+}
+
+function cacheMatchesCurrentAccount(cached) {
+  const cachedFingerprint = cached?.account_fingerprint ?? null;
+  if (sameAccountFingerprint(cachedFingerprint)) return true;
+
+  // One-time compatibility with older local cache files that stored raw account_id.
+  if (currentAccountId && cached?.account_id === currentAccountId) return true;
+  return false;
+}
+
+function snapshotMatchesCurrentAccount(snapshot) {
+  const snapshotFingerprint = snapshot?.account_fingerprint ?? null;
+  if (sameAccountFingerprint(snapshotFingerprint)) return true;
+
+  // One-time compatibility with older local snapshot files that stored raw account_id.
+  if (currentAccountId && snapshot?.account_id === currentAccountId) return true;
+  return false;
+}
+
+function sanitizeResetCreditsCache(cached) {
+  if (typeof cached?.available_count !== "number") return;
+  if (typeof cached?.fetched_at_ms !== "number") return;
+  if (cached.account_id == null && cached.account_fingerprint === currentAccountFingerprint) return;
+
+  writeJson(resetCreditsCachePath, {
+    account_fingerprint: currentAccountFingerprint,
+    available_count: cached.available_count,
+    fetched_at: cached.fetched_at ?? new Date(cached.fetched_at_ms).toISOString(),
+    fetched_at_ms: cached.fetched_at_ms,
+  });
+}
+
+function removeMismatchedLegacyResetCreditsCache(cached) {
+  if (cached?.account_id == null) return;
+  if (cacheMatchesCurrentAccount(cached)) return;
+
+  try {
+    fs.rmSync(resetCreditsCachePath, { force: true });
+  } catch {
+    // Ignore cache cleanup failures; the cache will not be used.
+  }
+}
+
 function readFreshResetCreditsCache() {
   const cached = readJson(resetCreditsCachePath);
   if (typeof cached?.available_count !== "number") return null;
   if (typeof cached?.fetched_at_ms !== "number") return null;
-  const cachedAccountId = cached?.account_id ?? null;
-  const legacyCacheAfterLogin = cachedAccountId === null && Number.isFinite(authLastRefreshMs) && cached.fetched_at_ms >= authLastRefreshMs;
-  if (cachedAccountId !== currentAccountId && !legacyCacheAfterLogin) return null;
+  const legacyCacheAfterLogin = cached?.account_fingerprint == null && cached?.account_id == null && Number.isFinite(authLastRefreshMs) && cached.fetched_at_ms >= authLastRefreshMs;
+  if (!cacheMatchesCurrentAccount(cached) && !legacyCacheAfterLogin) {
+    removeMismatchedLegacyResetCreditsCache(cached);
+    return null;
+  }
   if (Date.now() - cached.fetched_at_ms > resetCreditsCacheTtlMs) return null;
+  sanitizeResetCreditsCache(cached);
   return {
     available_count: cached.available_count,
     fetched_at: cached.fetched_at ?? new Date(cached.fetched_at_ms).toISOString(),
@@ -145,9 +206,12 @@ function readFreshResetCreditsCache() {
 function readAnyResetCreditsCache() {
   const cached = readJson(resetCreditsCachePath);
   if (typeof cached?.available_count !== "number") return null;
-  const cachedAccountId = cached?.account_id ?? null;
-  const legacyCacheAfterLogin = cachedAccountId === null && typeof cached?.fetched_at_ms === "number" && Number.isFinite(authLastRefreshMs) && cached.fetched_at_ms >= authLastRefreshMs;
-  if (cachedAccountId !== currentAccountId && !legacyCacheAfterLogin) return null;
+  const legacyCacheAfterLogin = cached?.account_fingerprint == null && cached?.account_id == null && typeof cached?.fetched_at_ms === "number" && Number.isFinite(authLastRefreshMs) && cached.fetched_at_ms >= authLastRefreshMs;
+  if (!cacheMatchesCurrentAccount(cached) && !legacyCacheAfterLogin) {
+    removeMismatchedLegacyResetCreditsCache(cached);
+    return null;
+  }
+  sanitizeResetCreditsCache(cached);
   return {
     available_count: cached.available_count,
     fetched_at: cached.fetched_at ?? null,
@@ -159,7 +223,7 @@ async function fetchResetCredits() {
   const fresh = readFreshResetCreditsCache();
   if (fresh) return fresh;
 
-  const accessToken = auth?.tokens?.access_token;
+  const accessToken = currentAccessToken;
   if (typeof accessToken !== "string" || accessToken.length === 0) {
     return readAnyResetCreditsCache();
   }
@@ -179,7 +243,7 @@ async function fetchResetCredits() {
     if (typeof body?.available_count !== "number") return readAnyResetCreditsCache();
 
     const value = {
-      account_id: currentAccountId,
+      account_fingerprint: currentAccountFingerprint,
       available_count: Math.max(0, Math.round(body.available_count)),
       fetched_at: new Date().toISOString(),
       fetched_at_ms: Date.now(),
@@ -195,7 +259,7 @@ async function fetchResetCredits() {
 }
 
 const existingSnapshot = readJson(outputPath);
-const existingSameAccount = (existingSnapshot?.account_id ?? null) === currentAccountId;
+const existingSameAccount = snapshotMatchesCurrentAccount(existingSnapshot);
 
 let latestLimits = null;
 let latestStaleLimits = null;
@@ -225,7 +289,7 @@ if (selectedLimits) {
   const sevenDay = mergeWindow(existingSnapshot?.seven_day, toWindow(selectedLimits.secondary), existingSameAccount);
   const snapshot = {
     updated_at: new Date().toISOString(),
-    account_id: currentAccountId,
+    account_fingerprint: currentAccountFingerprint,
     auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
     source_file: selectedLimits.filePath,
     source_timestamp: selectedLimits.timestampMs ? new Date(selectedLimits.timestampMs).toISOString() : null,
@@ -242,10 +306,11 @@ if (selectedLimits) {
 try {
   const existing = existingSnapshot;
   if (existingSameAccount && (existing?.five_hour || existing?.seven_day || existing?.reset_credits || resetCredits)) {
+    const { account_id: _legacyAccountId, ...existingWithoutRawAccount } = existing;
     const snapshot = {
-      ...existing,
+      ...existingWithoutRawAccount,
       updated_at: new Date().toISOString(),
-      account_id: currentAccountId,
+      account_fingerprint: currentAccountFingerprint,
       auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
       stale_source: true,
       reset_credits: resetCredits ?? existing.reset_credits ?? null,
@@ -254,7 +319,7 @@ try {
   } else {
     writeJson(outputPath, {
       updated_at: new Date().toISOString(),
-      account_id: currentAccountId,
+      account_fingerprint: currentAccountFingerprint,
       auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
       stale_source: true,
       five_hour: null,
