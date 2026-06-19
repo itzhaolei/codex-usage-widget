@@ -196,9 +196,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         appMenu.addItem(NSMenuItem(title: language.update, action: #selector(updateToLatestVersion), keyEquivalent: ""))
         appMenu.addItem(.separator())
-        appMenu.addItem(NSMenuItem(title: language.uninstall, action: #selector(confirmUninstall), keyEquivalent: ""))
+        appMenu.addItem(destructiveMenuItem(title: language.uninstall, action: #selector(confirmUninstall)))
 
         NSApp.mainMenu = mainMenu
+    }
+
+    private func destructiveMenuItem(title: String, action: Selector) -> NSMenuItem {
+        let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+        item.attributedTitle = NSAttributedString(
+            string: title,
+            attributes: [
+                .foregroundColor: NSColor.systemRed
+            ]
+        )
+        return item
     }
 
     @objc private func selectLanguage(_ sender: NSMenuItem) {
