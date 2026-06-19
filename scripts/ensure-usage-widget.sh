@@ -1,8 +1,7 @@
 #!/bin/bash
-# Ensure the Codex quota widget appears while Codex is running.
+# Ensure the Codex quota widget stays available.
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-CODEX_EXE="/Applications/Codex.app/Contents/MacOS/Codex"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 WIDGET_APP="$SCRIPT_DIR/UsageWidget.app"
 WIDGET_EXE="$WIDGET_APP/Contents/MacOS/UsageWidget"
@@ -17,11 +16,6 @@ if ! mkdir "$LOCK_DIR" 2>/dev/null; then
     exit 0
 fi
 trap 'rmdir "$LOCK_DIR" >/dev/null 2>&1' EXIT
-
-codex_running() {
-    pgrep -x Codex >/dev/null 2>&1 && return 0
-    ps ax -o command= | grep -F "$CODEX_EXE" | grep -v grep >/dev/null 2>&1
-}
 
 widget_running() {
     pgrep -f "$WIDGET_PATTERN" >/dev/null 2>&1
@@ -53,25 +47,18 @@ run_snapshot() {
     /bin/zsh -lc 'node "$1" "$2"' zsh "$SNAPSHOT_SCRIPT" "$SNAPSHOT_PATH" >/dev/null 2>&1 || true
 }
 
-if codex_running; then
-    if [ -f "$CLOSED_MARKER" ]; then
-        for PID in $(widget_pids); do
-            kill "$PID" >/dev/null 2>&1
-        done
-        exit 0
-    fi
-
-    keep_single_widget
-    if ! widget_running; then
-        run_snapshot
-        touch "$WIDGET_APP"
-        if ! widget_running; then
-            open -g "$WIDGET_APP"
-        fi
-    fi
-else
-    rm -f "$CLOSED_MARKER" >/dev/null 2>&1
+if [ -f "$CLOSED_MARKER" ]; then
     for PID in $(widget_pids); do
         kill "$PID" >/dev/null 2>&1
     done
+    exit 0
+fi
+
+keep_single_widget
+if ! widget_running; then
+    run_snapshot
+    touch "$WIDGET_APP"
+    if ! widget_running; then
+        open -g "$WIDGET_APP"
+    fi
 fi

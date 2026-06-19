@@ -37,6 +37,7 @@ All notable changes to Codex Usage Widget are documented here.
 - Fixed reset-time text rows to stay on one line and ellipsize when the text is too long.
 - Fixed the title row so it stays clear of the control capsule and ellipsizes instead of wrapping.
 - Fixed account switching so quota snapshots are keyed by a redacted local account fingerprint instead of raw account identifiers.
+- Changed lifecycle handling so the widget no longer exits when Codex Desktop is closed.
 
 ### Notes
 
