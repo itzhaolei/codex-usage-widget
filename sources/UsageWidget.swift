@@ -6,6 +6,7 @@ import Cocoa
 // MARK: — 快照模型
 struct UsageSnapshot: Codable {
     var updated_at: String?
+    var plan_type: String?
     var five_hour: UsageWindow?
     var seven_day: UsageWindow?
     var reset_credits: ResetCredits?
@@ -197,6 +198,44 @@ func progressBar(percent: Int, width: Int = 15) -> String {
     let filled = Int(round(Double(percent) / 100.0 * Double(width)))
     let empty = width - filled
     return String(repeating: "█", count: filled) + String(repeating: "░", count: empty)
+}
+
+func planBadgeText(_ planType: String?) -> String {
+    guard let raw = planType?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !raw.isEmpty else {
+        return ""
+    }
+    let label: String
+    switch raw {
+    case "free":
+        label = "Free"
+    case "plus":
+        label = "Plus"
+    case "pro", "pro5x", "pro_5x", "pro-5x":
+        label = "Pro5x"
+    case "pro20x", "pro_20x", "pro-20x":
+        label = "Pro20x"
+    default:
+        return ""
+    }
+    return "（\(label)）"
+}
+
+func normalizedPlanType(_ planType: String?) -> String? {
+    guard let raw = planType?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !raw.isEmpty else {
+        return nil
+    }
+    switch raw {
+    case "free":
+        return "free"
+    case "plus":
+        return "plus"
+    case "pro", "pro5x", "pro_5x", "pro-5x":
+        return "pro5x"
+    case "pro20x", "pro_20x", "pro-20x":
+        return "pro20x"
+    default:
+        return nil
+    }
 }
 
 // MARK: — 主窗口控制器
@@ -564,6 +603,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         let sevenBar = sevenPct >= 0 ? progressBar(percent: sevenPct) : emptyBar
 
         buildAttributedText(
+            planType: snap.plan_type,
             fiveBar: fiveBar, fivePct: fivePct, fiveReset: fiveReset,
             sevenBar: sevenBar, sevenPct: sevenPct, sevenReset: sevenReset,
             resetCredits: resetCredits
@@ -620,7 +660,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
         }
     }
 
-    func buildAttributedText(fiveBar: String, fivePct: Int, fiveReset: String,
+    func buildAttributedText(planType: String?,
+                             fiveBar: String, fivePct: Int, fiveReset: String,
                              sevenBar: String, sevenPct: Int, sevenReset: String,
                              resetCredits: Int?) {
         func fixedParagraph(height: CGFloat, spacing: CGFloat = 0) -> NSMutableParagraphStyle {
@@ -663,8 +704,21 @@ class WindowController: NSWindowController, NSWindowDelegate {
             return String(characters.prefix(max(0, low))) + ellipsis
         }
 
-        let title = attrs(font: NSFont.systemFont(ofSize: 15, weight: .bold),
+        let titleFont = NSFont.systemFont(ofSize: 15, weight: .bold)
+        let planFont = NSFont.systemFont(ofSize: 12, weight: .semibold)
+        let planColor: NSColor
+        switch normalizedPlanType(planType) {
+        case "plus":
+            planColor = NSColor.green
+        case "pro5x", "pro20x":
+            planColor = NSColor.systemOrange
+        default:
+            planColor = secondaryTextColor
+        }
+        let title = attrs(font: titleFont,
                           color: primaryTextColor, lineHeight: 18, spacing: 20)
+        let plan = attrs(font: planFont,
+                         color: planColor, lineHeight: 18, spacing: 20)
         let rowLabelFont = NSFont.monospacedSystemFont(ofSize: 13, weight: .bold)
         let separatorFont = NSFont.monospacedSystemFont(ofSize: 8, weight: .bold)
         let dimFont = NSFont.monospacedSystemFont(ofSize: 10, weight: .regular)
@@ -686,8 +740,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
         let rowLabel = attrs(font: rowLabelFont, color: primaryTextColor, lineHeight: 16)
         let separator = attrs(font: separatorFont,
                               color: secondaryTextColor, lineHeight: 16, baseline: 2.0)
-        let titleMaxWidth: CGFloat = 168
-        let titleText = ellipsized(language.title, font: NSFont.systemFont(ofSize: 15, weight: .bold), maxWidth: titleMaxWidth)
+        let planBadge = planBadgeText(planType)
+        let titleRowMaxWidth: CGFloat = 184
+        let titlePlanGap: CGFloat = planBadge.isEmpty ? 0 : 2
+        let titleMaxWidth = max(20, titleRowMaxWidth - textWidth(planBadge, font: planFont) - titlePlanGap)
+        let titleText = ellipsized(language.title, font: titleFont, maxWidth: titleMaxWidth)
         let fiveLabel = "5h"
         let fiveSeparator = "  ┃  "
         let weekSeparator = "   ┃  "
@@ -698,7 +755,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
         let sevenResetText = ellipsized("\(language.reset) \(sevenReset)", font: dimFont, maxWidth: sevenResetMaxWidth)
 
         let mas = NSMutableAttributedString()
-        mas.append(NSAttributedString(string: "\(titleText)\n", attributes: title))
+        mas.append(NSAttributedString(string: titleText, attributes: title))
+        if !planBadge.isEmpty {
+            mas.append(NSAttributedString(string: planBadge, attributes: plan))
+        }
+        mas.append(NSAttributedString(string: "\n", attributes: title))
         mas.append(NSAttributedString(string: fiveLabel, attributes: rowLabel))
         mas.append(NSAttributedString(string: fiveSeparator, attributes: separator))
         mas.append(NSAttributedString(string: "\(fiveResetText)\n", attributes: dim))

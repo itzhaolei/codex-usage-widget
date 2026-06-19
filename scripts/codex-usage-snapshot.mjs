@@ -123,6 +123,16 @@ function toUsageWindow(window) {
   };
 }
 
+function normalizePlanType(planType) {
+  if (typeof planType !== "string") return null;
+  const value = planType.trim().toLowerCase();
+  if (value === "free") return "free";
+  if (value === "plus") return "plus";
+  if (value === "pro" || value === "pro5x" || value === "pro_5x" || value === "pro-5x") return "pro5x";
+  if (value === "pro20x" || value === "pro_20x" || value === "pro-20x") return "pro20x";
+  return null;
+}
+
 function keepMonotonicUsage(existingWindow, nextWindow) {
   if (!nextWindow) return null;
   if (!existingWindow || typeof existingWindow.used_percentage !== "number") return nextWindow;
@@ -315,6 +325,7 @@ async function fetchUsage() {
     const rateLimit = body?.rate_limit;
     const fiveHour = toUsageWindow(rateLimit?.primary_window);
     const sevenDay = toUsageWindow(rateLimit?.secondary_window);
+    const planType = normalizePlanType(body?.plan_type);
     const availableCount = body?.rate_limit_reset_credits?.available_count;
     const resetCredits = typeof availableCount === "number"
       ? {
@@ -327,6 +338,7 @@ async function fetchUsage() {
     return {
       five_hour: fiveHour,
       seven_day: sevenDay,
+      plan_type: planType,
       reset_credits: resetCredits,
     };
   } catch {
@@ -362,6 +374,7 @@ if (usage?.five_hour || usage?.seven_day) {
     auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
     source: "wham_usage",
     stale_source: false,
+    plan_type: usage.plan_type,
     five_hour: usage.five_hour,
     seven_day: usage.seven_day,
     reset_credits: resetCredits,
@@ -383,6 +396,7 @@ if (selectedLimits) {
     source_file: selectedLimits.filePath,
     source_timestamp: selectedLimits.timestampMs ? new Date(selectedLimits.timestampMs).toISOString() : null,
     stale_source: false,
+    plan_type: null,
     five_hour: fiveHour,
     seven_day: sevenDay,
     reset_credits: resetCredits,
@@ -399,6 +413,7 @@ try {
     auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
     source: "unavailable",
     stale_source: true,
+    plan_type: usage?.plan_type ?? null,
     five_hour: null,
     seven_day: null,
     reset_credits: resetCredits,
