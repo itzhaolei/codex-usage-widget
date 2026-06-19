@@ -665,6 +665,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
         let title = attrs(font: NSFont.systemFont(ofSize: 15, weight: .bold),
                           color: primaryTextColor, lineHeight: 18, spacing: 20)
+        let rowLabelFont = NSFont.monospacedSystemFont(ofSize: 13, weight: .bold)
+        let separatorFont = NSFont.monospacedSystemFont(ofSize: 8, weight: .bold)
         let dimFont = NSFont.monospacedSystemFont(ofSize: 10, weight: .regular)
         let percent = attrs(font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular),
                             color: primaryTextColor, lineHeight: 20)
@@ -681,27 +683,31 @@ class WindowController: NSWindowController, NSWindowDelegate {
         let barTopSpacer = attrs(font: NSFont.monospacedSystemFont(ofSize: 4, weight: .regular),
                                  color: NSColor.clear, lineHeight: 4)
         let dim = attrs(font: dimFont, color: secondaryTextColor, lineHeight: 16)
-        let rowLabel = attrs(font: NSFont.monospacedSystemFont(ofSize: 13, weight: .bold),
-                             color: primaryTextColor, lineHeight: 16)
-        let separator = attrs(font: NSFont.monospacedSystemFont(ofSize: 8, weight: .bold),
+        let rowLabel = attrs(font: rowLabelFont, color: primaryTextColor, lineHeight: 16)
+        let separator = attrs(font: separatorFont,
                               color: secondaryTextColor, lineHeight: 16, baseline: 2.0)
         let titleMaxWidth: CGFloat = 168
         let titleText = ellipsized(language.title, font: NSFont.systemFont(ofSize: 15, weight: .bold), maxWidth: titleMaxWidth)
-        let resetMaxWidth = max(120, label.bounds.width - 58)
-        let fiveResetText = ellipsized("\(language.reset) \(fiveReset)", font: dimFont, maxWidth: resetMaxWidth)
-        let sevenResetText = ellipsized("\(language.reset) \(sevenReset)", font: dimFont, maxWidth: resetMaxWidth)
+        let fiveLabel = "5h"
+        let fiveSeparator = "  ┃  "
+        let weekSeparator = "   ┃  "
+        let rowPadding: CGFloat = 2
+        let fiveResetMaxWidth = max(80, label.bounds.width - textWidth(fiveLabel, font: rowLabelFont) - textWidth(fiveSeparator, font: separatorFont) - rowPadding)
+        let sevenResetMaxWidth = max(80, label.bounds.width - textWidth(language.week, font: rowLabelFont) - textWidth(weekSeparator, font: separatorFont) - rowPadding)
+        let fiveResetText = ellipsized("\(language.reset) \(fiveReset)", font: dimFont, maxWidth: fiveResetMaxWidth)
+        let sevenResetText = ellipsized("\(language.reset) \(sevenReset)", font: dimFont, maxWidth: sevenResetMaxWidth)
 
         let mas = NSMutableAttributedString()
         mas.append(NSAttributedString(string: "\(titleText)\n", attributes: title))
-        mas.append(NSAttributedString(string: "5h", attributes: rowLabel))
-        mas.append(NSAttributedString(string: "  ┃  ", attributes: separator))
+        mas.append(NSAttributedString(string: fiveLabel, attributes: rowLabel))
+        mas.append(NSAttributedString(string: fiveSeparator, attributes: separator))
         mas.append(NSAttributedString(string: "\(fiveResetText)\n", attributes: dim))
         mas.append(NSAttributedString(string: " \n", attributes: barTopSpacer))
         mas.append(NSAttributedString(string: fiveBar, attributes: fivePct <= 20 ? warn : green))
         mas.append(NSAttributedString(string: "  \(fivePct >= 0 ? "\(fivePct)%" : "—")\n", attributes: percent))
         mas.append(NSAttributedString(string: " \n", attributes: barBottomSpacer))
         mas.append(NSAttributedString(string: language.week, attributes: rowLabel))
-        mas.append(NSAttributedString(string: "   ┃  ", attributes: separator))
+        mas.append(NSAttributedString(string: weekSeparator, attributes: separator))
         mas.append(NSAttributedString(string: "\(sevenResetText)\n", attributes: dim))
         mas.append(NSAttributedString(string: " \n", attributes: barTopSpacer))
         mas.append(NSAttributedString(string: sevenBar, attributes: sevenPct <= 20 ? warn : green))
