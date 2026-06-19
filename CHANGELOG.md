@@ -40,7 +40,8 @@ All notable changes to Codex Usage Widget are documented here.
 - Changed lifecycle handling so the widget no longer exits when Codex Desktop is closed.
 - Fixed account switching so 5-hour and weekly quota rows stop reusing rate-limit events from the previous account.
 - Fixed 5-hour and weekly quota refresh after account switches by reading Codex's current usage endpoint instead of relying on stale session rate-limit events.
-- Added a non-compressing subscription badge after the widget title, showing Free, Plus, Pro5x, or Pro20x when available, with Free muted, Plus green, and Pro orange.
+- Added a non-compressing subscription badge after the widget title, showing Free, Plus, Pro5x, or Pro20x when available, with rounded backgrounds and white text.
+- Updated the README preview image to show the current Pro20x badge UI.
 
 ### Notes
 

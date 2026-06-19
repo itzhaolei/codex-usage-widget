@@ -201,23 +201,18 @@ func progressBar(percent: Int, width: Int = 15) -> String {
 }
 
 func planBadgeText(_ planType: String?) -> String {
-    guard let raw = planType?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !raw.isEmpty else {
-        return ""
-    }
-    let label: String
-    switch raw {
+    switch normalizedPlanType(planType) {
     case "free":
-        label = "Free"
+        return "Free"
     case "plus":
-        label = "Plus"
-    case "pro", "pro5x", "pro_5x", "pro-5x":
-        label = "Pro5x"
-    case "pro20x", "pro_20x", "pro-20x":
-        label = "Pro20x"
+        return "Plus"
+    case "pro5x":
+        return "Pro5x"
+    case "pro20x":
+        return "Pro20x"
     default:
         return ""
     }
-    return "（\(label)）"
 }
 
 func normalizedPlanType(_ planType: String?) -> String? {
@@ -703,22 +698,47 @@ class WindowController: NSWindowController, NSWindowDelegate {
             }
             return String(characters.prefix(max(0, low))) + ellipsis
         }
+        func badgeAttachment(text: String, font: NSFont, backgroundColor: NSColor, textColor: NSColor) -> NSTextAttachment {
+            let horizontalPadding: CGFloat = 7
+            let height: CGFloat = 16
+            let width = ceil(textWidth(text, font: font) + horizontalPadding * 2)
+            let image = NSImage(size: NSSize(width: width, height: height))
+            image.lockFocus()
+            backgroundColor.setFill()
+            NSBezierPath(roundedRect: NSRect(x: 0, y: 0, width: width, height: height), xRadius: 2, yRadius: 2).fill()
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: textColor
+            ]
+            let textSize = (text as NSString).size(withAttributes: attributes)
+            (text as NSString).draw(at: NSPoint(x: (width - textSize.width) / 2, y: (height - textSize.height) / 2 - 0.5), withAttributes: attributes)
+            image.unlockFocus()
+
+            let attachment = NSTextAttachment()
+            attachment.image = image
+            attachment.bounds = NSRect(x: 0, y: -2, width: width, height: height)
+            return attachment
+        }
 
         let titleFont = NSFont.systemFont(ofSize: 15, weight: .bold)
-        let planFont = NSFont.systemFont(ofSize: 12, weight: .semibold)
+        let planFont = NSFont.systemFont(ofSize: 11, weight: .semibold)
+        let planBadge = planBadgeText(planType)
         let planColor: NSColor
-        switch normalizedPlanType(planType) {
+        let planTextColor: NSColor
+        let planStyle = normalizedPlanType(planBadge) ?? normalizedPlanType(planType)
+        switch planStyle {
         case "plus":
-            planColor = NSColor.green
+            planColor = NSColor(calibratedRed: 0.0, green: 0.72, blue: 0.08, alpha: 1.0)
+            planTextColor = NSColor.white
         case "pro5x", "pro20x":
             planColor = NSColor.systemOrange
+            planTextColor = NSColor.white
         default:
-            planColor = secondaryTextColor
+            planColor = NSColor.systemGray
+            planTextColor = NSColor.white
         }
         let title = attrs(font: titleFont,
                           color: primaryTextColor, lineHeight: 18, spacing: 20)
-        let plan = attrs(font: planFont,
-                         color: planColor, lineHeight: 18, spacing: 20)
         let rowLabelFont = NSFont.monospacedSystemFont(ofSize: 13, weight: .bold)
         let separatorFont = NSFont.monospacedSystemFont(ofSize: 8, weight: .bold)
         let dimFont = NSFont.monospacedSystemFont(ofSize: 10, weight: .regular)
@@ -740,10 +760,10 @@ class WindowController: NSWindowController, NSWindowDelegate {
         let rowLabel = attrs(font: rowLabelFont, color: primaryTextColor, lineHeight: 16)
         let separator = attrs(font: separatorFont,
                               color: secondaryTextColor, lineHeight: 16, baseline: 2.0)
-        let planBadge = planBadgeText(planType)
+        let planBadgeWidth = planBadge.isEmpty ? 0 : ceil(textWidth(planBadge, font: planFont) + 14)
         let titleRowMaxWidth: CGFloat = 184
-        let titlePlanGap: CGFloat = planBadge.isEmpty ? 0 : 2
-        let titleMaxWidth = max(20, titleRowMaxWidth - textWidth(planBadge, font: planFont) - titlePlanGap)
+        let titlePlanGap: CGFloat = planBadge.isEmpty ? 0 : 5
+        let titleMaxWidth = max(20, titleRowMaxWidth - planBadgeWidth - titlePlanGap)
         let titleText = ellipsized(language.title, font: titleFont, maxWidth: titleMaxWidth)
         let fiveLabel = "5h"
         let fiveSeparator = "  ┃  "
@@ -757,7 +777,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
         let mas = NSMutableAttributedString()
         mas.append(NSAttributedString(string: titleText, attributes: title))
         if !planBadge.isEmpty {
-            mas.append(NSAttributedString(string: planBadge, attributes: plan))
+            mas.append(NSAttributedString(string: " ", attributes: title))
+            mas.append(NSAttributedString(attachment: badgeAttachment(text: planBadge, font: planFont, backgroundColor: planColor, textColor: planTextColor)))
         }
         mas.append(NSAttributedString(string: "\n", attributes: title))
         mas.append(NSAttributedString(string: fiveLabel, attributes: rowLabel))
