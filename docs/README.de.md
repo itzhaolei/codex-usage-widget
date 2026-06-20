@@ -13,6 +13,7 @@ Ein schwebendes macOS-Fenster zum Anzeigen des Codex 5-Stunden-Limits, des Woche
 - Speichert Fensterposition, Theme und Anheftstatus.
 - Hält jeweils nur ein HUD und einen Dock-Launcher aktiv.
 - Bietet Menüaktionen für Updates, Deinstallation und Sprachwechsel.
+- Zeigt einen kleinen roten Punkt neben der Versionsnummer, wenn auf GitHub eine neuere Version verfügbar ist.
 - Unterstützt dunkles und helles Theme.
 - Folgt automatisch der Systemsprache.
 
@@ -25,6 +26,8 @@ Wenn Sie Terminal nicht verwenden möchten, öffnen Sie die neueste Release-Seit
 [Neueste Release-Seite öffnen](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Entpacken Sie die Datei und doppelklicken Sie auf `Install Codex Usage Widget.app`. Codex Desktop sollte bereits installiert und angemeldet sein.
+
+Die README verweist immer auf die neueste Release-Seite. Für ältere Versionen öffnen Sie [alle Releases](https://github.com/itzhaolei/codex-usage-widget/releases) und laden den Installer auf der jeweiligen Versionsseite herunter.
 
 ### Methode 2: Einzeilige Installation
 

@@ -15,6 +15,7 @@ A local macOS floating widget for watching Codex usage limits without opening se
 - Keeps only one HUD and one Dock launcher instance running.
 - Includes a Dock launcher app.
 - Adds menu-bar actions for updates, uninstall, and language switching.
+- Shows a small red dot next to the version label when a newer GitHub release is available.
 - Supports dark and light themes.
 - Automatically follows the system language.
 
@@ -27,6 +28,8 @@ For users who do not want to use Terminal, open the latest release page and down
 [Open the latest release page](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Unzip it, then double-click `Install Codex Usage Widget.app`. The installer copies the prebuilt widget and Dock launcher, registers the background launch agent, adds the launcher to Dock, and opens the widget.
+
+The README always links to the latest release page. To install an older version, open [all releases](https://github.com/itzhaolei/codex-usage-widget/releases) and download the installer from that version's page.
 
 Codex Desktop should already be installed and signed in. After installation, the widget reads the local Codex quota data from the current user account.
 

@@ -13,6 +13,7 @@ Uma janela flutuante para macOS que mostra o uso de 5 horas, o uso semanal e as 
 - Lembra posição, tema e estado fixado.
 - Mantém apenas um HUD e um lançador no Dock.
 - Adiciona ações de menu para atualizar, desinstalar e trocar idioma.
+- Mostra um pequeno ponto vermelho ao lado da versão quando há uma versão mais recente no GitHub.
 - Suporta tema claro e escuro.
 - Segue automaticamente o idioma do sistema.
 
@@ -25,6 +26,8 @@ Se você não quiser usar o Terminal, abra a página da versão mais recente e b
 [Abrir a página da versão mais recente](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Descompacte e dê dois cliques em `Install Codex Usage Widget.app`. O Codex Desktop deve estar instalado e com login feito.
+
+O README sempre aponta para a página da versão mais recente. Para instalar uma versão antiga, abra [todas as versões](https://github.com/itzhaolei/codex-usage-widget/releases) e baixe o instalador na página da versão desejada.
 
 ### Método 2: instalação em uma linha
 

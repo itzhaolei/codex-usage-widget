@@ -13,6 +13,7 @@
 - 记住窗口位置、黑白模式和置顶状态。
 - 只保留一个悬浮窗和一个 Dock 启动器实例。
 - 在菜单栏提供版本更新、卸载和语言切换。
+- 当 GitHub 上有新版本时，在版本号旁显示小红点。
 - 支持深色和浅色模式。
 - 自动跟随系统语言。
 
@@ -25,6 +26,8 @@
 [打开最新版本发布页面](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 解压后，双击 `Install Codex Usage Widget.app` 即可安装。安装器会复制预编译好的悬浮窗和 Dock 启动器，注册后台自启动任务，把启动器放入 Dock，并打开工具。
+
+README 始终指向最新版本发布页。如果需要安装旧版本，请打开[所有版本页面](https://github.com/itzhaolei/codex-usage-widget/releases)，进入对应版本页面下载该版本的安装器。
 
 使用前需要已经安装并登录 Codex Desktop。安装完成后，工具会读取当前用户本机的 Codex 配额数据并自动显示。
 

@@ -334,6 +334,7 @@ class MetricCardView: NSView {
 class WindowController: NSWindowController, NSWindowDelegate {
     var label: NSTextView!
     var versionLabel: NSTextField!
+    var versionUpdateDot: NSView!
     var balanceCardView: MetricCardView!
     var resetCardView: MetricCardView!
     var rootView: NSView!
@@ -347,6 +348,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
     var clickMonitor: Any?
     var lastSnapshotRefresh = Date.distantPast
     var snapshotRefreshInFlight = false
+    var lastVersionCheck = Date.distantPast
+    var versionCheckInFlight = false
     var isPinned = true
     var isLightMode = false
     var language = localizedLanguage()
@@ -418,17 +421,33 @@ class WindowController: NSWindowController, NSWindowDelegate {
         resetCardView.autoresizingMask = [.minXMargin, .maxYMargin]
         rootView.addSubview(resetCardView)
 
-        versionLabel = NSTextField(labelWithString: appVersionText())
+        let versionText = appVersionText()
+        let versionFont = NSFont.monospacedSystemFont(ofSize: 9, weight: .regular)
+        versionLabel = NSTextField(labelWithString: versionText)
         versionLabel.frame = NSRect(x: w - 82, y: 8, width: 68, height: 16)
         versionLabel.autoresizingMask = [.minXMargin, .maxYMargin]
         versionLabel.alignment = .right
-        versionLabel.font = NSFont.monospacedSystemFont(ofSize: 9, weight: .regular)
+        versionLabel.font = versionFont
         versionLabel.textColor = secondaryTextColor
         versionLabel.backgroundColor = NSColor.clear
         versionLabel.isBezeled = false
         versionLabel.isEditable = false
         versionLabel.isSelectable = false
         rootView.addSubview(versionLabel)
+
+        let versionTextWidth = ceil((versionText as NSString).size(withAttributes: [.font: versionFont]).width)
+        let dotSize: CGFloat = 4
+        let dotGap: CGFloat = 4
+        let dotX = versionLabel.frame.maxX - versionTextWidth - dotGap - dotSize
+        let dotY = versionLabel.frame.midY - dotSize / 2 + 1
+        versionUpdateDot = NSView(frame: NSRect(x: dotX, y: dotY, width: dotSize, height: dotSize))
+        versionUpdateDot.autoresizingMask = [.minXMargin, .maxYMargin]
+        versionUpdateDot.wantsLayer = true
+        versionUpdateDot.layer?.cornerRadius = 2
+        versionUpdateDot.layer?.masksToBounds = true
+        versionUpdateDot.layer?.backgroundColor = NSColor.systemRed.cgColor
+        versionUpdateDot.isHidden = true
+        rootView.addSubview(versionUpdateDot)
 
         let controls = makeControlCapsule(frame: NSRect(x: w - 125, y: h - 38, width: 111, height: 28))
         controls.autoresizingMask = [.minXMargin, .minYMargin]
@@ -458,6 +477,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         installClickActivationMonitor()
         panel.makeKeyAndOrderFront(nil)
         panel.orderFrontRegardless()
+        refreshVersionUpdateStatus(force: true)
     }
 
     func installClickActivationMonitor() {
@@ -577,6 +597,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         balanceCardView?.applyAppearance(secondaryTextColor: secondaryTextColor)
         resetCardView?.applyAppearance(secondaryTextColor: secondaryTextColor)
         versionLabel?.textColor = secondaryTextColor
+        versionUpdateDot?.layer?.backgroundColor = NSColor.systemRed.cgColor
         if let image = NSImage(systemSymbolName: isLightMode ? "moon.fill" : "sun.max.fill", accessibilityDescription: nil) {
             image.isTemplate = true
             themeButton?.image = image
@@ -672,8 +693,70 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     func refresh() {
         reloadLanguageIfNeeded()
+        refreshVersionUpdateStatus()
         refreshSnapshotIfNeeded(redrawAfterCompletion: true)
         renderSnapshot()
+    }
+
+    func refreshVersionUpdateStatus(force: Bool = false) {
+        if versionCheckInFlight { return }
+        if !force, Date().timeIntervalSince(lastVersionCheck) < 1800 { return }
+        versionCheckInFlight = true
+        lastVersionCheck = Date()
+
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            let latestVersion = Self.fetchLatestReleaseTag()
+            let current = Self.normalizedVersion(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
+            let latest = Self.normalizedVersion(latestVersion)
+            let hasUpdate: Bool
+            if let current, let latest {
+                hasUpdate = Self.compareVersions(current, latest) == .orderedAscending
+            } else {
+                hasUpdate = false
+            }
+
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.versionCheckInFlight = false
+                self.versionUpdateDot?.isHidden = !hasUpdate
+            }
+        }
+    }
+
+    static func fetchLatestReleaseTag() -> String? {
+        guard let url = URL(string: "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases/latest"),
+              let data = try? Data(contentsOf: url),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return nil
+        }
+        return json["tag_name"] as? String
+    }
+
+    static func normalizedVersion(_ value: String?) -> [Int]? {
+        guard let value else { return nil }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        let version = trimmed.hasPrefix("v") ? String(trimmed.dropFirst()) : trimmed
+        let parts = version.split(separator: ".")
+        guard !parts.isEmpty else { return nil }
+
+        var numbers: [Int] = []
+        for part in parts {
+            let digits = part.prefix { $0.isNumber }
+            guard let number = Int(digits) else { return nil }
+            numbers.append(number)
+        }
+        return numbers
+    }
+
+    static func compareVersions(_ lhs: [Int], _ rhs: [Int]) -> ComparisonResult {
+        let count = max(lhs.count, rhs.count)
+        for index in 0..<count {
+            let left = index < lhs.count ? lhs[index] : 0
+            let right = index < rhs.count ? rhs[index] : 0
+            if left > right { return .orderedDescending }
+            if left < right { return .orderedAscending }
+        }
+        return .orderedSame
     }
 
     func reloadLanguageIfNeeded() {

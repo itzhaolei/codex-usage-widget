@@ -13,6 +13,7 @@ Une fenêtre flottante macOS pour afficher l’usage Codex sur 5 heures, l’usa
 - Mémorise la position, le thème et l’état épinglé.
 - Conserve un seul HUD et un seul lanceur Dock.
 - Ajoute des actions de menu pour mettre à jour, désinstaller et changer de langue.
+- Affiche un petit point rouge à côté de la version lorsqu’une nouvelle release GitHub est disponible.
 - Prend en charge les thèmes clair et sombre.
 - Suit automatiquement la langue du système.
 
@@ -25,6 +26,8 @@ Si vous ne souhaitez pas utiliser Terminal, ouvrez la dernière page de release 
 [Ouvrir la dernière page de release](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Décompressez-le, puis double-cliquez sur `Install Codex Usage Widget.app`. Codex Desktop doit déjà être installé et connecté.
+
+Le README pointe toujours vers la dernière page de release. Pour installer une ancienne version, ouvrez [toutes les releases](https://github.com/itzhaolei/codex-usage-widget/releases) et téléchargez l’installateur depuis la page de cette version.
 
 ### Méthode 2 : installation en une ligne
 

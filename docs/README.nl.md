@@ -13,6 +13,7 @@ Een zwevend macOS-venster voor Codex-gebruik over 5 uur, weekgebruik en beschikb
 - Onthoudt positie, thema en vastzetstatus.
 - Houdt slechts één HUD en één Dock-launcher actief.
 - Biedt menuacties voor bijwerken, verwijderen en taal wisselen.
+- Toont een kleine rode stip naast de versie wanneer er een nieuwere GitHub-release beschikbaar is.
 - Ondersteunt donker en licht thema.
 - Volgt automatisch de systeemtaal.
 
@@ -25,6 +26,8 @@ Als je Terminal niet wilt gebruiken, open dan de nieuwste releasepagina en downl
 [Open de nieuwste releasepagina](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Pak het bestand uit en dubbelklik op `Install Codex Usage Widget.app`. Codex Desktop moet al geïnstalleerd zijn en aangemeld zijn.
+
+De README verwijst altijd naar de nieuwste releasepagina. Voor een oudere versie open je [alle releases](https://github.com/itzhaolei/codex-usage-widget/releases) en download je de installer vanaf de pagina van die versie.
 
 ### Methode 2: installatie met één opdracht
 

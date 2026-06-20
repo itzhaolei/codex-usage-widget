@@ -7,6 +7,7 @@ All notable changes to Codex Usage Widget are documented here.
 ### Added
 
 - Added a USD balance display synced from the current Codex usage endpoint with the rest of the snapshot.
+- Added a red update indicator next to the version label when the installed version is older than the latest GitHub release.
 
 ### Changed
 
