@@ -10,11 +10,12 @@ All notable changes to Codex Usage Widget are documented here.
 
 ### Changed
 
-- Increased the widget height and redesigned the bottom area as two refined cards, with balance on the left and available resets on the right.
+- Increased the widget height and redesigned the bottom area as two native refined cards, with balance on the left and available resets on the right.
 
 ### Fixed
 
 - Fixed the local install script so reinstalling during development restarts both the Dock launcher and the floating widget instead of leaving old processes running.
+- Stopped the LaunchAgent before local reinstall work starts so it cannot relaunch the widget while the binary is being rebuilt.
 
 ### Notes
 

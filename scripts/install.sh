@@ -102,6 +102,7 @@ PY
 
 mkdir -p "$INSTALL_DIR" "$SCRIPTS_DIR" "$MACOS_DIR" "$RESOURCES_DIR" "$USER_APPS_DIR" "$LAUNCHER_MACOS_DIR" "$LAUNCHER_RESOURCES_DIR" "$LAUNCH_AGENT_DIR"
 
+launchctl bootout "gui/$(id -u)" "$LAUNCH_AGENT" >/dev/null 2>&1 || true
 pkill -f "$LAUNCHER_PATTERN" >/dev/null 2>&1 || true
 pkill -f "$WIDGET_PATTERN" >/dev/null 2>&1 || true
 sleep 0.3

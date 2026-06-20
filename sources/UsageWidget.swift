@@ -248,10 +248,97 @@ func normalizedPlanType(_ planType: String?) -> String? {
     }
 }
 
+class MetricCardView: NSView {
+    private let iconBox = NSView(frame: .zero)
+    private let iconLabel = NSTextField(labelWithString: "")
+    private let titleLabel = NSTextField(labelWithString: "")
+    private let valueLabel = NSTextField(labelWithString: "")
+    private var accentColor = NSColor.green
+    private var muted = false
+    private var lightMode = false
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        wantsLayer = true
+        layer?.cornerRadius = 9
+        layer?.masksToBounds = true
+        layer?.borderWidth = 1
+
+        iconBox.wantsLayer = true
+        iconBox.layer?.cornerRadius = 5
+        iconBox.layer?.masksToBounds = true
+        addSubview(iconBox)
+
+        iconLabel.alignment = .center
+        iconLabel.font = NSFont.monospacedSystemFont(ofSize: 10, weight: .bold)
+        iconLabel.backgroundColor = .clear
+        iconLabel.isBezeled = false
+        iconLabel.isEditable = false
+        iconLabel.isSelectable = false
+        iconBox.addSubview(iconLabel)
+
+        titleLabel.font = NSFont.monospacedSystemFont(ofSize: 9, weight: .medium)
+        titleLabel.backgroundColor = .clear
+        titleLabel.isBezeled = false
+        titleLabel.isEditable = false
+        titleLabel.isSelectable = false
+        titleLabel.lineBreakMode = .byTruncatingTail
+        addSubview(titleLabel)
+
+        valueLabel.font = NSFont.monospacedSystemFont(ofSize: 13, weight: .semibold)
+        valueLabel.backgroundColor = .clear
+        valueLabel.isBezeled = false
+        valueLabel.isEditable = false
+        valueLabel.isSelectable = false
+        valueLabel.lineBreakMode = .byTruncatingTail
+        addSubview(valueLabel)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func layout() {
+        super.layout()
+        iconBox.frame = NSRect(x: 9, y: 12, width: 20, height: 20)
+        iconLabel.frame = NSRect(x: 0, y: 2, width: 20, height: 14)
+        titleLabel.frame = NSRect(x: 38, y: 25, width: bounds.width - 48, height: 12)
+        valueLabel.frame = NSRect(x: 38, y: 8, width: bounds.width - 48, height: 17)
+    }
+
+    func configure(title: String, value: String, symbol: String, accentColor: NSColor, muted: Bool, lightMode: Bool, secondaryTextColor: NSColor) {
+        self.accentColor = accentColor
+        self.muted = muted
+        self.lightMode = lightMode
+        titleLabel.stringValue = title
+        valueLabel.stringValue = value
+        iconLabel.stringValue = symbol
+        titleLabel.textColor = secondaryTextColor
+        applyAppearance(secondaryTextColor: secondaryTextColor)
+        needsLayout = true
+    }
+
+    func applyAppearance(secondaryTextColor: NSColor) {
+        let effectiveAccent = muted ? secondaryTextColor : accentColor
+        layer?.backgroundColor = (lightMode
+            ? NSColor.white.withAlphaComponent(0.36)
+            : NSColor.white.withAlphaComponent(0.08)).cgColor
+        layer?.borderColor = (lightMode
+            ? NSColor.black.withAlphaComponent(0.12)
+            : NSColor.white.withAlphaComponent(0.14)).cgColor
+        iconBox.layer?.backgroundColor = effectiveAccent.withAlphaComponent(muted ? 0.12 : 0.20).cgColor
+        iconLabel.textColor = effectiveAccent
+        valueLabel.textColor = effectiveAccent
+        titleLabel.textColor = secondaryTextColor
+    }
+}
+
 // MARK: — 主窗口控制器
 class WindowController: NSWindowController, NSWindowDelegate {
     var label: NSTextView!
     var versionLabel: NSTextField!
+    var balanceCardView: MetricCardView!
+    var resetCardView: MetricCardView!
     var rootView: NSView!
     var vibrancyView: NSVisualEffectView!
     var capsuleView: NSView!
@@ -316,7 +403,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         vibrancyView.layer?.masksToBounds = true
         rootView.addSubview(vibrancyView)
 
-        label = NSTextView(frame: NSRect(x: 12, y: 6, width: w - 24, height: h - 22))
+        label = NSTextView(frame: NSRect(x: 12, y: 78, width: w - 24, height: h - 94))
         label.autoresizingMask = [.width, .height]
         label.drawsBackground = false
         label.isEditable = false
@@ -325,6 +412,14 @@ class WindowController: NSWindowController, NSWindowDelegate {
         label.textContainer?.lineFragmentPadding = 0
         label.backgroundColor = NSColor.clear
         rootView.addSubview(label)
+
+        balanceCardView = MetricCardView(frame: NSRect(x: 12, y: 30, width: 148, height: 44))
+        balanceCardView.autoresizingMask = [.maxXMargin, .maxYMargin]
+        rootView.addSubview(balanceCardView)
+
+        resetCardView = MetricCardView(frame: NSRect(x: 170, y: 30, width: 148, height: 44))
+        resetCardView.autoresizingMask = [.minXMargin, .maxYMargin]
+        rootView.addSubview(resetCardView)
 
         versionLabel = NSTextField(labelWithString: appVersionText())
         versionLabel.frame = NSRect(x: w - 82, y: 8, width: 68, height: 16)
@@ -482,6 +577,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
         for button in controlButtons {
             button.contentTintColor = controlTintColor
         }
+        balanceCardView?.applyAppearance(secondaryTextColor: secondaryTextColor)
+        resetCardView?.applyAppearance(secondaryTextColor: secondaryTextColor)
         versionLabel?.textColor = secondaryTextColor
         if let image = NSImage(systemSymbolName: isLightMode ? "moon.fill" : "sun.max.fill", accessibilityDescription: nil) {
             image.isTemplate = true
@@ -608,6 +705,26 @@ class WindowController: NSWindowController, NSWindowDelegate {
         let sevenReset = formatSevenDayReset(seven?.resets_at, language: language)
         let resetCredits = snap.reset_credits?.available_count
         let balance = formatUSDBalance(snap.balance_usd)
+        let resetText = resetCredits.map { "\($0) \(language.times)" } ?? "—"
+        let hasResetCredits = (resetCredits ?? 0) > 0
+        balanceCardView.configure(
+            title: language.balance,
+            value: balance,
+            symbol: "$",
+            accentColor: NSColor.green,
+            muted: balance == "—",
+            lightMode: isLightMode,
+            secondaryTextColor: secondaryTextColor
+        )
+        resetCardView.configure(
+            title: language.availableReset,
+            value: resetText,
+            symbol: "R",
+            accentColor: NSColor.green,
+            muted: !hasResetCredits,
+            lightMode: isLightMode,
+            secondaryTextColor: secondaryTextColor
+        )
 
         let emptyBar = String(repeating: "░", count: 15)
         let fiveBar = fivePct >= 0 ? progressBar(percent: fivePct) : emptyBar
@@ -616,9 +733,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         buildAttributedText(
             planType: snap.plan_type,
             fiveBar: fiveBar, fivePct: fivePct, fiveReset: fiveReset,
-            sevenBar: sevenBar, sevenPct: sevenPct, sevenReset: sevenReset,
-            resetCredits: resetCredits,
-            balance: balance
+            sevenBar: sevenBar, sevenPct: sevenPct, sevenReset: sevenReset
         )
     }
 
@@ -674,9 +789,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     func buildAttributedText(planType: String?,
                              fiveBar: String, fivePct: Int, fiveReset: String,
-                             sevenBar: String, sevenPct: Int, sevenReset: String,
-                             resetCredits: Int?,
-                             balance: String) {
+                             sevenBar: String, sevenPct: Int, sevenReset: String) {
         func fixedParagraph(height: CGFloat, spacing: CGFloat = 0) -> NSMutableParagraphStyle {
             let style = NSMutableParagraphStyle()
             style.minimumLineHeight = height
@@ -737,55 +850,6 @@ class WindowController: NSWindowController, NSWindowDelegate {
             attachment.bounds = NSRect(x: 0, y: -2, width: width, height: height)
             return attachment
         }
-        func infoCardAttachment(title: String, value: String, symbol: String, accentColor: NSColor, muted: Bool) -> NSTextAttachment {
-            let width: CGFloat = 145
-            let height: CGFloat = 34
-            let image = NSImage(size: NSSize(width: width, height: height))
-            image.lockFocus()
-            let background = isLightMode
-                ? NSColor.white.withAlphaComponent(0.34)
-                : NSColor.white.withAlphaComponent(0.075)
-            let stroke = isLightMode
-                ? NSColor.black.withAlphaComponent(0.12)
-                : NSColor.white.withAlphaComponent(0.14)
-            let rect = NSRect(x: 0.5, y: 0.5, width: width - 1, height: height - 1)
-            let path = NSBezierPath(roundedRect: rect, xRadius: 7, yRadius: 7)
-            background.setFill()
-            path.fill()
-            stroke.setStroke()
-            path.lineWidth = 1
-            path.stroke()
-
-            let iconRect = NSRect(x: 8, y: 9, width: 16, height: 16)
-            accentColor.withAlphaComponent(muted ? 0.12 : 0.20).setFill()
-            NSBezierPath(roundedRect: iconRect, xRadius: 4, yRadius: 4).fill()
-
-            let iconAttributes: [NSAttributedString.Key: Any] = [
-                .font: NSFont.monospacedSystemFont(ofSize: 10, weight: .bold),
-                .foregroundColor: muted ? secondaryTextColor : accentColor
-            ]
-            let icon = symbol as NSString
-            let iconSize = icon.size(withAttributes: iconAttributes)
-            icon.draw(at: NSPoint(x: iconRect.midX - iconSize.width / 2, y: iconRect.midY - iconSize.height / 2 - 0.5), withAttributes: iconAttributes)
-
-            let titleAttributes: [NSAttributedString.Key: Any] = [
-                .font: NSFont.monospacedSystemFont(ofSize: 9, weight: .medium),
-                .foregroundColor: secondaryTextColor
-            ]
-            let valueAttributes: [NSAttributedString.Key: Any] = [
-                .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .semibold),
-                .foregroundColor: muted ? secondaryTextColor : accentColor
-            ]
-            (title as NSString).draw(at: NSPoint(x: 30, y: 18), withAttributes: titleAttributes)
-            (value as NSString).draw(at: NSPoint(x: 30, y: 5), withAttributes: valueAttributes)
-            image.unlockFocus()
-
-            let attachment = NSTextAttachment()
-            attachment.image = image
-            attachment.bounds = NSRect(x: 0, y: -8, width: width, height: height)
-            return attachment
-        }
-
         let titleFont = NSFont.systemFont(ofSize: 15, weight: .bold)
         let planFont = NSFont.systemFont(ofSize: 11, weight: .semibold)
         let planBadge = planBadgeText(planType)
@@ -812,8 +876,6 @@ class WindowController: NSWindowController, NSWindowDelegate {
                             color: primaryTextColor, lineHeight: 20)
         let green = attrs(font: NSFont.monospacedSystemFont(ofSize: 20, weight: .regular),
                           color: NSColor.green, lineHeight: 20)
-        let greenText = attrs(font: NSFont.monospacedSystemFont(ofSize: 12, weight: .semibold),
-                              color: NSColor.green, lineHeight: 16)
         let warn = attrs(font: NSFont.monospacedSystemFont(ofSize: 20, weight: .regular),
                          color: NSColor.systemRed, lineHeight: 20)
         let barBottomSpacer = attrs(font: NSFont.monospacedSystemFont(ofSize: 10, weight: .regular),
@@ -858,24 +920,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         mas.append(NSAttributedString(string: " \n", attributes: barTopSpacer))
         mas.append(NSAttributedString(string: sevenBar, attributes: sevenPct <= 20 ? warn : green))
         mas.append(NSAttributedString(string: "  \(sevenPct >= 0 ? "\(sevenPct)%" : "—")\n", attributes: percent))
-        mas.append(NSAttributedString(string: " \n", attributes: barBottomSpacer))
-        let resetText = resetCredits.map { "\($0) \(language.times)" } ?? "—"
-        let hasResetCredits = (resetCredits ?? 0) > 0
-        mas.append(NSAttributedString(attachment: infoCardAttachment(
-            title: language.balance,
-            value: balance,
-            symbol: "$",
-            accentColor: NSColor.green,
-            muted: balance == "—"
-        )))
-        mas.append(NSAttributedString(string: "  ", attributes: greenText))
-        mas.append(NSAttributedString(attachment: infoCardAttachment(
-            title: language.availableReset,
-            value: resetText,
-            symbol: "R",
-            accentColor: NSColor.green,
-            muted: !hasResetCredits
-        )))
+        mas.append(NSAttributedString(string: " ", attributes: barBottomSpacer))
 
         label.textStorage?.setAttributedString(mas)
     }
