@@ -839,12 +839,12 @@ class WindowController: NSWindowController, NSWindowDelegate {
                 .foregroundColor: textColor
             ]
             let textSize = (text as NSString).size(withAttributes: attributes)
-            (text as NSString).draw(at: NSPoint(x: (width - textSize.width) / 2, y: (height - textSize.height) / 2 - 0.5), withAttributes: attributes)
+            (text as NSString).draw(at: NSPoint(x: (width - textSize.width) / 2, y: (height - textSize.height) / 2 + 0.5), withAttributes: attributes)
             image.unlockFocus()
 
             let attachment = NSTextAttachment()
             attachment.image = image
-            attachment.bounds = NSRect(x: 0, y: -2, width: width, height: height)
+            attachment.bounds = NSRect(x: 0, y: -1, width: width, height: height)
             return attachment
         }
         let titleFont = NSFont.systemFont(ofSize: 15, weight: .bold)
