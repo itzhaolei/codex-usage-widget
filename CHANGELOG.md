@@ -11,6 +11,7 @@ All notable changes to Codex Usage Widget are documented here.
 ### Changed
 
 - Increased the widget height and redesigned the bottom area as two native refined cards, with balance on the left and available resets on the right.
+- Raised the bottom cards slightly and replaced text-based card icons with cleaner system icons.
 
 ### Fixed
 

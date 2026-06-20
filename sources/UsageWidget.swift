@@ -250,7 +250,7 @@ func normalizedPlanType(_ planType: String?) -> String? {
 
 class MetricCardView: NSView {
     private let iconBox = NSView(frame: .zero)
-    private let iconLabel = NSTextField(labelWithString: "")
+    private let iconView = NSImageView(frame: .zero)
     private let titleLabel = NSTextField(labelWithString: "")
     private let valueLabel = NSTextField(labelWithString: "")
     private var accentColor = NSColor.green
@@ -269,13 +269,9 @@ class MetricCardView: NSView {
         iconBox.layer?.masksToBounds = true
         addSubview(iconBox)
 
-        iconLabel.alignment = .center
-        iconLabel.font = NSFont.monospacedSystemFont(ofSize: 10, weight: .bold)
-        iconLabel.backgroundColor = .clear
-        iconLabel.isBezeled = false
-        iconLabel.isEditable = false
-        iconLabel.isSelectable = false
-        iconBox.addSubview(iconLabel)
+        iconView.imageScaling = .scaleProportionallyDown
+        iconView.contentTintColor = .green
+        iconBox.addSubview(iconView)
 
         titleLabel.font = NSFont.monospacedSystemFont(ofSize: 9, weight: .medium)
         titleLabel.backgroundColor = .clear
@@ -301,7 +297,7 @@ class MetricCardView: NSView {
     override func layout() {
         super.layout()
         iconBox.frame = NSRect(x: 9, y: 12, width: 20, height: 20)
-        iconLabel.frame = NSRect(x: 0, y: 2, width: 20, height: 14)
+        iconView.frame = NSRect(x: 4, y: 4, width: 12, height: 12)
         titleLabel.frame = NSRect(x: 38, y: 25, width: bounds.width - 48, height: 12)
         valueLabel.frame = NSRect(x: 38, y: 8, width: bounds.width - 48, height: 17)
     }
@@ -312,7 +308,13 @@ class MetricCardView: NSView {
         self.lightMode = lightMode
         titleLabel.stringValue = title
         valueLabel.stringValue = value
-        iconLabel.stringValue = symbol
+        let symbolName = symbol == "$" ? "dollarsign" : "arrow.clockwise"
+        if let image = NSImage(systemSymbolName: symbolName, accessibilityDescription: nil) {
+            image.isTemplate = true
+            iconView.image = image
+        } else {
+            iconView.image = nil
+        }
         titleLabel.textColor = secondaryTextColor
         applyAppearance(secondaryTextColor: secondaryTextColor)
         needsLayout = true
@@ -327,7 +329,7 @@ class MetricCardView: NSView {
             ? NSColor.black.withAlphaComponent(0.12)
             : NSColor.white.withAlphaComponent(0.14)).cgColor
         iconBox.layer?.backgroundColor = effectiveAccent.withAlphaComponent(muted ? 0.12 : 0.20).cgColor
-        iconLabel.textColor = effectiveAccent
+        iconView.contentTintColor = effectiveAccent
         valueLabel.textColor = effectiveAccent
         titleLabel.textColor = secondaryTextColor
     }
@@ -413,11 +415,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
         label.backgroundColor = NSColor.clear
         rootView.addSubview(label)
 
-        balanceCardView = MetricCardView(frame: NSRect(x: 12, y: 30, width: 148, height: 44))
+        balanceCardView = MetricCardView(frame: NSRect(x: 12, y: 35, width: 148, height: 44))
         balanceCardView.autoresizingMask = [.maxXMargin, .maxYMargin]
         rootView.addSubview(balanceCardView)
 
-        resetCardView = MetricCardView(frame: NSRect(x: 170, y: 30, width: 148, height: 44))
+        resetCardView = MetricCardView(frame: NSRect(x: 170, y: 35, width: 148, height: 44))
         resetCardView.autoresizingMask = [.minXMargin, .maxYMargin]
         rootView.addSubview(resetCardView)
 
