@@ -249,8 +249,6 @@ func normalizedPlanType(_ planType: String?) -> String? {
 }
 
 class MetricCardView: NSView {
-    private let iconBox = NSView(frame: .zero)
-    private let iconView = NSImageView(frame: .zero)
     private let titleLabel = NSTextField(labelWithString: "")
     private let valueLabel = NSTextField(labelWithString: "")
     private var accentColor = NSColor.green
@@ -264,21 +262,13 @@ class MetricCardView: NSView {
         layer?.masksToBounds = true
         layer?.borderWidth = 1
 
-        iconBox.wantsLayer = true
-        iconBox.layer?.cornerRadius = 5
-        iconBox.layer?.masksToBounds = true
-        addSubview(iconBox)
-
-        iconView.imageScaling = .scaleProportionallyDown
-        iconView.contentTintColor = .green
-        iconBox.addSubview(iconView)
-
         titleLabel.font = NSFont.monospacedSystemFont(ofSize: 9, weight: .medium)
         titleLabel.backgroundColor = .clear
         titleLabel.isBezeled = false
         titleLabel.isEditable = false
         titleLabel.isSelectable = false
         titleLabel.lineBreakMode = .byTruncatingTail
+        titleLabel.alignment = .center
         addSubview(titleLabel)
 
         valueLabel.font = NSFont.monospacedSystemFont(ofSize: 13, weight: .semibold)
@@ -287,6 +277,7 @@ class MetricCardView: NSView {
         valueLabel.isEditable = false
         valueLabel.isSelectable = false
         valueLabel.lineBreakMode = .byTruncatingTail
+        valueLabel.alignment = .center
         addSubview(valueLabel)
     }
 
@@ -296,10 +287,8 @@ class MetricCardView: NSView {
 
     override func layout() {
         super.layout()
-        iconBox.frame = NSRect(x: 9, y: 12, width: 20, height: 20)
-        iconView.frame = NSRect(x: 4, y: 4, width: 12, height: 12)
-        titleLabel.frame = NSRect(x: 38, y: 25, width: bounds.width - 48, height: 12)
-        valueLabel.frame = NSRect(x: 38, y: 8, width: bounds.width - 48, height: 17)
+        titleLabel.frame = NSRect(x: 10, y: 25, width: bounds.width - 20, height: 12)
+        valueLabel.frame = NSRect(x: 10, y: 8, width: bounds.width - 20, height: 17)
     }
 
     func configure(title: String, value: String, symbol: String, accentColor: NSColor, muted: Bool, lightMode: Bool, secondaryTextColor: NSColor) {
@@ -308,13 +297,6 @@ class MetricCardView: NSView {
         self.lightMode = lightMode
         titleLabel.stringValue = title
         valueLabel.stringValue = value
-        let symbolName = symbol == "$" ? "dollarsign" : "arrow.clockwise"
-        if let image = NSImage(systemSymbolName: symbolName, accessibilityDescription: nil) {
-            image.isTemplate = true
-            iconView.image = image
-        } else {
-            iconView.image = nil
-        }
         titleLabel.textColor = secondaryTextColor
         applyAppearance(secondaryTextColor: secondaryTextColor)
         needsLayout = true
@@ -328,8 +310,6 @@ class MetricCardView: NSView {
         layer?.borderColor = (lightMode
             ? NSColor.black.withAlphaComponent(0.12)
             : NSColor.white.withAlphaComponent(0.14)).cgColor
-        iconBox.layer?.backgroundColor = effectiveAccent.withAlphaComponent(muted ? 0.12 : 0.20).cgColor
-        iconView.contentTintColor = effectiveAccent
         valueLabel.textColor = effectiveAccent
         titleLabel.textColor = secondaryTextColor
     }
@@ -415,11 +395,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
         label.backgroundColor = NSColor.clear
         rootView.addSubview(label)
 
-        balanceCardView = MetricCardView(frame: NSRect(x: 12, y: 35, width: 148, height: 44))
+        balanceCardView = MetricCardView(frame: NSRect(x: 12, y: 38, width: 148, height: 44))
         balanceCardView.autoresizingMask = [.maxXMargin, .maxYMargin]
         rootView.addSubview(balanceCardView)
 
-        resetCardView = MetricCardView(frame: NSRect(x: 170, y: 35, width: 148, height: 44))
+        resetCardView = MetricCardView(frame: NSRect(x: 170, y: 38, width: 148, height: 44))
         resetCardView.autoresizingMask = [.minXMargin, .maxYMargin]
         rootView.addSubview(resetCardView)
 
