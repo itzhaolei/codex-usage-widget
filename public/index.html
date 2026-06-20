@@ -42,18 +42,39 @@
     .brand img { width: 38px; height: 38px; border-radius: 10px; box-shadow: 0 10px 32px rgba(16, 240, 47, 0.2); }
     nav { display: flex; gap: 16px; color: var(--muted); font-size: 14px; }
     .topbar { display: flex; align-items: center; gap: 18px; }
-    .languages { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-    .lang {
+    .language-picker {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
       border: 1px solid var(--line);
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.06);
       color: var(--muted);
+      overflow: hidden;
+    }
+    .language-picker::after {
+      content: "⌄";
+      position: absolute;
+      right: 11px;
+      top: 50%;
+      transform: translateY(-54%);
+      pointer-events: none;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 13px;
+    }
+    .language-select {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--text);
       cursor: pointer;
       font: inherit;
-      font-size: 12px;
-      padding: 5px 9px;
+      font-size: 13px;
+      min-width: 146px;
+      padding: 8px 31px 8px 12px;
     }
-    .lang.active { color: #021107; background: var(--green); border-color: transparent; font-weight: 800; }
+    .language-select:focus { outline: 0; }
     .hero {
       display: grid;
       grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
@@ -134,7 +155,6 @@
       .hero { padding-bottom: 46px; }
       header { flex-direction: column; }
       .topbar { align-items: flex-start; }
-      .languages { justify-content: flex-start; }
     }
   </style>
 </head>
@@ -144,17 +164,20 @@
       <div class="brand"><img src="/assets/icon.png" alt="Quota Bubble icon"><span>Quota Bubble</span></div>
       <div class="topbar">
         <nav><a href="#install" data-i18n="navInstall">Install</a><a href="#features" data-i18n="navFeatures">Features</a><a href="https://github.com/itzhaolei/codex-usage-widget">GitHub</a></nav>
-        <div class="languages" aria-label="Language selector">
-          <button class="lang" data-lang="en" type="button">EN</button>
-          <button class="lang" data-lang="zh" type="button">中文</button>
-          <button class="lang" data-lang="ja" type="button">日本語</button>
-          <button class="lang" data-lang="ko" type="button">한국어</button>
-          <button class="lang" data-lang="de" type="button">DE</button>
-          <button class="lang" data-lang="fr" type="button">FR</button>
-          <button class="lang" data-lang="es" type="button">ES</button>
-          <button class="lang" data-lang="pt" type="button">PT</button>
-          <button class="lang" data-lang="it" type="button">IT</button>
-          <button class="lang" data-lang="nl" type="button">NL</button>
+        <div class="language-picker" aria-label="Language selector">
+          <select class="language-select" id="languageSelect">
+            <option value="system">System</option>
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+            <option value="ja">日本語</option>
+            <option value="ko">한국어</option>
+            <option value="de">Deutsch</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
+            <option value="pt">Português</option>
+            <option value="it">Italiano</option>
+            <option value="nl">Nederlands</option>
+          </select>
         </div>
       </div>
     </header>
@@ -193,7 +216,7 @@
   <script>
     const translations = {
       en: {
-        navInstall: "Install", navFeatures: "Features", eyebrow: "Local macOS quota monitor for Codex",
+        navInstall: "Install", navFeatures: "Features", system: "Follow system", eyebrow: "Local macOS quota monitor for Codex",
         headline: "Your Codex quota, always visible.",
         lead: "Quota Bubble is a small floating macOS window that keeps Codex usage, weekly limits, balance, reset credits, and update status in sight without opening settings.",
         download: "Download installer", source: "View source", share: "Share", shared: "Share sheet opened.", copied: "Link copied.", copyFailed: "Could not copy the link.",
@@ -205,7 +228,7 @@
         footer: "Quota Bubble is an independent local tool for viewing Codex quota information."
       },
       zh: {
-        navInstall: "安装", navFeatures: "功能", eyebrow: "Codex 本地 macOS 配额悬浮窗",
+        navInstall: "安装", navFeatures: "功能", system: "跟随系统", eyebrow: "Codex 本地 macOS 配额悬浮窗",
         headline: "Codex 配额，一眼可见。",
         lead: "Quota Bubble 是一个轻量的 macOS 悬浮窗，可以直接显示 Codex 用量、每周限制、余额、可用重置和更新状态，不用再打开设置查看。",
         download: "下载安装器", source: "查看源码", share: "分享", shared: "已打开系统分享。", copied: "链接已复制。", copyFailed: "链接复制失败。",
@@ -217,7 +240,7 @@
         footer: "Quota Bubble 是一个独立的本地工具，用来查看 Codex 配额信息。"
       },
       ja: {
-        navInstall: "インストール", navFeatures: "機能", eyebrow: "Codex 用のローカル macOS クォータモニター",
+        navInstall: "インストール", navFeatures: "機能", system: "システムに合わせる", eyebrow: "Codex 用のローカル macOS クォータモニター",
         headline: "Codex のクォータを、いつでも見える場所に。",
         lead: "Quota Bubble は、Codex の使用量、週間制限、残高、リセット回数、更新状態を設定画面なしで確認できる小さな macOS フローティングウィンドウです。",
         download: "インストーラーをダウンロード", source: "ソースを見る", share: "共有", shared: "共有シートを開きました。", copied: "リンクをコピーしました。", copyFailed: "リンクをコピーできませんでした。",
@@ -229,7 +252,7 @@
         footer: "Quota Bubble は Codex のクォータ情報を表示する独立したローカルツールです。"
       },
       ko: {
-        navInstall: "설치", navFeatures: "기능", eyebrow: "Codex용 로컬 macOS 할당량 모니터",
+        navInstall: "설치", navFeatures: "기능", system: "시스템 따르기", eyebrow: "Codex용 로컬 macOS 할당량 모니터",
         headline: "Codex 할당량을 항상 한눈에.",
         lead: "Quota Bubble은 Codex 사용량, 주간 한도, 잔액, 재설정 횟수, 업데이트 상태를 설정을 열지 않고 보여 주는 작은 macOS 플로팅 창입니다.",
         download: "설치 프로그램 다운로드", source: "소스 보기", share: "공유", shared: "공유 창을 열었습니다.", copied: "링크가 복사되었습니다.", copyFailed: "링크를 복사하지 못했습니다.",
@@ -241,7 +264,7 @@
         footer: "Quota Bubble은 Codex 할당량 정보를 확인하는 독립 로컬 도구입니다."
       },
       de: {
-        navInstall: "Installieren", navFeatures: "Funktionen", eyebrow: "Lokaler macOS-Quota-Monitor für Codex",
+        navInstall: "Installieren", navFeatures: "Funktionen", system: "System folgen", eyebrow: "Lokaler macOS-Quota-Monitor für Codex",
         headline: "Dein Codex-Kontingent immer sichtbar.",
         lead: "Quota Bubble ist ein kleines schwebendes macOS-Fenster für Codex-Nutzung, Wochenlimits, Guthaben, Reset-Credits und Update-Status.",
         download: "Installer laden", source: "Quellcode ansehen", share: "Teilen", shared: "Teilen-Dialog geöffnet.", copied: "Link kopiert.", copyFailed: "Link konnte nicht kopiert werden.",
@@ -253,7 +276,7 @@
         footer: "Quota Bubble ist ein unabhängiges lokales Tool zum Anzeigen von Codex-Kontingenten."
       },
       fr: {
-        navInstall: "Installer", navFeatures: "Fonctionnalités", eyebrow: "Moniteur de quota macOS local pour Codex",
+        navInstall: "Installer", navFeatures: "Fonctionnalités", system: "Suivre le système", eyebrow: "Moniteur de quota macOS local pour Codex",
         headline: "Votre quota Codex, toujours visible.",
         lead: "Quota Bubble est une petite fenêtre flottante macOS pour suivre l’usage Codex, les limites hebdomadaires, le solde, les réinitialisations et l’état de mise à jour.",
         download: "Télécharger l’installateur", source: "Voir le code", share: "Partager", shared: "Feuille de partage ouverte.", copied: "Lien copié.", copyFailed: "Impossible de copier le lien.",
@@ -265,7 +288,7 @@
         footer: "Quota Bubble est un outil local indépendant pour afficher les informations de quota Codex."
       },
       es: {
-        navInstall: "Instalar", navFeatures: "Funciones", eyebrow: "Monitor local de cuota macOS para Codex",
+        navInstall: "Instalar", navFeatures: "Funciones", system: "Seguir sistema", eyebrow: "Monitor local de cuota macOS para Codex",
         headline: "Tu cuota de Codex, siempre visible.",
         lead: "Quota Bubble es una pequeña ventana flotante para macOS que muestra uso de Codex, límites semanales, saldo, reinicios y estado de actualización.",
         download: "Descargar instalador", source: "Ver código", share: "Compartir", shared: "Panel de compartir abierto.", copied: "Enlace copiado.", copyFailed: "No se pudo copiar el enlace.",
@@ -277,7 +300,7 @@
         footer: "Quota Bubble es una herramienta local independiente para ver la cuota de Codex."
       },
       pt: {
-        navInstall: "Instalar", navFeatures: "Recursos", eyebrow: "Monitor local de cota macOS para Codex",
+        navInstall: "Instalar", navFeatures: "Recursos", system: "Seguir sistema", eyebrow: "Monitor local de cota macOS para Codex",
         headline: "Sua cota do Codex sempre visível.",
         lead: "Quota Bubble é uma pequena janela flutuante para macOS que mostra uso do Codex, limites semanais, saldo, redefinições e estado de atualização.",
         download: "Baixar instalador", source: "Ver código", share: "Compartilhar", shared: "Painel de compartilhamento aberto.", copied: "Link copiado.", copyFailed: "Não foi possível copiar o link.",
@@ -289,7 +312,7 @@
         footer: "Quota Bubble é uma ferramenta local independente para ver cotas do Codex."
       },
       it: {
-        navInstall: "Installa", navFeatures: "Funzioni", eyebrow: "Monitor quota macOS locale per Codex",
+        navInstall: "Installa", navFeatures: "Funzioni", system: "Segui sistema", eyebrow: "Monitor quota macOS locale per Codex",
         headline: "La tua quota Codex sempre visibile.",
         lead: "Quota Bubble è una piccola finestra flottante macOS che mostra uso Codex, limiti settimanali, saldo, ripristini e stato aggiornamenti.",
         download: "Scarica installer", source: "Vedi sorgente", share: "Condividi", shared: "Pannello di condivisione aperto.", copied: "Link copiato.", copyFailed: "Impossibile copiare il link.",
@@ -301,7 +324,7 @@
         footer: "Quota Bubble è uno strumento locale indipendente per visualizzare le quote Codex."
       },
       nl: {
-        navInstall: "Installeren", navFeatures: "Functies", eyebrow: "Lokale macOS-quotamonitor voor Codex",
+        navInstall: "Installeren", navFeatures: "Functies", system: "Systeem volgen", eyebrow: "Lokale macOS-quotamonitor voor Codex",
         headline: "Je Codex-quota altijd zichtbaar.",
         lead: "Quota Bubble is een klein zwevend macOS-venster voor Codex-gebruik, weeklimieten, saldo, resets en updatestatus.",
         download: "Installer downloaden", source: "Bron bekijken", share: "Delen", shared: "Deelvenster geopend.", copied: "Link gekopieerd.", copyFailed: "Link kon niet worden gekopieerd.",
@@ -315,23 +338,25 @@
     };
 
     const supported = Object.keys(translations);
-    const stored = localStorage.getItem("quota-bubble-language");
+    const stored = localStorage.getItem("quota-bubble-language") || "system";
     const browser = (navigator.language || "en").slice(0, 2).toLowerCase();
-    const initial = supported.includes(stored) ? stored : (supported.includes(browser) ? browser : "en");
+    const systemLanguage = supported.includes(browser) ? browser : "en";
+    const initial = supported.includes(stored) ? stored : systemLanguage;
 
     function applyLanguage(code) {
-      const dict = translations[code] || translations.en;
-      document.documentElement.lang = code;
+      const effectiveCode = supported.includes(code) ? code : systemLanguage;
+      const dict = translations[effectiveCode] || translations.en;
+      document.documentElement.lang = effectiveCode;
       document.querySelectorAll("[data-i18n]").forEach((node) => {
         node.textContent = dict[node.dataset.i18n] || translations.en[node.dataset.i18n] || "";
       });
       document.querySelectorAll("[data-i18n-html]").forEach((node) => {
         node.innerHTML = dict[node.dataset.i18nHtml] || translations.en[node.dataset.i18nHtml] || "";
       });
-      document.querySelectorAll(".lang").forEach((button) => {
-        button.classList.toggle("active", button.dataset.lang === code);
-      });
-      localStorage.setItem("quota-bubble-language", code);
+      const languageSelect = document.getElementById("languageSelect");
+      languageSelect.value = supported.includes(code) ? code : "system";
+      languageSelect.options[0].textContent = dict.system || translations.en.system;
+      localStorage.setItem("quota-bubble-language", supported.includes(code) ? code : "system");
     }
 
     async function copyShareLink(text) {
@@ -352,7 +377,7 @@
 
     async function shareSite() {
       const currentLang = localStorage.getItem("quota-bubble-language") || initial;
-      const dict = translations[currentLang] || translations.en;
+      const dict = translations[supported.includes(currentLang) ? currentLang : systemLanguage] || translations.en;
       const note = document.getElementById("shareNote");
       const url = window.location.href;
       const text = "Quota Bubble - " + (dict.eyebrow || translations.en.eyebrow);
@@ -370,11 +395,9 @@
       }
     }
 
-    document.querySelectorAll(".lang").forEach((button) => {
-      button.addEventListener("click", () => applyLanguage(button.dataset.lang));
-    });
+    document.getElementById("languageSelect").addEventListener("change", (event) => applyLanguage(event.target.value));
     document.getElementById("shareButton").addEventListener("click", shareSite);
-    applyLanguage(initial);
+    applyLanguage(stored === "system" ? "system" : initial);
   </script>
 </body>
 </html>

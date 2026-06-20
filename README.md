@@ -1,5 +1,18 @@
 # Quota Bubble
 
+<table>
+  <tr>
+    <td width="72">
+      <a href="https://quota-bubble.pages.dev"><img src="assets/icon.png" width="56" alt="Quota Bubble icon"></a>
+    </td>
+    <td>
+      <strong>Official Website</strong><br>
+      Download the installer, copy the one-line install command, and preview the multilingual product page.<br>
+      <a href="https://quota-bubble.pages.dev"><strong>Open quota-bubble.pages.dev →</strong></a>
+    </td>
+  </tr>
+</table>
+
 [English](README.md) | [中文](docs/README.zh-CN.md) | [日本語](docs/README.ja.md) | [한국어](docs/README.ko.md) | [Deutsch](docs/README.de.md) | [Français](docs/README.fr.md) | [Español](docs/README.es.md) | [Português](docs/README.pt.md) | [Italiano](docs/README.it.md) | [Nederlands](docs/README.nl.md)
 
 A local macOS floating widget for watching Codex usage limits without opening settings.
