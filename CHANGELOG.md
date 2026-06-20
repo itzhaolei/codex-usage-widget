@@ -9,11 +9,14 @@ All notable changes to Quota Bubble are documented here.
 - Renamed the product from Codex Usage Widget to Quota Bubble across the floating window, Dock launcher, macOS app menu, installer, documentation, plugin metadata, and release assets.
 - Replaced the Dock icon with a Quota Bubble branded `QB` icon.
 - Updated the README preview image to use the Quota Bubble title.
+- Restored the localized in-window title text, such as `Codex 额度` and `Codex Quota`, while keeping the app brand as Quota Bubble.
 - Kept the underlying repository path, bundle identifiers, and local install directory compatible with existing 1.x installs.
 
 ### Added
 
 - Added a static website in `public/` for Cloudflare Pages, with download, one-line install, feature, privacy, and deployment guidance sections.
+- Added website language switching for Chinese, English, Japanese, Korean, German, French, Spanish, Portuguese, Italian, and Dutch.
+- Added a website share button using the system share sheet with clipboard fallback.
 - Added installer compatibility for 1.x updaters by including the legacy installer app entry in the 2.0.0 package.
 
 ### Fixed
