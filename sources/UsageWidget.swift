@@ -848,6 +848,40 @@ class WindowController: NSWindowController, NSWindowDelegate {
             attachment.bounds = NSRect(x: 0, y: round(alignedCenter - height / 2), width: width, height: height)
             return attachment
         }
+        func barAttachment(percent: Int, font: NSFont, color: NSColor) -> NSTextAttachment {
+            let widthChars = 15
+            let height: CGFloat = 20
+            let normalizedPercent = min(100, max(0, percent))
+            let filledChars = Int(round(Double(normalizedPercent) / 100.0 * Double(widthChars)))
+            let fullBar = String(repeating: "█", count: widthChars)
+            let barWidth = ceil(textWidth(fullBar, font: font))
+            let charWidth = barWidth / CGFloat(widthChars)
+            let filledWidth = charWidth * CGFloat(filledChars)
+            let image = NSImage(size: NSSize(width: barWidth, height: height))
+            image.lockFocus()
+
+            color.setFill()
+            NSBezierPath(rect: NSRect(x: 0, y: 0, width: filledWidth, height: height)).fill()
+            if filledChars < widthChars {
+                let emptyText = String(repeating: "░", count: widthChars - filledChars)
+                let attributes: [NSAttributedString.Key: Any] = [
+                    .font: font,
+                    .foregroundColor: color
+                ]
+                let textSize = (emptyText as NSString).size(withAttributes: attributes)
+                (emptyText as NSString).draw(
+                    at: NSPoint(x: filledWidth, y: (height - textSize.height) / 2),
+                    withAttributes: attributes
+                )
+            }
+            image.unlockFocus()
+
+            let attachment = NSTextAttachment()
+            attachment.image = image
+            let alignedCenter = (font.ascender + font.descender) / 2
+            attachment.bounds = NSRect(x: 0, y: round(alignedCenter - height / 2), width: barWidth, height: height)
+            return attachment
+        }
         let titleFont = NSFont.systemFont(ofSize: 15, weight: .bold)
         let planFont = NSFont.systemFont(ofSize: 11, weight: .semibold)
         let planBadge = planBadgeText(planType)
@@ -872,10 +906,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         let dimFont = NSFont.monospacedSystemFont(ofSize: 10, weight: .regular)
         let percent = attrs(font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular),
                             color: primaryTextColor, lineHeight: 20)
-        let green = attrs(font: NSFont.monospacedSystemFont(ofSize: 20, weight: .regular),
-                          color: NSColor.green, lineHeight: 20)
-        let warn = attrs(font: NSFont.monospacedSystemFont(ofSize: 20, weight: .regular),
-                         color: NSColor.systemRed, lineHeight: 20)
+        let barFont = NSFont.monospacedSystemFont(ofSize: 20, weight: .regular)
         let barBottomSpacer = attrs(font: NSFont.monospacedSystemFont(ofSize: 10, weight: .regular),
                                     color: NSColor.clear, lineHeight: 10)
         let barTopSpacer = attrs(font: NSFont.monospacedSystemFont(ofSize: 4, weight: .regular),
@@ -909,14 +940,14 @@ class WindowController: NSWindowController, NSWindowDelegate {
         mas.append(NSAttributedString(string: fiveSeparator, attributes: separator))
         mas.append(NSAttributedString(string: "\(fiveResetText)\n", attributes: dim))
         mas.append(NSAttributedString(string: " \n", attributes: barTopSpacer))
-        mas.append(NSAttributedString(string: fiveBar, attributes: fivePct <= 20 ? warn : green))
+        mas.append(NSAttributedString(attachment: barAttachment(percent: fivePct, font: barFont, color: fivePct <= 20 ? NSColor.systemRed : NSColor.green)))
         mas.append(NSAttributedString(string: "  \(fivePct >= 0 ? "\(fivePct)%" : "—")\n", attributes: percent))
         mas.append(NSAttributedString(string: " \n", attributes: barBottomSpacer))
         mas.append(NSAttributedString(string: language.week, attributes: rowLabel))
         mas.append(NSAttributedString(string: weekSeparator, attributes: separator))
         mas.append(NSAttributedString(string: "\(sevenResetText)\n", attributes: dim))
         mas.append(NSAttributedString(string: " \n", attributes: barTopSpacer))
-        mas.append(NSAttributedString(string: sevenBar, attributes: sevenPct <= 20 ? warn : green))
+        mas.append(NSAttributedString(attachment: barAttachment(percent: sevenPct, font: barFont, color: sevenPct <= 20 ? NSColor.systemRed : NSColor.green)))
         mas.append(NSAttributedString(string: "  \(sevenPct >= 0 ? "\(sevenPct)%" : "—")\n", attributes: percent))
         mas.append(NSAttributedString(string: " ", attributes: barBottomSpacer))
 
