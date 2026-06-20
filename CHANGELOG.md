@@ -2,7 +2,7 @@
 
 All notable changes to Codex Usage Widget are documented here.
 
-## 1.0.1 - Unreleased
+## 1.0.1 - 2026-06-20
 
 ### Added
 
@@ -12,11 +12,14 @@ All notable changes to Codex Usage Widget are documented here.
 
 - Increased the widget height and redesigned the bottom area as two native refined cards, with balance on the left and available resets on the right.
 - Raised the bottom cards slightly and replaced text-based card icons with cleaner system icons.
+- Refined the bottom cards with centered text, compact sizing, theme-aware value colors, and a softer neumorphic style.
+- Replaced text-block progress bar fill rendering with seamless drawing while keeping the original visual style, and added subtle 20% separators.
 
 ### Fixed
 
 - Fixed the local install script so reinstalling during development restarts both the Dock launcher and the floating widget instead of leaving old processes running.
 - Stopped the LaunchAgent before local reinstall work starts so it cannot relaunch the widget while the binary is being rebuilt.
+- Aligned the subscription badge vertically with the title text.
 
 ### Notes
 
