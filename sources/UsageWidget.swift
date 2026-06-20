@@ -394,11 +394,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
         label.backgroundColor = NSColor.clear
         rootView.addSubview(label)
 
-        balanceCardView = MetricCardView(frame: NSRect(x: 61, y: 38, width: 99, height: 47))
+        balanceCardView = MetricCardView(frame: NSRect(x: 12, y: 38, width: 111, height: 47))
         balanceCardView.autoresizingMask = [.maxXMargin, .maxYMargin]
         rootView.addSubview(balanceCardView)
 
-        resetCardView = MetricCardView(frame: NSRect(x: 170, y: 38, width: 99, height: 47))
+        resetCardView = MetricCardView(frame: NSRect(x: 133, y: 38, width: 111, height: 47))
         resetCardView.autoresizingMask = [.minXMargin, .maxYMargin]
         rootView.addSubview(resetCardView)
 
