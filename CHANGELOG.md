@@ -2,6 +2,21 @@
 
 All notable changes to Codex Usage Widget are documented here.
 
+## 1.0.1 - Unreleased
+
+### Added
+
+- Added a USD balance display synced from the current Codex usage endpoint with the rest of the snapshot.
+
+### Changed
+
+- Increased the widget height and redesigned the bottom area as two refined cards, with balance on the left and available resets on the right.
+
+### Notes
+
+- The widget reads local Codex session metadata and local Codex auth tokens only to derive quota state, current usage limits, subscription type, USD balance, and reset-credit availability.
+- Snapshot and cache files store only a short irreversible account fingerprint, not raw account IDs, email addresses, or tokens.
+
 ## 1.0.0 - 2026-06-19
 
 ### Added
@@ -42,10 +57,9 @@ All notable changes to Codex Usage Widget are documented here.
 - Fixed 5-hour and weekly quota refresh after account switches by reading Codex's current usage endpoint instead of relying on stale session rate-limit events.
 - Added a non-compressing subscription badge after the widget title, showing Free, Plus, Pro5x, or Pro20x when available, with rounded backgrounds and white text.
 - Updated the README preview image to show the current Pro20x badge UI.
-- Added a USD balance row below available resets, refreshed from the current Codex usage endpoint with the rest of the snapshot.
 
 ### Notes
 
-- The widget reads local Codex session metadata and local Codex auth tokens only to derive quota state, current usage limits, subscription type, USD balance, and reset-credit availability.
+- The widget reads local Codex session metadata and local Codex auth tokens only to derive quota state, current usage limits, subscription type, and reset-credit availability.
 - Snapshot and cache files store only a short irreversible account fingerprint, not raw account IDs, email addresses, or tokens.
 - No personal account data is committed to this repository.

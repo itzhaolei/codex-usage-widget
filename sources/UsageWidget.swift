@@ -276,7 +276,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     convenience init() {
         let w: CGFloat = 330
-        let h: CGFloat = 220
+        let h: CGFloat = 240
         let contentRect = NSRect(x: 0, y: 0, width: w, height: h)
 
         let panel = NSPanel(
@@ -737,24 +737,52 @@ class WindowController: NSWindowController, NSWindowDelegate {
             attachment.bounds = NSRect(x: 0, y: -2, width: width, height: height)
             return attachment
         }
-        func balanceIconAttachment(font: NSFont) -> NSTextAttachment {
-            let size: CGFloat = 14
-            let image = NSImage(size: NSSize(width: size, height: size))
+        func infoCardAttachment(title: String, value: String, symbol: String, accentColor: NSColor, muted: Bool) -> NSTextAttachment {
+            let width: CGFloat = 145
+            let height: CGFloat = 34
+            let image = NSImage(size: NSSize(width: width, height: height))
             image.lockFocus()
-            NSColor.green.withAlphaComponent(0.18).setFill()
-            NSBezierPath(roundedRect: NSRect(x: 0, y: 0, width: size, height: size), xRadius: 2, yRadius: 2).fill()
-            let attributes: [NSAttributedString.Key: Any] = [
-                .font: font,
-                .foregroundColor: NSColor.green
+            let background = isLightMode
+                ? NSColor.white.withAlphaComponent(0.34)
+                : NSColor.white.withAlphaComponent(0.075)
+            let stroke = isLightMode
+                ? NSColor.black.withAlphaComponent(0.12)
+                : NSColor.white.withAlphaComponent(0.14)
+            let rect = NSRect(x: 0.5, y: 0.5, width: width - 1, height: height - 1)
+            let path = NSBezierPath(roundedRect: rect, xRadius: 7, yRadius: 7)
+            background.setFill()
+            path.fill()
+            stroke.setStroke()
+            path.lineWidth = 1
+            path.stroke()
+
+            let iconRect = NSRect(x: 8, y: 9, width: 16, height: 16)
+            accentColor.withAlphaComponent(muted ? 0.12 : 0.20).setFill()
+            NSBezierPath(roundedRect: iconRect, xRadius: 4, yRadius: 4).fill()
+
+            let iconAttributes: [NSAttributedString.Key: Any] = [
+                .font: NSFont.monospacedSystemFont(ofSize: 10, weight: .bold),
+                .foregroundColor: muted ? secondaryTextColor : accentColor
             ]
-            let text = "$" as NSString
-            let textSize = text.size(withAttributes: attributes)
-            text.draw(at: NSPoint(x: (size - textSize.width) / 2, y: (size - textSize.height) / 2 - 0.5), withAttributes: attributes)
+            let icon = symbol as NSString
+            let iconSize = icon.size(withAttributes: iconAttributes)
+            icon.draw(at: NSPoint(x: iconRect.midX - iconSize.width / 2, y: iconRect.midY - iconSize.height / 2 - 0.5), withAttributes: iconAttributes)
+
+            let titleAttributes: [NSAttributedString.Key: Any] = [
+                .font: NSFont.monospacedSystemFont(ofSize: 9, weight: .medium),
+                .foregroundColor: secondaryTextColor
+            ]
+            let valueAttributes: [NSAttributedString.Key: Any] = [
+                .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .semibold),
+                .foregroundColor: muted ? secondaryTextColor : accentColor
+            ]
+            (title as NSString).draw(at: NSPoint(x: 30, y: 18), withAttributes: titleAttributes)
+            (value as NSString).draw(at: NSPoint(x: 30, y: 5), withAttributes: valueAttributes)
             image.unlockFocus()
 
             let attachment = NSTextAttachment()
             attachment.image = image
-            attachment.bounds = NSRect(x: 0, y: -2, width: size, height: size)
+            attachment.bounds = NSRect(x: 0, y: -8, width: width, height: height)
             return attachment
         }
 
@@ -786,8 +814,6 @@ class WindowController: NSWindowController, NSWindowDelegate {
                           color: NSColor.green, lineHeight: 20)
         let greenText = attrs(font: NSFont.monospacedSystemFont(ofSize: 12, weight: .semibold),
                               color: NSColor.green, lineHeight: 16)
-        let mutedText = attrs(font: NSFont.monospacedSystemFont(ofSize: 12, weight: .semibold),
-                              color: secondaryTextColor, lineHeight: 16)
         let warn = attrs(font: NSFont.monospacedSystemFont(ofSize: 20, weight: .regular),
                          color: NSColor.systemRed, lineHeight: 20)
         let barBottomSpacer = attrs(font: NSFont.monospacedSystemFont(ofSize: 10, weight: .regular),
@@ -834,10 +860,22 @@ class WindowController: NSWindowController, NSWindowDelegate {
         mas.append(NSAttributedString(string: "  \(sevenPct >= 0 ? "\(sevenPct)%" : "—")\n", attributes: percent))
         mas.append(NSAttributedString(string: " \n", attributes: barBottomSpacer))
         let resetText = resetCredits.map { "\($0) \(language.times)" } ?? "—"
-        let resetAttributes = (resetCredits ?? 0) > 0 ? greenText : mutedText
-        mas.append(NSAttributedString(string: "\(language.availableReset) \(resetText)\n", attributes: resetAttributes))
-        mas.append(NSAttributedString(attachment: balanceIconAttachment(font: NSFont.monospacedSystemFont(ofSize: 10, weight: .semibold))))
-        mas.append(NSAttributedString(string: " \(language.balance) \(balance)", attributes: greenText))
+        let hasResetCredits = (resetCredits ?? 0) > 0
+        mas.append(NSAttributedString(attachment: infoCardAttachment(
+            title: language.balance,
+            value: balance,
+            symbol: "$",
+            accentColor: NSColor.green,
+            muted: balance == "—"
+        )))
+        mas.append(NSAttributedString(string: "  ", attributes: greenText))
+        mas.append(NSAttributedString(attachment: infoCardAttachment(
+            title: language.availableReset,
+            value: resetText,
+            symbol: "R",
+            accentColor: NSColor.green,
+            muted: !hasResetCredits
+        )))
 
         label.textStorage?.setAttributedString(mas)
     }
