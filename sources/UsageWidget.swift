@@ -287,8 +287,8 @@ class MetricCardView: NSView {
 
     override func layout() {
         super.layout()
-        titleLabel.frame = NSRect(x: 10, y: 28, width: bounds.width - 20, height: 12)
-        valueLabel.frame = NSRect(x: 10, y: 8, width: bounds.width - 20, height: 17)
+        titleLabel.frame = NSRect(x: 10, y: 29, width: bounds.width - 20, height: 12)
+        valueLabel.frame = NSRect(x: 10, y: 7, width: bounds.width - 20, height: 17)
     }
 
     func configure(title: String, value: String, symbol: String, accentColor: NSColor, muted: Bool, lightMode: Bool, secondaryTextColor: NSColor) {
@@ -394,11 +394,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
         label.backgroundColor = NSColor.clear
         rootView.addSubview(label)
 
-        balanceCardView = MetricCardView(frame: NSRect(x: 12, y: 38, width: 111, height: 47))
+        balanceCardView = MetricCardView(frame: NSRect(x: 12, y: 38, width: 131, height: 47))
         balanceCardView.autoresizingMask = [.maxXMargin, .maxYMargin]
         rootView.addSubview(balanceCardView)
 
-        resetCardView = MetricCardView(frame: NSRect(x: 133, y: 38, width: 111, height: 47))
+        resetCardView = MetricCardView(frame: NSRect(x: 153, y: 38, width: 131, height: 47))
         resetCardView.autoresizingMask = [.minXMargin, .maxYMargin]
         rootView.addSubview(resetCardView)
 
