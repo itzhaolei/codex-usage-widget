@@ -826,7 +826,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
             }
             return String(characters.prefix(max(0, low))) + ellipsis
         }
-        func badgeAttachment(text: String, font: NSFont, backgroundColor: NSColor, textColor: NSColor) -> NSTextAttachment {
+        func badgeAttachment(text: String, font: NSFont, alignTo alignFont: NSFont, backgroundColor: NSColor, textColor: NSColor) -> NSTextAttachment {
             let horizontalPadding: CGFloat = 7
             let height: CGFloat = 16
             let width = ceil(textWidth(text, font: font) + horizontalPadding * 2)
@@ -844,7 +844,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
             let attachment = NSTextAttachment()
             attachment.image = image
-            attachment.bounds = NSRect(x: 0, y: -1, width: width, height: height)
+            let alignedCenter = (alignFont.ascender + alignFont.descender) / 2
+            attachment.bounds = NSRect(x: 0, y: round(alignedCenter - height / 2), width: width, height: height)
             return attachment
         }
         let titleFont = NSFont.systemFont(ofSize: 15, weight: .bold)
@@ -901,7 +902,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         mas.append(NSAttributedString(string: titleText, attributes: title))
         if !planBadge.isEmpty {
             mas.append(NSAttributedString(string: " ", attributes: title))
-            mas.append(NSAttributedString(attachment: badgeAttachment(text: planBadge, font: planFont, backgroundColor: planColor, textColor: planTextColor)))
+            mas.append(NSAttributedString(attachment: badgeAttachment(text: planBadge, font: planFont, alignTo: titleFont, backgroundColor: planColor, textColor: planTextColor)))
         }
         mas.append(NSAttributedString(string: "\n", attributes: title))
         mas.append(NSAttributedString(string: fiveLabel, attributes: rowLabel))
