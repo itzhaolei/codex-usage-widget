@@ -259,7 +259,7 @@ class MetricCardView: NSView {
         super.init(frame: frameRect)
         wantsLayer = true
         layer?.cornerRadius = 9
-        layer?.masksToBounds = true
+        layer?.masksToBounds = false
         layer?.borderWidth = 1
 
         titleLabel.font = NSFont.monospacedSystemFont(ofSize: 9, weight: .medium)
@@ -304,11 +304,15 @@ class MetricCardView: NSView {
 
     func applyAppearance(secondaryTextColor: NSColor) {
         layer?.backgroundColor = (lightMode
-            ? NSColor.white.withAlphaComponent(0.36)
-            : NSColor.white.withAlphaComponent(0.08)).cgColor
+            ? NSColor.white.withAlphaComponent(0.24)
+            : NSColor.black.withAlphaComponent(0.28)).cgColor
         layer?.borderColor = (lightMode
-            ? NSColor.black.withAlphaComponent(0.12)
-            : NSColor.white.withAlphaComponent(0.14)).cgColor
+            ? NSColor.black.withAlphaComponent(0.10)
+            : NSColor.white.withAlphaComponent(0.10)).cgColor
+        layer?.shadowColor = NSColor.black.cgColor
+        layer?.shadowOpacity = lightMode ? 0.06 : 0.18
+        layer?.shadowRadius = 8
+        layer?.shadowOffset = NSSize(width: 0, height: -1)
         valueLabel.textColor = NSColor.white
         titleLabel.textColor = secondaryTextColor
     }
