@@ -77,55 +77,55 @@ func effectiveLanguageCode() -> String {
 func launcherLanguage() -> LauncherLanguage {
     switch effectiveLanguageCode() {
     case "zh":
-        return LauncherLanguage(notInstalled: "Codex Usage Widget 尚未安装", installHint: "请先安装或重新运行安装器。", launchFailed: "启动失败",
+        return LauncherLanguage(notInstalled: "Quota Bubble 尚未安装", installHint: "请先安装或重新运行安装器。", launchFailed: "启动失败",
             update: "版本更新", uninstall: "卸载", language: "语言", followSystem: "跟随系统",
             updateStarted: "正在更新", updateStartedInfo: "正在下载并安装最新版本。", upToDate: "已是最新版本", upToDateInfo: "当前安装的版本已经是最新版本。", updateSucceeded: "更新成功", updateSucceededInfo: "已安装最新版本。", updateFailed: "更新失败",
-            uninstallTitle: "卸载 Codex Usage Widget？", uninstallMessage: "这会关闭窗口并移除启动器、后台任务和本地安装文件。", cancel: "取消", confirmUninstall: "卸载")
+            uninstallTitle: "卸载 Quota Bubble？", uninstallMessage: "这会关闭窗口并移除启动器、后台任务和本地安装文件。", cancel: "取消", confirmUninstall: "卸载")
     case "ja":
-        return LauncherLanguage(notInstalled: "Codex Usage Widget は未インストールです", installHint: "インストーラーを再実行してください。", launchFailed: "起動に失敗しました",
+        return LauncherLanguage(notInstalled: "Quota Bubble は未インストールです", installHint: "インストーラーを再実行してください。", launchFailed: "起動に失敗しました",
             update: "アップデート", uninstall: "アンインストール", language: "言語", followSystem: "システムに合わせる",
             updateStarted: "更新中", updateStartedInfo: "最新バージョンをダウンロードしてインストールしています。", upToDate: "最新バージョンです", upToDateInfo: "現在インストールされているバージョンは最新です。", updateSucceeded: "更新完了", updateSucceededInfo: "最新バージョンがインストールされました。", updateFailed: "更新に失敗しました",
-            uninstallTitle: "Codex Usage Widget をアンインストールしますか？", uninstallMessage: "ウィンドウ、ランチャー、バックグラウンドタスク、ローカルファイルを削除します。", cancel: "キャンセル", confirmUninstall: "アンインストール")
+            uninstallTitle: "Quota Bubble をアンインストールしますか？", uninstallMessage: "ウィンドウ、ランチャー、バックグラウンドタスク、ローカルファイルを削除します。", cancel: "キャンセル", confirmUninstall: "アンインストール")
     case "ko":
-        return LauncherLanguage(notInstalled: "Codex Usage Widget가 설치되지 않았습니다", installHint: "설치 프로그램을 다시 실행하세요.", launchFailed: "시작 실패",
+        return LauncherLanguage(notInstalled: "Quota Bubble가 설치되지 않았습니다", installHint: "설치 프로그램을 다시 실행하세요.", launchFailed: "시작 실패",
             update: "버전 업데이트", uninstall: "제거", language: "언어", followSystem: "시스템 따르기",
             updateStarted: "업데이트 중", updateStartedInfo: "최신 버전을 다운로드하고 설치하는 중입니다.", upToDate: "최신 버전입니다", upToDateInfo: "현재 설치된 버전이 최신 버전입니다.", updateSucceeded: "업데이트 완료", updateSucceededInfo: "최신 버전이 설치되었습니다.", updateFailed: "업데이트 실패",
-            uninstallTitle: "Codex Usage Widget을 제거할까요?", uninstallMessage: "창, 런처, 백그라운드 작업 및 로컬 설치 파일을 제거합니다.", cancel: "취소", confirmUninstall: "제거")
+            uninstallTitle: "Quota Bubble을 제거할까요?", uninstallMessage: "창, 런처, 백그라운드 작업 및 로컬 설치 파일을 제거합니다.", cancel: "취소", confirmUninstall: "제거")
     case "de":
-        return LauncherLanguage(notInstalled: "Codex Usage Widget ist nicht installiert", installHint: "Führen Sie den Installer erneut aus.", launchFailed: "Start fehlgeschlagen",
+        return LauncherLanguage(notInstalled: "Quota Bubble ist nicht installiert", installHint: "Führen Sie den Installer erneut aus.", launchFailed: "Start fehlgeschlagen",
             update: "Update", uninstall: "Deinstallieren", language: "Sprache", followSystem: "System folgen",
             updateStarted: "Update läuft", updateStartedInfo: "Die neueste Version wird heruntergeladen und installiert.", upToDate: "Bereits aktuell", upToDateInfo: "Die installierte Version ist bereits die neueste.", updateSucceeded: "Update abgeschlossen", updateSucceededInfo: "Die neueste Version wurde installiert.", updateFailed: "Update fehlgeschlagen",
-            uninstallTitle: "Codex Usage Widget deinstallieren?", uninstallMessage: "Fenster, Launcher, Hintergrundaufgabe und lokale Dateien werden entfernt.", cancel: "Abbrechen", confirmUninstall: "Deinstallieren")
+            uninstallTitle: "Quota Bubble deinstallieren?", uninstallMessage: "Fenster, Launcher, Hintergrundaufgabe und lokale Dateien werden entfernt.", cancel: "Abbrechen", confirmUninstall: "Deinstallieren")
     case "fr":
-        return LauncherLanguage(notInstalled: "Codex Usage Widget n’est pas installé", installHint: "Relancez l’installateur.", launchFailed: "Échec du lancement",
+        return LauncherLanguage(notInstalled: "Quota Bubble n’est pas installé", installHint: "Relancez l’installateur.", launchFailed: "Échec du lancement",
             update: "Mettre à jour", uninstall: "Désinstaller", language: "Langue", followSystem: "Suivre le système",
             updateStarted: "Mise à jour", updateStartedInfo: "Téléchargement et installation de la dernière version.", upToDate: "Déjà à jour", upToDateInfo: "La version installée est déjà la plus récente.", updateSucceeded: "Mise à jour terminée", updateSucceededInfo: "La dernière version a été installée.", updateFailed: "Échec de la mise à jour",
-            uninstallTitle: "Désinstaller Codex Usage Widget ?", uninstallMessage: "La fenêtre, le lanceur, la tâche d’arrière-plan et les fichiers locaux seront supprimés.", cancel: "Annuler", confirmUninstall: "Désinstaller")
+            uninstallTitle: "Désinstaller Quota Bubble ?", uninstallMessage: "La fenêtre, le lanceur, la tâche d’arrière-plan et les fichiers locaux seront supprimés.", cancel: "Annuler", confirmUninstall: "Désinstaller")
     case "es":
-        return LauncherLanguage(notInstalled: "Codex Usage Widget no está instalado", installHint: "Vuelve a ejecutar el instalador.", launchFailed: "Error al iniciar",
+        return LauncherLanguage(notInstalled: "Quota Bubble no está instalado", installHint: "Vuelve a ejecutar el instalador.", launchFailed: "Error al iniciar",
             update: "Actualizar versión", uninstall: "Desinstalar", language: "Idioma", followSystem: "Seguir sistema",
             updateStarted: "Actualizando", updateStartedInfo: "Descargando e instalando la versión más reciente.", upToDate: "Ya está actualizado", upToDateInfo: "La versión instalada ya es la más reciente.", updateSucceeded: "Actualización completada", updateSucceededInfo: "Se instaló la versión más reciente.", updateFailed: "Error al actualizar",
-            uninstallTitle: "¿Desinstalar Codex Usage Widget?", uninstallMessage: "Se eliminarán la ventana, el lanzador, la tarea en segundo plano y los archivos locales.", cancel: "Cancelar", confirmUninstall: "Desinstalar")
+            uninstallTitle: "¿Desinstalar Quota Bubble?", uninstallMessage: "Se eliminarán la ventana, el lanzador, la tarea en segundo plano y los archivos locales.", cancel: "Cancelar", confirmUninstall: "Desinstalar")
     case "pt":
-        return LauncherLanguage(notInstalled: "Codex Usage Widget não está instalado", installHint: "Execute o instalador novamente.", launchFailed: "Falha ao iniciar",
+        return LauncherLanguage(notInstalled: "Quota Bubble não está instalado", installHint: "Execute o instalador novamente.", launchFailed: "Falha ao iniciar",
             update: "Atualizar versão", uninstall: "Desinstalar", language: "Idioma", followSystem: "Seguir sistema",
             updateStarted: "Atualizando", updateStartedInfo: "Baixando e instalando a versão mais recente.", upToDate: "Já está atualizado", upToDateInfo: "A versão instalada já é a mais recente.", updateSucceeded: "Atualização concluída", updateSucceededInfo: "A versão mais recente foi instalada.", updateFailed: "Falha na atualização",
-            uninstallTitle: "Desinstalar Codex Usage Widget?", uninstallMessage: "A janela, o lançador, a tarefa em segundo plano e os arquivos locais serão removidos.", cancel: "Cancelar", confirmUninstall: "Desinstalar")
+            uninstallTitle: "Desinstalar Quota Bubble?", uninstallMessage: "A janela, o lançador, a tarefa em segundo plano e os arquivos locais serão removidos.", cancel: "Cancelar", confirmUninstall: "Desinstalar")
     case "it":
-        return LauncherLanguage(notInstalled: "Codex Usage Widget non è installato", installHint: "Esegui di nuovo l’installer.", launchFailed: "Avvio non riuscito",
+        return LauncherLanguage(notInstalled: "Quota Bubble non è installato", installHint: "Esegui di nuovo l’installer.", launchFailed: "Avvio non riuscito",
             update: "Aggiorna versione", uninstall: "Disinstalla", language: "Lingua", followSystem: "Segui sistema",
             updateStarted: "Aggiornamento", updateStartedInfo: "Download e installazione dell’ultima versione.", upToDate: "Già aggiornato", upToDateInfo: "La versione installata è già la più recente.", updateSucceeded: "Aggiornamento completato", updateSucceededInfo: "È stata installata la versione più recente.", updateFailed: "Aggiornamento non riuscito",
-            uninstallTitle: "Disinstallare Codex Usage Widget?", uninstallMessage: "La finestra, il launcher, l’attività in background e i file locali saranno rimossi.", cancel: "Annulla", confirmUninstall: "Disinstalla")
+            uninstallTitle: "Disinstallare Quota Bubble?", uninstallMessage: "La finestra, il launcher, l’attività in background e i file locali saranno rimossi.", cancel: "Annulla", confirmUninstall: "Disinstalla")
     case "nl":
-        return LauncherLanguage(notInstalled: "Codex Usage Widget is niet geïnstalleerd", installHint: "Voer de installer opnieuw uit.", launchFailed: "Starten mislukt",
+        return LauncherLanguage(notInstalled: "Quota Bubble is niet geïnstalleerd", installHint: "Voer de installer opnieuw uit.", launchFailed: "Starten mislukt",
             update: "Versie bijwerken", uninstall: "Verwijderen", language: "Taal", followSystem: "Systeem volgen",
             updateStarted: "Bijwerken", updateStartedInfo: "De nieuwste versie wordt gedownload en geïnstalleerd.", upToDate: "Al bijgewerkt", upToDateInfo: "De geïnstalleerde versie is al de nieuwste.", updateSucceeded: "Bijwerken voltooid", updateSucceededInfo: "De nieuwste versie is geïnstalleerd.", updateFailed: "Bijwerken mislukt",
-            uninstallTitle: "Codex Usage Widget verwijderen?", uninstallMessage: "Het venster, de launcher, achtergrondtaak en lokale bestanden worden verwijderd.", cancel: "Annuleren", confirmUninstall: "Verwijderen")
+            uninstallTitle: "Quota Bubble verwijderen?", uninstallMessage: "Het venster, de launcher, achtergrondtaak en lokale bestanden worden verwijderd.", cancel: "Annuleren", confirmUninstall: "Verwijderen")
     default:
-        return LauncherLanguage(notInstalled: "Codex Usage Widget is not installed", installHint: "Run the installer again.", launchFailed: "Launch failed",
+        return LauncherLanguage(notInstalled: "Quota Bubble is not installed", installHint: "Run the installer again.", launchFailed: "Launch failed",
             update: "Check for Updates", uninstall: "Uninstall", language: "Language", followSystem: "Follow System",
             updateStarted: "Updating", updateStartedInfo: "Downloading and installing the latest version.", upToDate: "Already up to date", upToDateInfo: "The installed version is already the latest version.", updateSucceeded: "Update complete", updateSucceededInfo: "The latest version has been installed.", updateFailed: "Update failed",
-            uninstallTitle: "Uninstall Codex Usage Widget?", uninstallMessage: "This will close the widget and remove the launcher, background task, and local install files.", cancel: "Cancel", confirmUninstall: "Uninstall")
+            uninstallTitle: "Uninstall Quota Bubble?", uninstallMessage: "This will close the widget and remove the launcher, background task, and local install files.", cancel: "Cancel", confirmUninstall: "Uninstall")
     }
 }
 
@@ -179,7 +179,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let mainMenu = NSMenu()
         let appItem = NSMenuItem()
-        let appMenu = NSMenu(title: "Codex Usage Widget")
+        let appMenu = NSMenu(title: "Quota Bubble")
         appItem.submenu = appMenu
         mainMenu.addItem(appItem)
 
@@ -379,7 +379,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ASSET_URL='\(escapedAssetURL)'
         /usr/bin/curl -L -o "$TMP_DIR/installer.zip" "$ASSET_URL"
         /usr/bin/unzip -q "$TMP_DIR/installer.zip" -d "$TMP_DIR"
-        CODEX_USAGE_WIDGET_KEEP_LAUNCHER=1 /bin/bash "$TMP_DIR/Install Codex Usage Widget.app/Contents/Resources/install-packaged.sh"
+        CODEX_USAGE_WIDGET_KEEP_LAUNCHER=1 /bin/bash "$TMP_DIR/Install Quota Bubble.app/Contents/Resources/install-packaged.sh"
         """, completion: completion)
     }
 
@@ -395,13 +395,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         runDetachedShell("""
         CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
         INSTALL_DIR="$CODEX_HOME/usage-widget"
-        LAUNCHER_APP="$HOME/Applications/Codex Usage Widget.app"
+        LAUNCHER_APP="$HOME/Applications/Quota Bubble.app"
         LAUNCH_AGENT="$HOME/Library/LaunchAgents/com.codex.usage-widget.autostart.plist"
         launchctl bootout "gui/$(id -u)" "$LAUNCH_AGENT" >/dev/null 2>&1 || true
         pkill -f "UsageWidget.app/Contents/MacOS/UsageWidget" >/dev/null 2>&1 || true
+        pkill -f "Quota Bubble.app/Contents/MacOS/Quota Bubble" >/dev/null 2>&1 || true
         pkill -f "Codex Usage Widget.app/Contents/MacOS/Codex Usage Widget" >/dev/null 2>&1 || true
-        rm -rf "$INSTALL_DIR" "$CODEX_HOME/scripts/codex-usage-snapshot.mjs" "$LAUNCHER_APP" "$LAUNCH_AGENT"
-        /usr/bin/python3 -c 'import plistlib,subprocess; from pathlib import Path; from urllib.parse import unquote,urlparse; from urllib.request import url2pathname; p=Path.home()/"Library/Preferences/com.apple.dock.plist"; data=plistlib.load(p.open("rb")) if p.exists() else {}; apps=data.get("persistent-apps", []); conv=lambda u: (url2pathname(unquote(urlparse(u).path)).rstrip("/") if isinstance(u,str) and urlparse(u).scheme=="file" else (unquote(u).replace("file://","").rstrip("/") if isinstance(u,str) else "")); new=[x for x in apps if not conv(x.get("tile-data",{}).get("file-data",{}).get("_CFURLString")).endswith("/Codex Usage Widget.app")]; changed=new!=apps; data["persistent-apps"]=new if changed else apps; plistlib.dump(data,p.open("wb")) if changed else None; subprocess.run(["killall","Dock"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL) if changed else None'
+        rm -rf "$INSTALL_DIR" "$CODEX_HOME/scripts/codex-usage-snapshot.mjs" "$LAUNCHER_APP" "$HOME/Applications/Codex Usage Widget.app" "$LAUNCH_AGENT"
+        /usr/bin/python3 -c 'import plistlib,subprocess; from pathlib import Path; from urllib.parse import unquote,urlparse; from urllib.request import url2pathname; p=Path.home()/"Library/Preferences/com.apple.dock.plist"; data=plistlib.load(p.open("rb")) if p.exists() else {}; apps=data.get("persistent-apps", []); conv=lambda u: (url2pathname(unquote(urlparse(u).path)).rstrip("/") if isinstance(u,str) and urlparse(u).scheme=="file" else (unquote(u).replace("file://","").rstrip("/") if isinstance(u,str) else "")); new=[x for x in apps if not (conv(x.get("tile-data",{}).get("file-data",{}).get("_CFURLString")).endswith("/Quota Bubble.app") or conv(x.get("tile-data",{}).get("file-data",{}).get("_CFURLString")).endswith("/Codex Usage Widget.app"))]; changed=new!=apps; data["persistent-apps"]=new if changed else apps; plistlib.dump(data,p.open("wb")) if changed else None; subprocess.run(["killall","Dock"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL) if changed else None'
         """)
     }
 

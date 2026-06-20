@@ -1,16 +1,16 @@
 ---
 name: codex-usage-widget
-description: Install, restart, stop, or inspect the local macOS Codex usage quota widget. Use when the user asks for a floating quota window, Codex usage HUD, reset-credit display, or wants to manage this plugin's widget.
+description: Install, restart, stop, or inspect the local macOS Quota Bubble. Use when the user asks for a floating quota window, Codex usage HUD, reset-credit display, or wants to manage this plugin's widget.
 ---
 
-# Codex Usage Widget
+# Quota Bubble
 
 This plugin provides a local macOS floating widget for Codex quota visibility.
 
 ## What It Installs
 
 - `~/.codex/usage-widget/UsageWidget.app`: the macOS floating HUD.
-- `~/Applications/Codex Usage Widget.app`: a Dock-visible launcher app with the plugin icon.
+- `~/Applications/Quota Bubble.app`: a Dock-visible launcher app with the plugin icon.
 - `~/.codex/scripts/codex-usage-snapshot.mjs`: reads Codex session usage and reset-credit information.
 - `~/.codex/usage-widget/ensure-usage-widget.sh`: keeps one widget running while Codex desktop is running.
 - `~/Library/LaunchAgents/com.codex.usage-widget.autostart.plist`: launches the ensure script every 10 seconds.
@@ -27,7 +27,7 @@ bash scripts/install.sh
 
 One-line install for other users is documented in `ONE_LINE_INSTALL.md`. It uses `scripts/bootstrap-install.sh` after the plugin is published as a downloadable archive.
 
-By default, install also adds `Codex Usage Widget.app` to the Dock. To skip Dock pinning:
+By default, install also adds `Quota Bubble.app` to the Dock. To skip Dock pinning:
 
 ```bash
 PIN_TO_DOCK=0 bash scripts/install.sh
@@ -53,9 +53,9 @@ bash scripts/status.sh
 
 ## Behavior
 
-- The widget appears when the Codex desktop app is running.
+- The widget can run independently of the Codex desktop app lifecycle.
 - The Dock launcher can be clicked to restart/show the widget.
-- The widget closes when Codex closes.
+- Closing Codex does not close Quota Bubble.
 - Only one widget instance is kept alive.
 - The close button hides the widget for the current Codex run.
 - The widget refreshes the visible countdown every second and refreshes the snapshot in the background.

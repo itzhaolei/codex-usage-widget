@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quota Bubble</title>
+  <meta name="description" content="Quota Bubble is a local macOS floating widget for Codex quota, balance, reset credits, and update status.">
+  <link rel="icon" href="/assets/icon.png">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #071015;
+      --panel: rgba(14, 32, 42, 0.72);
+      --panel-strong: rgba(17, 42, 54, 0.92);
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #f6fbff;
+      --muted: rgba(246, 251, 255, 0.68);
+      --green: #10f02f;
+      --green-soft: rgba(16, 240, 47, 0.16);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 74% 16%, rgba(16, 240, 47, 0.18), transparent 32rem),
+        radial-gradient(circle at 22% 62%, rgba(72, 160, 220, 0.16), transparent 30rem),
+        linear-gradient(145deg, #071015 0%, #0c1b24 52%, #05080c 100%);
+    }
+    a { color: inherit; }
+    .page { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 28px 0;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: 0.01em; }
+    .brand img { width: 38px; height: 38px; border-radius: 10px; box-shadow: 0 10px 32px rgba(16, 240, 47, 0.2); }
+    nav { display: flex; gap: 16px; color: var(--muted); font-size: 14px; }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
+      gap: 54px;
+      align-items: center;
+      padding: 78px 0 72px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 18px var(--green); }
+    h1 { margin: 20px 0 14px; font-size: clamp(44px, 7vw, 82px); line-height: 0.92; letter-spacing: -0.04em; }
+    .lead { margin: 0 0 28px; color: var(--muted); font-size: 19px; line-height: 1.65; max-width: 620px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 760;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .button.primary { background: var(--green); color: #021107; border-color: transparent; box-shadow: 0 16px 44px rgba(16, 240, 47, 0.24); }
+    .terminal {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.32);
+      color: rgba(255, 255, 255, 0.86);
+      overflow: auto;
+      font: 12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      white-space: nowrap;
+    }
+    .preview {
+      position: relative;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+      box-shadow: 0 28px 90px rgba(0, 0, 0, 0.38);
+      backdrop-filter: blur(18px);
+    }
+    .preview img { display: block; width: 100%; border-radius: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 0 0 72px; }
+    .card { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 20px; min-height: 146px; }
+    .card strong { display: block; margin-bottom: 10px; font-size: 16px; }
+    .card span { color: var(--muted); line-height: 1.55; font-size: 14px; }
+    .deploy { margin-bottom: 80px; padding: 24px; border: 1px solid var(--line); border-radius: 22px; background: var(--panel-strong); color: var(--muted); }
+    .deploy strong { color: var(--text); }
+    footer { padding: 0 0 30px; color: rgba(255,255,255,0.48); font-size: 13px; }
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; padding-top: 38px; gap: 30px; }
+      .grid { grid-template-columns: 1fr 1fr; }
+      nav { display: none; }
+    }
+    @media (max-width: 560px) {
+      .page { width: min(100% - 28px, 1120px); }
+      .grid { grid-template-columns: 1fr; }
+      .hero { padding-bottom: 46px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="brand"><img src="/assets/icon.png" alt="Quota Bubble icon"><span>Quota Bubble</span></div>
+      <nav><a href="#install">Install</a><a href="#features">Features</a><a href="https://github.com/itzhaolei/codex-usage-widget">GitHub</a></nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <div class="eyebrow"><span class="dot"></span>Local macOS quota monitor for Codex</div>
+          <h1>Your Codex quota, always visible.</h1>
+          <p class="lead">Quota Bubble is a small floating macOS window that keeps Codex usage, weekly limits, balance, reset credits, and update status in sight without opening settings.</p>
+          <div id="install" class="actions">
+            <a class="button primary" href="https://github.com/itzhaolei/codex-usage-widget/releases/latest">Download installer</a>
+            <a class="button" href="https://github.com/itzhaolei/codex-usage-widget">View source</a>
+          </div>
+          <div class="terminal">CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"</div>
+        </div>
+        <div class="preview"><img src="/assets/preview.png" alt="Quota Bubble preview"></div>
+      </section>
+
+      <section id="features" class="grid">
+        <div class="card"><strong>Always on top</strong><span>Pin the bubble where you work and keep Dock state synced with the window.</span></div>
+        <div class="card"><strong>Live quota</strong><span>Refreshes local Codex quota, reset time, balance, and reset credits every second.</span></div>
+        <div class="card"><strong>Private by design</strong><span>Runs locally and stores only redacted account fingerprints, never raw account IDs or tokens.</span></div>
+        <div class="card"><strong>Easy updates</strong><span>Use the app menu to check GitHub releases and update directly from the installer package.</span></div>
+      </section>
+
+      <section class="deploy">
+        <strong>Recommended free deployment:</strong> Cloudflare Pages project <code>quota-bubble</code>, production branch <code>main</code>, build command <code>exit 0</code>, output directory <code>public</code>. Suggested free domain: <code>quotabubble.dpdns.org</code> with <code>CNAME</code> to the Pages domain after Cloudflare custom-domain setup.
+      </section>
+    </main>
+
+    <footer>Quota Bubble is an independent local tool for viewing Codex quota information.</footer>
+  </div>
+</body>
+</html>

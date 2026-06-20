@@ -1,15 +1,15 @@
-# Codex Usage Widget
+# Quota Bubble
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
 Uma janela flutuante para macOS que mostra o uso de 5 horas, o uso semanal e as redefinições disponíveis do Codex.
 
-![Codex Usage Widget preview](../assets/preview.png)
+![Quota Bubble preview](../assets/preview.png)
 
 ## Recursos
 
 - Mostra o uso de 5 horas, o uso semanal e as redefinições disponíveis do Codex.
-- Acompanha o ciclo de vida do Codex Desktop.
+- Roda de forma independente e lê dados locais de cota do Codex.
 - Lembra posição, tema e estado fixado.
 - Mantém apenas um HUD e um lançador no Dock.
 - Adiciona ações de menu para atualizar, desinstalar e trocar idioma.
@@ -25,7 +25,7 @@ Se você não quiser usar o Terminal, abra a página da versão mais recente e b
 
 [Abrir a página da versão mais recente](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
-Descompacte e dê dois cliques em `Install Codex Usage Widget.app`. O Codex Desktop deve estar instalado e com login feito.
+Descompacte e dê dois cliques em `Install Quota Bubble.app`. O Codex Desktop deve estar instalado e com login feito.
 
 O README sempre aponta para a página da versão mais recente. Para instalar uma versão antiga, abra [todas as versões](https://github.com/itzhaolei/codex-usage-widget/releases) e baixe o instalador na página da versão desejada.
 

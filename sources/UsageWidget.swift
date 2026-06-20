@@ -50,7 +50,7 @@ func plural(_ value: Int, _ one: String, _ other: String) -> String {
 }
 
 let zhLanguage = AppLanguage(
-    title: "Codex 额度", week: "周", reset: "重置", availableReset: "可用重置", balance: "余额", times: "次",
+    title: "Quota Bubble", week: "周", reset: "重置", availableReset: "可用重置", balance: "余额", times: "次",
     alreadyReset: "已重置", unableToReadSnapshot: "无法读取快照",
     switchToDark: "切换到黑色模式", switchToLight: "切换到白色模式",
     pin: "置顶", unpin: "取消置顶", close: "关闭窗口", separator: " ",
@@ -90,62 +90,62 @@ func localizedLanguage() -> AppLanguage {
     let code = effectiveLanguageCode()
     if code == "zh" { return zhLanguage }
     if code == "ja" {
-        return AppLanguage(title: "Codex 使用量", week: "週", reset: "リセット", availableReset: "利用可能なリセット", balance: "残高", times: "回",
+        return AppLanguage(title: "Quota Bubble", week: "週", reset: "リセット", availableReset: "利用可能なリセット", balance: "残高", times: "回",
             alreadyReset: "リセット済み", unableToReadSnapshot: "スナップショットを読み込めません",
             switchToDark: "ダークモードに切り替え", switchToLight: "ライトモードに切り替え",
             pin: "最前面に固定", unpin: "固定を解除", close: "ウィンドウを閉じる", separator: " ",
             afterSuffix: "後", day: { "\($0)日" }, hour: { "\($0)時間" }, minute: { "\($0)分" }, second: { "\($0)秒" })
     }
     if code == "ko" {
-        return AppLanguage(title: "Codex 사용량", week: "주", reset: "재설정", availableReset: "사용 가능 재설정", balance: "잔액", times: "회",
+        return AppLanguage(title: "Quota Bubble", week: "주", reset: "재설정", availableReset: "사용 가능 재설정", balance: "잔액", times: "회",
             alreadyReset: "재설정됨", unableToReadSnapshot: "스냅샷을 읽을 수 없음",
             switchToDark: "다크 모드로 전환", switchToLight: "라이트 모드로 전환",
             pin: "항상 위", unpin: "항상 위 해제", close: "창 닫기", separator: " ",
             afterSuffix: " 후", day: { "\($0)일" }, hour: { "\($0)시간" }, minute: { "\($0)분" }, second: { "\($0)초" })
     }
     if code == "de" {
-        return AppLanguage(title: "Codex Limit", week: "Woche", reset: "Reset", availableReset: "Verfügbare Resets", balance: "Guthaben", times: "Mal",
+        return AppLanguage(title: "Quota Bubble", week: "Woche", reset: "Reset", availableReset: "Verfügbare Resets", balance: "Guthaben", times: "Mal",
             alreadyReset: "Zurückgesetzt", unableToReadSnapshot: "Snapshot kann nicht gelesen werden",
             switchToDark: "Zu Dunkel wechseln", switchToLight: "Zu Hell wechseln",
             pin: "Anheften", unpin: "Lösen", close: "Fenster schließen", separator: " ",
             afterSuffix: " später", day: { plural($0, "Tag", "Tage") }, hour: { plural($0, "Stunde", "Stunden") }, minute: { plural($0, "Minute", "Minuten") }, second: { plural($0, "Sekunde", "Sekunden") })
     }
     if code == "fr" {
-        return AppLanguage(title: "Quota Codex", week: "Semaine", reset: "Réinit.", availableReset: "Réinitialisations dispo.", balance: "Solde", times: "fois",
+        return AppLanguage(title: "Quota Bubble", week: "Semaine", reset: "Réinit.", availableReset: "Réinitialisations dispo.", balance: "Solde", times: "fois",
             alreadyReset: "Réinitialisé", unableToReadSnapshot: "Impossible de lire l’instantané",
             switchToDark: "Passer en mode sombre", switchToLight: "Passer en mode clair",
             pin: "Épingler", unpin: "Détacher", close: "Fermer la fenêtre", separator: " ",
             afterSuffix: " plus tard", day: { plural($0, "jour", "jours") }, hour: { plural($0, "heure", "heures") }, minute: { plural($0, "minute", "minutes") }, second: { plural($0, "seconde", "secondes") })
     }
     if code == "es" {
-        return AppLanguage(title: "Cuota Codex", week: "Semana", reset: "Reinicio", availableReset: "Reinicios disponibles", balance: "Saldo", times: "veces",
+        return AppLanguage(title: "Quota Bubble", week: "Semana", reset: "Reinicio", availableReset: "Reinicios disponibles", balance: "Saldo", times: "veces",
             alreadyReset: "Reiniciado", unableToReadSnapshot: "No se puede leer la instantánea",
             switchToDark: "Cambiar a modo oscuro", switchToLight: "Cambiar a modo claro",
             pin: "Fijar", unpin: "Desfijar", close: "Cerrar ventana", separator: " ",
             afterSuffix: " después", day: { plural($0, "día", "días") }, hour: { plural($0, "hora", "horas") }, minute: { plural($0, "minuto", "minutos") }, second: { plural($0, "segundo", "segundos") })
     }
     if code == "pt" {
-        return AppLanguage(title: "Cota Codex", week: "Semana", reset: "Redefinir", availableReset: "Redefinições disponíveis", balance: "Saldo", times: "vezes",
+        return AppLanguage(title: "Quota Bubble", week: "Semana", reset: "Redefinir", availableReset: "Redefinições disponíveis", balance: "Saldo", times: "vezes",
             alreadyReset: "Redefinido", unableToReadSnapshot: "Não foi possível ler o snapshot",
             switchToDark: "Alternar para modo escuro", switchToLight: "Alternar para modo claro",
             pin: "Fixar", unpin: "Desafixar", close: "Fechar janela", separator: " ",
             afterSuffix: " depois", day: { plural($0, "dia", "dias") }, hour: { plural($0, "hora", "horas") }, minute: { plural($0, "minuto", "minutos") }, second: { plural($0, "segundo", "segundos") })
     }
     if code == "it" {
-        return AppLanguage(title: "Quota Codex", week: "Settimana", reset: "Ripristino", availableReset: "Ripristini disponibili", balance: "Saldo", times: "volte",
+        return AppLanguage(title: "Quota Bubble", week: "Settimana", reset: "Ripristino", availableReset: "Ripristini disponibili", balance: "Saldo", times: "volte",
             alreadyReset: "Ripristinato", unableToReadSnapshot: "Impossibile leggere lo snapshot",
             switchToDark: "Passa alla modalità scura", switchToLight: "Passa alla modalità chiara",
             pin: "Fissa", unpin: "Rimuovi fissaggio", close: "Chiudi finestra", separator: " ",
             afterSuffix: " dopo", day: { plural($0, "giorno", "giorni") }, hour: { plural($0, "ora", "ore") }, minute: { plural($0, "minuto", "minuti") }, second: { plural($0, "secondo", "secondi") })
     }
     if code == "nl" {
-        return AppLanguage(title: "Codex-limiet", week: "Week", reset: "Reset", availableReset: "Beschikbare resets", balance: "Saldo", times: "keer",
+        return AppLanguage(title: "Quota Bubble", week: "Week", reset: "Reset", availableReset: "Beschikbare resets", balance: "Saldo", times: "keer",
             alreadyReset: "Gereset", unableToReadSnapshot: "Kan snapshot niet lezen",
             switchToDark: "Schakel naar donker", switchToLight: "Schakel naar licht",
             pin: "Vastzetten", unpin: "Losmaken", close: "Venster sluiten", separator: " ",
             afterSuffix: " later", day: { plural($0, "dag", "dagen") }, hour: { plural($0, "uur", "uur") }, minute: { plural($0, "minuut", "minuten") }, second: { plural($0, "seconde", "seconden") })
     }
-    return AppLanguage(title: "Codex Quota", week: "Week", reset: "Reset", availableReset: "Available resets", balance: "Balance", times: "times",
+    return AppLanguage(title: "Quota Bubble", week: "Week", reset: "Reset", availableReset: "Available resets", balance: "Balance", times: "times",
         alreadyReset: "Reset", unableToReadSnapshot: "Unable to read snapshot",
         switchToDark: "Switch to dark mode", switchToLight: "Switch to light mode",
         pin: "Pin", unpin: "Unpin", close: "Close window", separator: " ",
@@ -495,7 +495,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
             return
         }
 
-        let launcherPath = NSString(string: "~/Applications/Codex Usage Widget.app").expandingTildeInPath
+        let launcherPath = NSString(string: "~/Applications/Quota Bubble.app").expandingTildeInPath
         let launcherURL = URL(fileURLWithPath: launcherPath)
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.activates = true

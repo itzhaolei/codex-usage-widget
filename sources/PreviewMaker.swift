@@ -57,7 +57,7 @@ roundedRect(widgetRect, radius: 32).fill()
 NSColor(calibratedWhite: 0.02, alpha: 0.78).setFill()
 roundedRect(widgetRect.insetBy(dx: 2, dy: 2), radius: 30).fill()
 
-drawText("Codex 额度", at: NSPoint(x: 410, y: 570), size: 34, weight: .bold, color: .white)
+drawText("Quota Bubble", at: NSPoint(x: 410, y: 570), size: 34, weight: .bold, color: .white)
 
 let capsule = NSRect(x: 838, y: 560, width: 150, height: 46)
 NSColor(calibratedWhite: 1, alpha: 0.08).setFill()
@@ -84,8 +84,8 @@ drawMono("18%", at: NSPoint(x: 906, y: 328), size: 22, weight: .regular, color: 
 
 drawMono("可用重置 1 次", at: NSPoint(x: 410, y: 282), size: 22, weight: .semibold, color: green)
 
-drawText("Floating quota HUD for Codex", at: NSPoint(x: 410, y: 166), size: 30, weight: .semibold, color: .white)
-drawText("Pinned, theme-aware, and refreshed locally.", at: NSPoint(x: 410, y: 122), size: 22, weight: .regular, color: NSColor(calibratedWhite: 1, alpha: 0.68))
+drawText("Floating quota bubble for Codex", at: NSPoint(x: 410, y: 166), size: 30, weight: .semibold, color: .white)
+drawText("Pinned, theme-aware, and refreshed every second.", at: NSPoint(x: 410, y: 122), size: 22, weight: .regular, color: NSColor(calibratedWhite: 1, alpha: 0.68))
 
 image.unlockFocus()
 

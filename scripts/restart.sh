@@ -28,4 +28,4 @@ run_snapshot
 touch "$WIDGET_APP"
 open -g "$WIDGET_APP"
 
-echo "Codex Usage Widget restarted."
+echo "Quota Bubble restarted."

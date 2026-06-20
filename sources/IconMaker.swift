@@ -7,40 +7,46 @@ let image = NSImage(size: size)
 image.lockFocus()
 
 let rect = NSRect(origin: .zero, size: size)
-let background = NSBezierPath(roundedRect: rect.insetBy(dx: 42, dy: 42), xRadius: 220, yRadius: 220)
-NSColor(calibratedWhite: 0.05, alpha: 1).setFill()
-background.fill()
+let shell = NSBezierPath(roundedRect: rect.insetBy(dx: 46, dy: 46), xRadius: 232, yRadius: 232)
+NSColor(calibratedRed: 0.035, green: 0.075, blue: 0.105, alpha: 1).setFill()
+shell.fill()
 
-let glass = NSBezierPath(roundedRect: rect.insetBy(dx: 92, dy: 92), xRadius: 170, yRadius: 170)
-NSColor(calibratedWhite: 1, alpha: 0.08).setFill()
-glass.fill()
+let bubble = NSBezierPath(roundedRect: rect.insetBy(dx: 108, dy: 122), xRadius: 190, yRadius: 190)
+NSColor(calibratedRed: 0.075, green: 0.155, blue: 0.205, alpha: 1).setFill()
+bubble.fill()
 
-let green = NSColor(calibratedRed: 0.12, green: 0.86, blue: 0.35, alpha: 1)
-let dimGreen = NSColor(calibratedRed: 0.12, green: 0.86, blue: 0.35, alpha: 0.28)
+let glow = NSGradient(colors: [
+    NSColor(calibratedRed: 0.18, green: 0.92, blue: 0.32, alpha: 0.38),
+    NSColor(calibratedRed: 0.18, green: 0.92, blue: 0.32, alpha: 0.0)
+])
+glow?.draw(in: NSBezierPath(ovalIn: NSRect(x: 150, y: 110, width: 724, height: 724)), angle: 90)
+
+let green = NSColor(calibratedRed: 0.05, green: 1.0, blue: 0.14, alpha: 1)
+let track = NSColor(calibratedRed: 0.05, green: 1.0, blue: 0.14, alpha: 0.18)
 
 func drawBar(y: CGFloat, fillWidth: CGFloat) {
-    let x: CGFloat = 208
-    let fullWidth: CGFloat = 608
-    let height: CGFloat = 92
-    let track = NSBezierPath(roundedRect: NSRect(x: x, y: y, width: fullWidth, height: height), xRadius: 46, yRadius: 46)
-    dimGreen.setFill()
-    track.fill()
+    let x: CGFloat = 220
+    let fullWidth: CGFloat = 584
+    let height: CGFloat = 76
+    let trackPath = NSBezierPath(roundedRect: NSRect(x: x, y: y, width: fullWidth, height: height), xRadius: 28, yRadius: 28)
+    track.setFill()
+    trackPath.fill()
 
-    let fill = NSBezierPath(roundedRect: NSRect(x: x, y: y, width: fillWidth, height: height), xRadius: 46, yRadius: 46)
+    let fillPath = NSBezierPath(roundedRect: NSRect(x: x, y: y, width: fillWidth, height: height), xRadius: 28, yRadius: 28)
     green.setFill()
-    fill.fill()
+    fillPath.fill()
 }
 
-drawBar(y: 352, fillWidth: 456)
-drawBar(y: 504, fillWidth: 320)
+drawBar(y: 332, fillWidth: 420)
+drawBar(y: 454, fillWidth: 292)
 
-let title = "Codex"
 let attrs: [NSAttributedString.Key: Any] = [
-    .font: NSFont.systemFont(ofSize: 150, weight: .bold),
+    .font: NSFont.systemFont(ofSize: 172, weight: .black),
     .foregroundColor: NSColor.white
 ]
-let titleSize = title.size(withAttributes: attrs)
-title.draw(at: NSPoint(x: (1024 - titleSize.width) / 2, y: 648), withAttributes: attrs)
+let mark = "QB"
+let markSize = mark.size(withAttributes: attrs)
+mark.draw(at: NSPoint(x: (1024 - markSize.width) / 2, y: 626), withAttributes: attrs)
 
 image.unlockFocus()
 

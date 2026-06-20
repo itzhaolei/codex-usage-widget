@@ -10,8 +10,8 @@ WIDGET_PATTERN="UsageWidget.app/Contents/MacOS/UsageWidget"
 MACOS_DIR="$APP_DIR/Contents/MacOS"
 RESOURCES_DIR="$APP_DIR/Contents/Resources"
 USER_APPS_DIR="$HOME/Applications"
-LAUNCHER_APP="$USER_APPS_DIR/Codex Usage Widget.app"
-LAUNCHER_PATTERN="Codex Usage Widget.app/Contents/MacOS/Codex Usage Widget"
+LAUNCHER_APP="$USER_APPS_DIR/Quota Bubble.app"
+LAUNCHER_PATTERN="Quota Bubble.app/Contents/MacOS/Quota Bubble"
 LAUNCHER_MACOS_DIR="$LAUNCHER_APP/Contents/MacOS"
 LAUNCHER_RESOURCES_DIR="$LAUNCHER_APP/Contents/Resources"
 LAUNCH_AGENT_DIR="$HOME/Library/LaunchAgents"
@@ -50,7 +50,7 @@ def url_to_path(url):
 
 def is_launcher_item(item):
     path = url_to_path(item_url(item))
-    return path == launcher_path or path.endswith("/Codex Usage Widget.app")
+    return path == launcher_path or path.endswith("/Quota Bubble.app") or path.endswith("/Codex Usage Widget.app")
 
 launcher_item = {
     "tile-data": {
@@ -58,7 +58,7 @@ launcher_item = {
             "_CFURLString": launcher_url,
             "_CFURLStringType": 15,
         },
-        "file-label": "Codex Usage Widget",
+        "file-label": "Quota Bubble",
     },
     "tile-type": "file-tile",
 }
@@ -100,10 +100,12 @@ if changed:
 PY
 }
 
+rm -rf "$USER_APPS_DIR/Codex Usage Widget.app"
 mkdir -p "$INSTALL_DIR" "$SCRIPTS_DIR" "$MACOS_DIR" "$RESOURCES_DIR" "$USER_APPS_DIR" "$LAUNCHER_MACOS_DIR" "$LAUNCHER_RESOURCES_DIR" "$LAUNCH_AGENT_DIR"
 
 launchctl bootout "gui/$(id -u)" "$LAUNCH_AGENT" >/dev/null 2>&1 || true
 pkill -f "$LAUNCHER_PATTERN" >/dev/null 2>&1 || true
+pkill -f "Codex Usage Widget.app/Contents/MacOS/Codex Usage Widget" >/dev/null 2>&1 || true
 pkill -f "$WIDGET_PATTERN" >/dev/null 2>&1 || true
 sleep 0.3
 
@@ -134,8 +136,8 @@ done
 iconutil -c icns "$ICONSET" -o "$ICON_ICNS"
 cp "$ICON_ICNS" "$RESOURCES_DIR/AppIcon.icns"
 
-swiftc -parse-as-library -o "$LAUNCHER_MACOS_DIR/Codex Usage Widget" "$PLUGIN_DIR/sources/CodexUsageWidgetLauncher.swift" -framework Cocoa
-chmod +x "$LAUNCHER_MACOS_DIR/Codex Usage Widget"
+swiftc -parse-as-library -o "$LAUNCHER_MACOS_DIR/Quota Bubble" "$PLUGIN_DIR/sources/CodexUsageWidgetLauncher.swift" -framework Cocoa
+chmod +x "$LAUNCHER_MACOS_DIR/Quota Bubble"
 cp "$ICON_ICNS" "$LAUNCHER_RESOURCES_DIR/AppIcon.icns"
 
 cat > "$APP_DIR/Contents/Info.plist" <<'PLIST'
@@ -148,13 +150,13 @@ cat > "$APP_DIR/Contents/Info.plist" <<'PLIST'
     <key>CFBundleIdentifier</key>
     <string>local.codex.usage-widget</string>
     <key>CFBundleName</key>
-    <string>Codex Usage Widget</string>
+    <string>Quota Bubble</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.1.0</string>
+    <string>2.0.0</string>
     <key>LSUIElement</key>
     <true/>
     <key>NSHighResolutionCapable</key>
@@ -169,19 +171,19 @@ cat > "$LAUNCHER_APP/Contents/Info.plist" <<'PLIST'
 <plist version="1.0">
 <dict>
     <key>CFBundleExecutable</key>
-    <string>Codex Usage Widget</string>
+    <string>Quota Bubble</string>
     <key>CFBundleIdentifier</key>
     <string>local.codex.usage-widget.launcher</string>
     <key>CFBundleName</key>
-    <string>Codex Usage Widget</string>
+    <string>Quota Bubble</string>
     <key>CFBundleDisplayName</key>
-    <string>Codex Usage Widget</string>
+    <string>Quota Bubble</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.1.0</string>
+    <string>2.0.0</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>
@@ -227,5 +229,5 @@ fi
 
 open -g "$LAUNCHER_APP" >/dev/null 2>&1 || true
 
-echo "Codex Usage Widget installed."
+echo "Quota Bubble installed."
 echo "Dock launcher: $LAUNCHER_APP"

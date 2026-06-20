@@ -1,19 +1,21 @@
-# Codex Usage Widget
+# Quota Bubble
 
 [English](README.md) | [中文](docs/README.zh-CN.md) | [日本語](docs/README.ja.md) | [한국어](docs/README.ko.md) | [Deutsch](docs/README.de.md) | [Français](docs/README.fr.md) | [Español](docs/README.es.md) | [Português](docs/README.pt.md) | [Italiano](docs/README.it.md) | [Nederlands](docs/README.nl.md)
 
 A local macOS floating widget for watching Codex usage limits without opening settings.
 
-![Codex Usage Widget preview](assets/preview.png)
+Website source lives in `public/` and is ready for Cloudflare Pages. Recommended Pages settings: project name `quota-bubble`, production branch `main`, build command `exit 0`, output directory `public`. Suggested free domain: `quotabubble.dpdns.org` after dpdns approval.
+
+![Quota Bubble preview](assets/preview.png)
 
 ## Features
 
 - Floating quota HUD for Codex desktop.
-- Shows 5-hour usage, weekly usage, and available reset credits.
-- Follows the Codex desktop lifecycle.
+- Shows 5-hour usage, weekly usage, USD balance, and available reset credits.
+- Runs independently while reading local Codex quota data.
 - Remembers position, theme, and pinned state.
 - Keeps only one HUD and one Dock launcher instance running.
-- Includes a Dock launcher app.
+- Includes a renamed Dock launcher app and refreshed Quota Bubble icon.
 - Adds menu-bar actions for updates, uninstall, and language switching.
 - Shows a small red dot next to the version label when a newer GitHub release is available.
 - Supports dark and light themes.
@@ -27,7 +29,7 @@ For users who do not want to use Terminal, open the latest release page and down
 
 [Open the latest release page](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
-Unzip it, then double-click `Install Codex Usage Widget.app`. The installer copies the prebuilt widget and Dock launcher, registers the background launch agent, adds the launcher to Dock, and opens the widget.
+Unzip it, then double-click `Install Quota Bubble.app`. The installer copies the prebuilt widget and Dock launcher, registers the background launch agent, adds the launcher to Dock, and opens the widget.
 
 The README always links to the latest release page. To install an older version, open [all releases](https://github.com/itzhaolei/codex-usage-widget/releases) and download the installer from that version's page.
 
@@ -48,7 +50,7 @@ bash scripts/install.sh
 The installer builds:
 
 - `~/.codex/usage-widget/UsageWidget.app`
-- `~/Applications/Codex Usage Widget.app`
+- `~/Applications/Quota Bubble.app`
 - `~/Library/LaunchAgents/com.codex.usage-widget.autostart.plist`
 
 ## Uninstall

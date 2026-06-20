@@ -1,6 +1,24 @@
 # Changelog
 
-All notable changes to Codex Usage Widget are documented here.
+All notable changes to Quota Bubble are documented here.
+
+## 2.0.0 - 2026-06-21
+
+### Changed
+
+- Renamed the product from Codex Usage Widget to Quota Bubble across the floating window, Dock launcher, macOS app menu, installer, documentation, plugin metadata, and release assets.
+- Replaced the Dock icon with a Quota Bubble branded `QB` icon.
+- Updated the README preview image to use the Quota Bubble title.
+- Kept the underlying repository path, bundle identifiers, and local install directory compatible with existing 1.x installs.
+
+### Added
+
+- Added a static website in `public/` for Cloudflare Pages, with download, one-line install, feature, privacy, and deployment guidance sections.
+- Added installer compatibility for 1.x updaters by including the legacy installer app entry in the 2.0.0 package.
+
+### Fixed
+
+- Cleans up old `Codex Usage Widget.app` Dock entries and app bundles when installing, updating, or uninstalling Quota Bubble.
 
 ## 1.1.0 - 2026-06-20
 

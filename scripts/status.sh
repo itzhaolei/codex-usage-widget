@@ -4,7 +4,7 @@ set -euo pipefail
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 INSTALL_DIR="$CODEX_HOME/usage-widget"
 WIDGET_EXE="$INSTALL_DIR/UsageWidget.app/Contents/MacOS/UsageWidget"
-LAUNCHER_APP="$HOME/Applications/Codex Usage Widget.app"
+LAUNCHER_APP="$HOME/Applications/Quota Bubble.app"
 SNAPSHOT="$CODEX_HOME/codex-usage-snapshot.json"
 LABEL="com.codex.usage-widget.autostart"
 

@@ -1,15 +1,15 @@
-# Codex Usage Widget
+# Quota Bubble
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
 一个 macOS 悬浮配额窗口，用来直接查看 Codex 的 5 小时额度、每周额度和可用重置次数。
 
-![Codex Usage Widget 预览](../assets/preview.png)
+![Quota Bubble 预览](../assets/preview.png)
 
 ## 功能
 
 - 显示 Codex 5 小时额度、每周额度和可用重置次数。
-- 跟随 Codex 桌面端启动和关闭。
+- 可独立运行，并读取本机 Codex 配额数据。
 - 记住窗口位置、黑白模式和置顶状态。
 - 只保留一个悬浮窗和一个 Dock 启动器实例。
 - 在菜单栏提供版本更新、卸载和语言切换。
@@ -25,7 +25,7 @@
 
 [打开最新版本发布页面](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
-解压后，双击 `Install Codex Usage Widget.app` 即可安装。安装器会复制预编译好的悬浮窗和 Dock 启动器，注册后台自启动任务，把启动器放入 Dock，并打开工具。
+解压后，双击 `Install Quota Bubble.app` 即可安装。安装器会复制预编译好的悬浮窗和 Dock 启动器，注册后台自启动任务，把启动器放入 Dock，并打开工具。
 
 README 始终指向最新版本发布页。如果需要安装旧版本，请打开[所有版本页面](https://github.com/itzhaolei/codex-usage-widget/releases)，进入对应版本页面下载该版本的安装器。
 

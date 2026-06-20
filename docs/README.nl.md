@@ -1,15 +1,15 @@
-# Codex Usage Widget
+# Quota Bubble
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
 Een zwevend macOS-venster voor Codex-gebruik over 5 uur, weekgebruik en beschikbare resets.
 
-![Codex Usage Widget preview](../assets/preview.png)
+![Quota Bubble preview](../assets/preview.png)
 
 ## Functies
 
 - Toont Codex-gebruik over 5 uur, weekgebruik en beschikbare resets.
-- Volgt de levenscyclus van Codex Desktop.
+- Draait zelfstandig en leest lokale Codex-quotagegevens.
 - Onthoudt positie, thema en vastzetstatus.
 - Houdt slechts één HUD en één Dock-launcher actief.
 - Biedt menuacties voor bijwerken, verwijderen en taal wisselen.
@@ -25,7 +25,7 @@ Als je Terminal niet wilt gebruiken, open dan de nieuwste releasepagina en downl
 
 [Open de nieuwste releasepagina](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
-Pak het bestand uit en dubbelklik op `Install Codex Usage Widget.app`. Codex Desktop moet al geïnstalleerd zijn en aangemeld zijn.
+Pak het bestand uit en dubbelklik op `Install Quota Bubble.app`. Codex Desktop moet al geïnstalleerd zijn en aangemeld zijn.
 
 De README verwijst altijd naar de nieuwste releasepagina. Voor een oudere versie open je [alle releases](https://github.com/itzhaolei/codex-usage-widget/releases) en download je de installer vanaf de pagina van die versie.
 

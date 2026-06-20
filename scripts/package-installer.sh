@@ -9,12 +9,12 @@ with open(sys.argv[1], "r", encoding="utf-8") as handle:
     print(json.load(handle)["version"])
 PY
 )}"
-APP_NAME="Install Codex Usage Widget"
+APP_NAME="Install Quota Bubble"
 BUILD_DIR="${TMPDIR:-/tmp}/codex-usage-widget-installer-$VERSION"
 DIST_DIR="$PLUGIN_DIR/dist"
 INSTALLER_APP="$BUILD_DIR/$APP_NAME.app"
 PAYLOAD_DIR="$INSTALLER_APP/Contents/Resources/payload"
-ZIP_PATH="$DIST_DIR/CodexUsageWidget-$VERSION-Installer.zip"
+ZIP_PATH="$DIST_DIR/QuotaBubble-$VERSION-Installer.zip"
 
 rm -rf "$BUILD_DIR" "$ZIP_PATH"
 mkdir -p "$INSTALLER_APP/Contents/MacOS" "$INSTALLER_APP/Contents/Resources" "$PAYLOAD_DIR/scripts" "$PAYLOAD_DIR/apps" "$DIST_DIR"
@@ -81,7 +81,7 @@ cat > "$WIDGET_APP/Contents/Info.plist" <<PLIST
     <key>CFBundleIdentifier</key>
     <string>local.codex.usage-widget</string>
     <key>CFBundleName</key>
-    <string>Codex Usage Widget</string>
+    <string>Quota Bubble</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundlePackageType</key>
@@ -96,12 +96,12 @@ cat > "$WIDGET_APP/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
-LAUNCHER_APP="$PAYLOAD_DIR/apps/Codex Usage Widget.app"
+LAUNCHER_APP="$PAYLOAD_DIR/apps/Quota Bubble.app"
 LAUNCHER_MACOS="$LAUNCHER_APP/Contents/MacOS"
 LAUNCHER_RESOURCES="$LAUNCHER_APP/Contents/Resources"
 mkdir -p "$LAUNCHER_MACOS" "$LAUNCHER_RESOURCES"
-swiftc -parse-as-library -o "$LAUNCHER_MACOS/Codex Usage Widget" "$PLUGIN_DIR/sources/CodexUsageWidgetLauncher.swift" -framework Cocoa
-chmod +x "$LAUNCHER_MACOS/Codex Usage Widget"
+swiftc -parse-as-library -o "$LAUNCHER_MACOS/Quota Bubble" "$PLUGIN_DIR/sources/CodexUsageWidgetLauncher.swift" -framework Cocoa
+chmod +x "$LAUNCHER_MACOS/Quota Bubble"
 cp "$ICON_ICNS" "$LAUNCHER_RESOURCES/AppIcon.icns"
 cat > "$LAUNCHER_APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -109,13 +109,13 @@ cat > "$LAUNCHER_APP/Contents/Info.plist" <<PLIST
 <plist version="1.0">
 <dict>
     <key>CFBundleExecutable</key>
-    <string>Codex Usage Widget</string>
+    <string>Quota Bubble</string>
     <key>CFBundleIdentifier</key>
     <string>local.codex.usage-widget.launcher</string>
     <key>CFBundleName</key>
-    <string>Codex Usage Widget</string>
+    <string>Quota Bubble</string>
     <key>CFBundleDisplayName</key>
-    <string>Codex Usage Widget</string>
+    <string>Quota Bubble</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundlePackageType</key>
@@ -138,12 +138,12 @@ CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 INSTALL_DIR="$CODEX_HOME/usage-widget"
 SCRIPTS_DIR="$CODEX_HOME/scripts"
 USER_APPS_DIR="$HOME/Applications"
-LAUNCHER_APP="$USER_APPS_DIR/Codex Usage Widget.app"
+LAUNCHER_APP="$USER_APPS_DIR/Quota Bubble.app"
 LAUNCH_AGENT_DIR="$HOME/Library/LaunchAgents"
 LAUNCH_AGENT="$LAUNCH_AGENT_DIR/com.codex.usage-widget.autostart.plist"
 LABEL="com.codex.usage-widget.autostart"
 WIDGET_PATTERN="UsageWidget.app/Contents/MacOS/UsageWidget"
-LAUNCHER_PATTERN="Codex Usage Widget.app/Contents/MacOS/Codex Usage Widget"
+LAUNCHER_PATTERN="Quota Bubble.app/Contents/MacOS/Quota Bubble"
 
 dedupe_dock_launcher() {
     /usr/bin/python3 - "$LAUNCHER_APP" <<'PY'
@@ -171,7 +171,7 @@ def url_to_path(url):
 
 def is_launcher_item(item):
     path = url_to_path(item_url(item))
-    return path == launcher_path or path.endswith("/Codex Usage Widget.app")
+    return path == launcher_path or path.endswith("/Quota Bubble.app") or path.endswith("/Codex Usage Widget.app")
 
 launcher_item = {
     "tile-data": {
@@ -179,7 +179,7 @@ launcher_item = {
             "_CFURLString": launcher_url,
             "_CFURLStringType": 15,
         },
-        "file-label": "Codex Usage Widget",
+        "file-label": "Quota Bubble",
     },
     "tile-type": "file-tile",
 }
@@ -221,11 +221,13 @@ if changed:
 PY
 }
 
+rm -rf "$USER_APPS_DIR/Codex Usage Widget.app"
 mkdir -p "$INSTALL_DIR" "$SCRIPTS_DIR" "$USER_APPS_DIR" "$LAUNCH_AGENT_DIR"
 
 pkill -f "$WIDGET_PATTERN" >/dev/null 2>&1 || true
 if [ "${CODEX_USAGE_WIDGET_KEEP_LAUNCHER:-0}" != "1" ]; then
     pkill -f "$LAUNCHER_PATTERN" >/dev/null 2>&1 || true
+    pkill -f "Codex Usage Widget.app/Contents/MacOS/Codex Usage Widget" >/dev/null 2>&1 || true
 fi
 
 cp "$PAYLOAD_DIR/scripts/codex-usage-snapshot.mjs" "$SCRIPTS_DIR/codex-usage-snapshot.mjs"
@@ -236,10 +238,10 @@ cp "$PAYLOAD_DIR/scripts/status.sh" "$INSTALL_DIR/status.sh"
 cp "$PAYLOAD_DIR/scripts/uninstall.sh" "$INSTALL_DIR/uninstall.sh"
 chmod +x "$SCRIPTS_DIR/codex-usage-snapshot.mjs" "$INSTALL_DIR/ensure-usage-widget.sh" "$INSTALL_DIR/start-usage-widget.sh" "$INSTALL_DIR/restart.sh" "$INSTALL_DIR/status.sh" "$INSTALL_DIR/uninstall.sh"
 
-rm -rf "$INSTALL_DIR/UsageWidget.app" "$LAUNCHER_APP"
+rm -rf "$INSTALL_DIR/UsageWidget.app" "$LAUNCHER_APP" "$USER_APPS_DIR/Codex Usage Widget.app"
 cp -R "$PAYLOAD_DIR/apps/UsageWidget.app" "$INSTALL_DIR/UsageWidget.app"
-cp -R "$PAYLOAD_DIR/apps/Codex Usage Widget.app" "$LAUNCHER_APP"
-chmod +x "$INSTALL_DIR/UsageWidget.app/Contents/MacOS/UsageWidget" "$LAUNCHER_APP/Contents/MacOS/Codex Usage Widget"
+cp -R "$PAYLOAD_DIR/apps/Quota Bubble.app" "$LAUNCHER_APP"
+chmod +x "$INSTALL_DIR/UsageWidget.app/Contents/MacOS/UsageWidget" "$LAUNCHER_APP/Contents/MacOS/Quota Bubble"
 xattr -dr com.apple.quarantine "$INSTALL_DIR/UsageWidget.app" "$LAUNCHER_APP" >/dev/null 2>&1 || true
 
 cat > "$LAUNCH_AGENT" <<PLIST
@@ -275,9 +277,11 @@ bash "$INSTALL_DIR/ensure-usage-widget.sh" >/dev/null 2>&1 || true
 dedupe_dock_launcher
 if [ "${CODEX_USAGE_WIDGET_KEEP_LAUNCHER:-0}" != "1" ]; then
     open -g "$LAUNCHER_APP" >/dev/null 2>&1 || true
+else
+    ( sleep 1; open -g "$LAUNCHER_APP" >/dev/null 2>&1 || true; pkill -f "Codex Usage Widget.app/Contents/MacOS/Codex Usage Widget" >/dev/null 2>&1 || true ) &
 fi
 
-echo "Codex Usage Widget installed."
+echo "Quota Bubble installed."
 echo "Dock launcher: $LAUNCHER_APP"
 SCRIPT
 chmod +x "$INSTALLER_APP/Contents/Resources/install-packaged.sh"
@@ -290,10 +294,10 @@ APP_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 INSTALL_SCRIPT="$APP_DIR/Resources/install-packaged.sh"
 
 if OUTPUT="$(/bin/bash "$INSTALL_SCRIPT" 2>&1)"; then
-    /usr/bin/osascript -e 'display dialog "Codex Usage Widget installed successfully." buttons {"OK"} default button "OK" with title "Codex Usage Widget"'
+    /usr/bin/osascript -e 'display dialog "Quota Bubble installed successfully." buttons {"OK"} default button "OK" with title "Quota Bubble"'
 else
     ESCAPED_OUTPUT="$(printf '%s' "$OUTPUT" | tail -n 12 | sed 's/"/\\"/g')"
-    /usr/bin/osascript -e "display dialog \"Install failed:\n$ESCAPED_OUTPUT\" buttons {\"OK\"} default button \"OK\" with title \"Codex Usage Widget\""
+    /usr/bin/osascript -e "display dialog \"Install failed:\n$ESCAPED_OUTPUT\" buttons {\"OK\"} default button \"OK\" with title \"Quota Bubble\""
     exit 1
 fi
 SCRIPT
@@ -301,7 +305,8 @@ chmod +x "$INSTALLER_APP/Contents/MacOS/$APP_NAME"
 
 (
     cd "$BUILD_DIR"
-    zip -qry "$ZIP_PATH" "$APP_NAME.app"
+    ln -s "$APP_NAME.app" "Install Codex Usage Widget.app"
+    zip -qry "$ZIP_PATH" "$APP_NAME.app" "Install Codex Usage Widget.app"
 )
 
 echo "$ZIP_PATH"

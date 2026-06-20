@@ -1,15 +1,15 @@
-# Codex Usage Widget
+# Quota Bubble
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
 Ein schwebendes macOS-Fenster zum Anzeigen des Codex 5-Stunden-Limits, des Wochenlimits und verfügbarer Reset-Credits.
 
-![Codex Usage Widget preview](../assets/preview.png)
+![Quota Bubble preview](../assets/preview.png)
 
 ## Funktionen
 
 - Zeigt Codex 5-Stunden-Nutzung, Wochennutzung und verfügbare Reset-Credits.
-- Folgt dem Lebenszyklus der Codex-Desktop-App.
+- Läuft unabhängig und liest lokale Codex-Kontingentdaten.
 - Speichert Fensterposition, Theme und Anheftstatus.
 - Hält jeweils nur ein HUD und einen Dock-Launcher aktiv.
 - Bietet Menüaktionen für Updates, Deinstallation und Sprachwechsel.
@@ -25,7 +25,7 @@ Wenn Sie Terminal nicht verwenden möchten, öffnen Sie die neueste Release-Seit
 
 [Neueste Release-Seite öffnen](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
-Entpacken Sie die Datei und doppelklicken Sie auf `Install Codex Usage Widget.app`. Codex Desktop sollte bereits installiert und angemeldet sein.
+Entpacken Sie die Datei und doppelklicken Sie auf `Install Quota Bubble.app`. Codex Desktop sollte bereits installiert und angemeldet sein.
 
 Die README verweist immer auf die neueste Release-Seite. Für ältere Versionen öffnen Sie [alle Releases](https://github.com/itzhaolei/codex-usage-widget/releases) und laden den Installer auf der jeweiligen Versionsseite herunter.
 
