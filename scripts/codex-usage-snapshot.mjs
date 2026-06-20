@@ -133,6 +133,13 @@ function normalizePlanType(planType) {
   return null;
 }
 
+function normalizeBalanceUsd(balance) {
+  if (typeof balance === "number" && Number.isFinite(balance)) return String(balance);
+  if (typeof balance !== "string") return null;
+  const value = balance.trim();
+  return value.length > 0 ? value : null;
+}
+
 function keepMonotonicUsage(existingWindow, nextWindow) {
   if (!nextWindow) return null;
   if (!existingWindow || typeof existingWindow.used_percentage !== "number") return nextWindow;
@@ -326,6 +333,7 @@ async function fetchUsage() {
     const fiveHour = toUsageWindow(rateLimit?.primary_window);
     const sevenDay = toUsageWindow(rateLimit?.secondary_window);
     const planType = normalizePlanType(body?.plan_type);
+    const balanceUsd = normalizeBalanceUsd(body?.credits?.balance);
     const availableCount = body?.rate_limit_reset_credits?.available_count;
     const resetCredits = typeof availableCount === "number"
       ? {
@@ -334,11 +342,12 @@ async function fetchUsage() {
         }
       : null;
 
-    if (!fiveHour && !sevenDay && !resetCredits) return null;
+    if (!fiveHour && !sevenDay && !resetCredits && !balanceUsd) return null;
     return {
       five_hour: fiveHour,
       seven_day: sevenDay,
       plan_type: planType,
+      balance_usd: balanceUsd,
       reset_credits: resetCredits,
     };
   } catch {
@@ -375,6 +384,7 @@ if (usage?.five_hour || usage?.seven_day) {
     source: "wham_usage",
     stale_source: false,
     plan_type: usage.plan_type,
+    balance_usd: usage.balance_usd,
     five_hour: usage.five_hour,
     seven_day: usage.seven_day,
     reset_credits: resetCredits,
@@ -397,6 +407,7 @@ if (selectedLimits) {
     source_timestamp: selectedLimits.timestampMs ? new Date(selectedLimits.timestampMs).toISOString() : null,
     stale_source: false,
     plan_type: null,
+    balance_usd: usage?.balance_usd ?? null,
     five_hour: fiveHour,
     seven_day: sevenDay,
     reset_credits: resetCredits,
@@ -414,6 +425,7 @@ try {
     source: "unavailable",
     stale_source: true,
     plan_type: usage?.plan_type ?? null,
+    balance_usd: usage?.balance_usd ?? null,
     five_hour: null,
     seven_day: null,
     reset_credits: resetCredits,
