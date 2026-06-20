@@ -249,6 +249,7 @@ func normalizedPlanType(_ planType: String?) -> String? {
 }
 
 class MetricCardView: NSView {
+    private let highlightLayer = CALayer()
     private let titleLabel = NSTextField(labelWithString: "")
     private let valueLabel = NSTextField(labelWithString: "")
     private var accentColor = NSColor.green
@@ -261,6 +262,9 @@ class MetricCardView: NSView {
         layer?.cornerRadius = 9
         layer?.masksToBounds = false
         layer?.borderWidth = 1
+        highlightLayer.cornerRadius = 9
+        highlightLayer.masksToBounds = true
+        layer?.addSublayer(highlightLayer)
 
         titleLabel.font = NSFont.monospacedSystemFont(ofSize: 9, weight: .medium)
         titleLabel.backgroundColor = .clear
@@ -287,6 +291,7 @@ class MetricCardView: NSView {
 
     override func layout() {
         super.layout()
+        highlightLayer.frame = bounds
         titleLabel.frame = NSRect(x: 10, y: 29, width: bounds.width - 20, height: 12)
         valueLabel.frame = NSRect(x: 10, y: 7, width: bounds.width - 20, height: 17)
     }
@@ -304,16 +309,23 @@ class MetricCardView: NSView {
 
     func applyAppearance(secondaryTextColor: NSColor) {
         layer?.backgroundColor = (lightMode
-            ? NSColor.white.withAlphaComponent(0.24)
-            : NSColor.black.withAlphaComponent(0.28)).cgColor
+            ? NSColor.white.withAlphaComponent(0.42)
+            : NSColor.white.withAlphaComponent(0.07)).cgColor
         layer?.borderColor = (lightMode
-            ? NSColor.black.withAlphaComponent(0.10)
-            : NSColor.white.withAlphaComponent(0.10)).cgColor
+            ? NSColor.white.withAlphaComponent(0.46)
+            : NSColor.white.withAlphaComponent(0.12)).cgColor
+        highlightLayer.backgroundColor = (lightMode
+            ? NSColor.white.withAlphaComponent(0.18)
+            : NSColor.white.withAlphaComponent(0.04)).cgColor
+        highlightLayer.borderColor = (lightMode
+            ? NSColor.black.withAlphaComponent(0.05)
+            : NSColor.black.withAlphaComponent(0.24)).cgColor
+        highlightLayer.borderWidth = 1
         layer?.shadowColor = NSColor.black.cgColor
-        layer?.shadowOpacity = lightMode ? 0.06 : 0.18
-        layer?.shadowRadius = 8
-        layer?.shadowOffset = NSSize(width: 0, height: -1)
-        valueLabel.textColor = NSColor.white
+        layer?.shadowOpacity = lightMode ? 0.10 : 0.22
+        layer?.shadowRadius = 10
+        layer?.shadowOffset = NSSize(width: 3, height: -3)
+        valueLabel.textColor = lightMode ? NSColor.black : NSColor.white
         titleLabel.textColor = secondaryTextColor
     }
 }
