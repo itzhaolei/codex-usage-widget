@@ -202,17 +202,17 @@ func progressBar(percent: Int, width: Int = 15) -> String {
     return String(repeating: "█", count: filled) + String(repeating: "░", count: empty)
 }
 
-func formatUSDBalance(_ rawBalance: String?) -> String {
+func formatUSDBalanceValue(_ rawBalance: String?) -> String {
     guard let raw = rawBalance?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
         return "—"
     }
     if let value = Double(raw) {
-        return String(format: "$%.2f", value)
+        return String(format: "%.2f", value)
     }
     if raw.hasPrefix("$") {
-        return raw
+        return String(raw.dropFirst())
     }
-    return "$\(raw)"
+    return raw
 }
 
 func planBadgeText(_ planType: String?) -> String {
@@ -303,14 +303,13 @@ class MetricCardView: NSView {
     }
 
     func applyAppearance(secondaryTextColor: NSColor) {
-        let effectiveAccent = muted ? secondaryTextColor : accentColor
         layer?.backgroundColor = (lightMode
             ? NSColor.white.withAlphaComponent(0.36)
             : NSColor.white.withAlphaComponent(0.08)).cgColor
         layer?.borderColor = (lightMode
             ? NSColor.black.withAlphaComponent(0.12)
             : NSColor.white.withAlphaComponent(0.14)).cgColor
-        valueLabel.textColor = effectiveAccent
+        valueLabel.textColor = NSColor.white
         titleLabel.textColor = secondaryTextColor
     }
 }
@@ -686,11 +685,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
         let fiveReset = formatFiveHourReset(five?.resets_at, language: language)
         let sevenReset = formatSevenDayReset(seven?.resets_at, language: language)
         let resetCredits = snap.reset_credits?.available_count
-        let balance = formatUSDBalance(snap.balance_usd)
-        let resetText = resetCredits.map { "\($0) \(language.times)" } ?? "—"
+        let balance = formatUSDBalanceValue(snap.balance_usd)
+        let resetText = resetCredits.map { "\($0)" } ?? "—"
         let hasResetCredits = (resetCredits ?? 0) > 0
         balanceCardView.configure(
-            title: language.balance,
+            title: "\(language.balance)（$）",
             value: balance,
             symbol: "$",
             accentColor: NSColor.green,
@@ -699,7 +698,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
             secondaryTextColor: secondaryTextColor
         )
         resetCardView.configure(
-            title: language.availableReset,
+            title: "\(language.availableReset)（\(language.times)）",
             value: resetText,
             symbol: "R",
             accentColor: NSColor.green,
