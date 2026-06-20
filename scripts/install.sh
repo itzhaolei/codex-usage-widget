@@ -6,10 +6,12 @@ CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 INSTALL_DIR="$CODEX_HOME/usage-widget"
 SCRIPTS_DIR="$CODEX_HOME/scripts"
 APP_DIR="$INSTALL_DIR/UsageWidget.app"
+WIDGET_PATTERN="UsageWidget.app/Contents/MacOS/UsageWidget"
 MACOS_DIR="$APP_DIR/Contents/MacOS"
 RESOURCES_DIR="$APP_DIR/Contents/Resources"
 USER_APPS_DIR="$HOME/Applications"
 LAUNCHER_APP="$USER_APPS_DIR/Codex Usage Widget.app"
+LAUNCHER_PATTERN="Codex Usage Widget.app/Contents/MacOS/Codex Usage Widget"
 LAUNCHER_MACOS_DIR="$LAUNCHER_APP/Contents/MacOS"
 LAUNCHER_RESOURCES_DIR="$LAUNCHER_APP/Contents/Resources"
 LAUNCH_AGENT_DIR="$HOME/Library/LaunchAgents"
@@ -99,6 +101,10 @@ PY
 }
 
 mkdir -p "$INSTALL_DIR" "$SCRIPTS_DIR" "$MACOS_DIR" "$RESOURCES_DIR" "$USER_APPS_DIR" "$LAUNCHER_MACOS_DIR" "$LAUNCHER_RESOURCES_DIR" "$LAUNCH_AGENT_DIR"
+
+pkill -f "$LAUNCHER_PATTERN" >/dev/null 2>&1 || true
+pkill -f "$WIDGET_PATTERN" >/dev/null 2>&1 || true
+sleep 0.3
 
 cp "$PLUGIN_DIR/scripts/codex-usage-snapshot.mjs" "$SCRIPTS_DIR/codex-usage-snapshot.mjs"
 cp "$PLUGIN_DIR/scripts/ensure-usage-widget.sh" "$INSTALL_DIR/ensure-usage-widget.sh"

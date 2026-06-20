@@ -12,6 +12,10 @@ All notable changes to Codex Usage Widget are documented here.
 
 - Increased the widget height and redesigned the bottom area as two refined cards, with balance on the left and available resets on the right.
 
+### Fixed
+
+- Fixed the local install script so reinstalling during development restarts both the Dock launcher and the floating widget instead of leaving old processes running.
+
 ### Notes
 
 - The widget reads local Codex session metadata and local Codex auth tokens only to derive quota state, current usage limits, subscription type, USD balance, and reset-credit availability.
