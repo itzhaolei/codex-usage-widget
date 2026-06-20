@@ -197,9 +197,17 @@ func formatSevenDayReset(_ timestamp: TimeInterval?, language: AppLanguage) -> S
 }
 
 func progressBar(percent: Int, width: Int = 15) -> String {
-    let filled = Int(round(Double(percent) / 100.0 * Double(width)))
+    let normalizedPercent = min(100, max(0, percent))
+    let filled = Int(round(Double(normalizedPercent) / 100.0 * Double(width)))
     let empty = width - filled
-    return String(repeating: "█", count: filled) + String(repeating: "░", count: empty)
+    let rawBar = Array(String(repeating: "█", count: filled) + String(repeating: "░", count: empty))
+    let segmentSize = max(1, width / 5)
+    var segments: [String] = []
+    for start in stride(from: 0, to: rawBar.count, by: segmentSize) {
+        let end = min(start + segmentSize, rawBar.count)
+        segments.append(String(rawBar[start..<end]))
+    }
+    return segments.joined(separator: "▏")
 }
 
 func formatUSDBalanceValue(_ rawBalance: String?) -> String {
@@ -723,7 +731,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
             secondaryTextColor: secondaryTextColor
         )
 
-        let emptyBar = String(repeating: "░", count: 15)
+        let emptyBar = progressBar(percent: 0)
         let fiveBar = fivePct >= 0 ? progressBar(percent: fivePct) : emptyBar
         let sevenBar = sevenPct >= 0 ? progressBar(percent: sevenPct) : emptyBar
 
