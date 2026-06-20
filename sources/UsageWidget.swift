@@ -862,6 +862,13 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
             color.setFill()
             NSBezierPath(rect: NSRect(x: 0, y: 0, width: filledWidth, height: height)).fill()
+            let separatorColor = (color.blended(withFraction: 0.28, of: NSColor.black) ?? color).withAlphaComponent(0.45)
+            separatorColor.setFill()
+            let separatorWidth: CGFloat = 0.6
+            for segment in 1..<5 {
+                let x = barWidth * CGFloat(segment) / 5
+                NSBezierPath(rect: NSRect(x: x, y: 0, width: separatorWidth, height: height)).fill()
+            }
             if filledChars < widthChars {
                 let emptyText = String(repeating: "░", count: widthChars - filledChars)
                 let attributes: [NSAttributedString.Key: Any] = [
