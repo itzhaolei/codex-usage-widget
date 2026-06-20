@@ -2,7 +2,7 @@
 
 All notable changes to Codex Usage Widget are documented here.
 
-## 1.0.1 - 2026-06-20
+## 1.1.0 - 2026-06-20
 
 ### Added
 
