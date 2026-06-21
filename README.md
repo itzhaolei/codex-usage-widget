@@ -3,7 +3,7 @@
 <table>
   <tr>
     <td width="72">
-      <a href="https://quota-bubble.pages.dev"><img src="assets/icon.png" width="56" alt="Quota Bubble icon"></a>
+      <a href="https://quota-bubble.pages.dev"><img src="assets/app-icon.png" width="56" alt="Quota Bubble app icon"></a>
     </td>
     <td>
       <strong>Official Website</strong><br>
