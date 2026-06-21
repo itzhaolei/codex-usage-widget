@@ -3,12 +3,12 @@
 <table>
   <tr>
     <td width="72">
-      <a href="https://github.com/itzhaolei/codex-usage-widget"><img src="assets/app-icon.png" width="56" alt="Quota Bubble app icon"></a>
+      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html"><img src="assets/app-icon.png" width="56" alt="Quota Bubble app icon"></a>
     </td>
     <td>
       <strong>Official Website</strong><br>
       Download the installer, copy the one-line install command, and preview the multilingual product page.<br>
-      <a href="https://github.com/itzhaolei/codex-usage-widget"><strong>Open GitHub page →</strong></a>
+      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html"><strong>Open website preview →</strong></a>
     </td>
   </tr>
 </table>
