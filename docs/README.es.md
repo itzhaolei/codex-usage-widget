@@ -4,7 +4,7 @@
 
 Una ventana flotante para macOS que muestra el uso de Codex en 5 horas, el uso semanal y los reinicios disponibles.
 
-![Quota Bubble preview](../assets/preview.png)
+![Quota Bubble preview](../assets/preview-plus.png)
 
 ## Funciones
 

@@ -4,7 +4,7 @@
 
 Een zwevend macOS-venster voor Codex-gebruik over 5 uur, weekgebruik en beschikbare resets.
 
-![Quota Bubble preview](../assets/preview.png)
+![Quota Bubble preview](../assets/preview-plus.png)
 
 ## Functies
 

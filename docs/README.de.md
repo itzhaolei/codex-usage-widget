@@ -4,7 +4,7 @@
 
 Ein schwebendes macOS-Fenster zum Anzeigen des Codex 5-Stunden-Limits, des Wochenlimits und verfügbarer Reset-Credits.
 
-![Quota Bubble preview](../assets/preview.png)
+![Quota Bubble preview](../assets/preview-plus.png)
 
 ## Funktionen
 

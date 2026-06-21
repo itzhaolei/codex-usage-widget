@@ -4,7 +4,7 @@
 
 Una finestra flottante per macOS che mostra l’uso Codex su 5 ore, l’uso settimanale e i ripristini disponibili.
 
-![Quota Bubble preview](../assets/preview.png)
+![Quota Bubble preview](../assets/preview-plus.png)
 
 ## Funzionalità
 

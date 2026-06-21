@@ -4,7 +4,7 @@
 
 Codex의 5시간 사용량, 주간 사용량, 사용 가능한 재설정 횟수를 보여 주는 macOS 플로팅 창입니다.
 
-![Quota Bubble preview](../assets/preview.png)
+![Quota Bubble preview](../assets/preview-plus.png)
 
 ## 기능
 

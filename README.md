@@ -2,8 +2,8 @@
 
 <table>
   <tr>
-    <td width="220">
-      <a href="https://quota-bubble.pages.dev"><img src="assets/preview.png" width="210" alt="Quota Bubble preview"></a>
+    <td width="72">
+      <a href="https://quota-bubble.pages.dev"><img src="assets/icon.png" width="56" alt="Quota Bubble icon"></a>
     </td>
     <td>
       <strong>Official Website</strong><br>
@@ -19,7 +19,7 @@ A local macOS floating widget for watching Codex usage limits without opening se
 
 Website source lives in `public/` and is ready for Cloudflare Pages. Recommended Pages settings: project name `quota-bubble`, production branch `main`, build command `exit 0`, output directory `public`. Suggested free domain: `quotabubble.dpdns.org` after dpdns approval.
 
-![Quota Bubble preview](assets/preview.png)
+![Quota Bubble preview](assets/preview-plus.png)
 
 ## Features
 

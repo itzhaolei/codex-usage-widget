@@ -4,7 +4,7 @@
 
 一个 macOS 悬浮配额窗口，用来直接查看 Codex 的 5 小时额度、每周额度和可用重置次数。
 
-![Quota Bubble 预览](../assets/preview.png)
+![Quota Bubble 预览](../assets/preview-plus.png)
 
 ## 功能
 

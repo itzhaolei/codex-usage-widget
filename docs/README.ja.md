@@ -4,7 +4,7 @@
 
 Codex の 5 時間使用量、週間使用量、利用可能なリセット回数を表示する macOS のフローティングウィンドウです。
 
-![Quota Bubble preview](../assets/preview.png)
+![Quota Bubble preview](../assets/preview-plus.png)
 
 ## 機能
 
