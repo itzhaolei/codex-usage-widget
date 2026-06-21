@@ -3,12 +3,12 @@
 <table>
   <tr>
     <td width="72">
-      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html"><img src="assets/app-icon.png" width="56" alt="Quota Bubble app icon"></a>
+      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260621-1"><img src="assets/app-icon.png?raw=1" width="56" alt="Quota Bubble app icon"></a>
     </td>
     <td>
       <strong>Official Website</strong><br>
       Download the installer, copy the one-line install command, and preview the multilingual product page.<br>
-      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html"><strong>Open website preview →</strong></a>
+      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260621-1"><strong>Open website preview →</strong></a>
     </td>
   </tr>
 </table>
@@ -19,7 +19,7 @@ A local macOS floating widget for watching Codex usage limits without opening se
 
 Website source lives in `public/` and is ready for Cloudflare Pages. Recommended Pages settings: project name `quota-bubble`, production branch `main`, build command `exit 0`, output directory `public`. Suggested free domain: `quotabubble.dpdns.org` after dpdns approval.
 
-![Quota Bubble preview](assets/preview-plus.png)
+![Quota Bubble preview](assets/preview-plus.png?raw=1)
 
 ## Features
 
