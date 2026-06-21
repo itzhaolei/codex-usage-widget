@@ -2,8 +2,8 @@
 
 <table>
   <tr>
-    <td width="72">
-      <a href="https://quota-bubble.pages.dev"><img src="assets/icon.png" width="56" alt="Quota Bubble icon"></a>
+    <td width="220">
+      <a href="https://quota-bubble.pages.dev"><img src="assets/preview.png" width="210" alt="Quota Bubble preview"></a>
     </td>
     <td>
       <strong>Official Website</strong><br>
