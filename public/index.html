@@ -111,11 +111,17 @@
     }
     .button.primary { background: var(--green); color: #021107; border-color: transparent; box-shadow: 0 16px 44px rgba(16, 240, 47, 0.24); }
     .share-note { color: var(--muted); font-size: 13px; min-height: 18px; margin-top: 10px; }
-    .terminal {
+    .command-row {
       margin-top: 16px;
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+    .terminal {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
       padding: 13px 14px;
       border: 1px solid var(--line);
       border-radius: 14px;
@@ -129,13 +135,14 @@
     .copy-command {
       flex: 0 0 auto;
       border: 1px solid rgba(16, 240, 47, 0.32);
-      border-radius: 10px;
-      background: rgba(16, 240, 47, 0.12);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(16, 240, 47, 0.18), rgba(16, 240, 47, 0.08));
       color: var(--green);
       cursor: pointer;
-      font: 700 12px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      min-height: 32px;
-      padding: 0 12px;
+      font: 800 13px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 46px;
+      padding: 0 18px;
+      box-shadow: 0 12px 34px rgba(16, 240, 47, 0.10);
     }
     .preview {
       position: relative;
@@ -147,16 +154,178 @@
       backdrop-filter: blur(18px);
     }
     .preview img { display: block; width: 100%; border-radius: 18px; }
-    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 0 0 72px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 0 0 30px; }
     .card { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 20px; min-height: 146px; }
     .card strong { display: block; margin-bottom: 10px; font-size: 16px; }
     .card span { color: var(--muted); line-height: 1.55; font-size: 14px; }
-    .deploy { margin-bottom: 80px; padding: 24px; border: 1px solid var(--line); border-radius: 22px; background: var(--panel-strong); color: var(--muted); }
-    .deploy strong { color: var(--text); }
+    .poster-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      padding: 0 0 76px;
+    }
+    .poster {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 318px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 24px;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 78% 12%, rgba(16, 240, 47, 0.22), transparent 12rem),
+        linear-gradient(160deg, rgba(20, 47, 61, 0.92), rgba(6, 13, 18, 0.95));
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    }
+    .poster:nth-child(2) {
+      background:
+        radial-gradient(circle at 18% 16%, rgba(72, 160, 220, 0.22), transparent 12rem),
+        linear-gradient(160deg, rgba(18, 39, 52, 0.92), rgba(7, 12, 17, 0.95));
+    }
+    .poster:nth-child(3) {
+      background:
+        radial-gradient(circle at 74% 76%, rgba(255, 149, 36, 0.18), transparent 12rem),
+        linear-gradient(160deg, rgba(18, 38, 48, 0.92), rgba(6, 11, 16, 0.96));
+    }
+    .poster::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), transparent 34%);
+      pointer-events: none;
+    }
+    .poster-copy,
+    .poster-visual { position: relative; z-index: 1; }
+    .poster-kicker {
+      display: inline-flex;
+      align-self: flex-start;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .poster-title {
+      margin: 16px 0 9px;
+      max-width: 12ch;
+      font-size: 27px;
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      font-weight: 850;
+    }
+    .poster-text {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .poster-visual {
+      min-height: 112px;
+      margin-top: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      background: rgba(3, 9, 12, 0.44);
+      padding: 14px;
+      backdrop-filter: blur(16px);
+    }
+    .poster-window-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 13px;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .poster-dots { display: flex; gap: 5px; }
+    .poster-dots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.35); }
+    .poster-meter {
+      height: 13px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.13);
+      overflow: hidden;
+      margin-bottom: 9px;
+    }
+    .poster-meter span {
+      display: block;
+      height: 100%;
+      width: var(--value);
+      background: var(--green);
+      box-shadow: 0 0 22px rgba(16, 240, 47, 0.42);
+    }
+    .poster-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .poster-chip {
+      min-height: 44px;
+      border-radius: 12px;
+      padding: 9px 10px;
+      background: rgba(255, 255, 255, 0.09);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .poster-chip small {
+      display: block;
+      margin-bottom: 4px;
+      color: rgba(255, 255, 255, 0.56);
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .poster-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-content: flex-end;
+      min-height: 88px;
+    }
+    .poster-badge {
+      display: inline-flex;
+      align-items: center;
+      height: 30px;
+      padding: 0 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.09);
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 12px;
+      font-weight: 830;
+    }
+    .poster-badge.green { background: rgba(16, 240, 47, 0.14); color: var(--green); }
+    .poster-update {
+      display: grid;
+      gap: 10px;
+      min-height: 88px;
+      align-content: end;
+    }
+    .poster-update-line {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .poster-update-line span:first-child {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 22px rgba(16, 240, 47, 0.3);
+    }
     footer { padding: 0 0 30px; color: rgba(255,255,255,0.48); font-size: 13px; }
     @media (max-width: 860px) {
       .hero { grid-template-columns: 1fr; padding-top: 38px; gap: 30px; }
       .grid { grid-template-columns: 1fr 1fr; }
+      .poster-grid { grid-template-columns: 1fr; }
+      .poster { min-height: 276px; }
+      .command-row { align-items: stretch; flex-direction: column; }
+      .copy-command { width: 100%; }
       nav { display: none; }
       header { align-items: flex-start; }
       .topbar { flex-direction: column; align-items: flex-end; gap: 10px; }
@@ -164,6 +333,7 @@
     @media (max-width: 560px) {
       .page { width: min(100% - 28px, 1120px); }
       .grid { grid-template-columns: 1fr; }
+      .poster-title { max-width: 100%; }
       .hero { padding-bottom: 46px; }
       header { flex-direction: column; }
       .topbar { align-items: flex-start; }
@@ -206,8 +376,10 @@
             <button class="button" id="shareButton" type="button" data-i18n="share">Share</button>
           </div>
           <div class="share-note" id="shareNote" aria-live="polite"></div>
-          <div class="terminal">
-            <code id="installCommand">CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"</code>
+          <div class="command-row">
+            <div class="terminal">
+              <code id="installCommand">CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"</code>
+            </div>
             <button class="copy-command" id="copyCommandButton" type="button" data-i18n="copyCommand">Copy</button>
           </div>
         </div>
@@ -221,8 +393,49 @@
         <div class="card"><strong data-i18n="card4Title">Easy updates</strong><span data-i18n="card4Text">Use the app menu to check GitHub releases and update directly from the installer package.</span></div>
       </section>
 
-      <section class="deploy" data-i18n-html="deploy">
-        <strong>Recommended free deployment:</strong> Cloudflare Pages project <code>quota-bubble</code>, production branch <code>main</code>, build command <code>exit 0</code>, output directory <code>public</code>. Suggested free domain: <code>quotabubble.dpdns.org</code> with <code>CNAME</code> to the Pages domain after Cloudflare custom-domain setup.
+      <section class="poster-grid" aria-label="Quota Bubble highlights">
+        <article class="poster">
+          <div class="poster-copy">
+            <span class="poster-kicker" data-i18n="poster1Kicker">Focus</span>
+            <div class="poster-title" data-i18n="poster1Title">Quota without context switching.</div>
+            <p class="poster-text" data-i18n="poster1Text">Keep the numbers beside your work, not buried in settings.</p>
+          </div>
+          <div class="poster-visual" aria-hidden="true">
+            <div class="poster-window-head"><span>Codex</span><div class="poster-dots"><span></span><span></span><span></span></div></div>
+            <div class="poster-meter"><span style="--value: 87%"></span></div>
+            <div class="poster-meter"><span style="--value: 68%"></span></div>
+            <div class="poster-row"><div class="poster-chip"><small>Balance</small>$0.00</div><div class="poster-chip"><small>Resets</small>1</div></div>
+          </div>
+        </article>
+        <article class="poster">
+          <div class="poster-copy">
+            <span class="poster-kicker" data-i18n="poster2Kicker">Private</span>
+            <div class="poster-title" data-i18n="poster2Title">Local first, account safe.</div>
+            <p class="poster-text" data-i18n="poster2Text">Quota Bubble watches local Codex data and keeps account details redacted.</p>
+          </div>
+          <div class="poster-visual" aria-hidden="true">
+            <div class="poster-badges">
+              <span class="poster-badge green">Local</span>
+              <span class="poster-badge">Redacted</span>
+              <span class="poster-badge">No token storage</span>
+              <span class="poster-badge">Theme aware</span>
+            </div>
+          </div>
+        </article>
+        <article class="poster">
+          <div class="poster-copy">
+            <span class="poster-kicker" data-i18n="poster3Kicker">Updates</span>
+            <div class="poster-title" data-i18n="poster3Title">Install once, stay current.</div>
+            <p class="poster-text" data-i18n="poster3Text">Download the installer or copy one command, then update from the app menu.</p>
+          </div>
+          <div class="poster-visual" aria-hidden="true">
+            <div class="poster-update">
+              <div class="poster-update-line"><span></span><strong>v2.0.0</strong><em>Latest release</em></div>
+              <div class="poster-meter"><span style="--value: 100%"></span></div>
+              <div class="poster-update-line"><span></span><strong>Ready</strong><em>Direct install</em></div>
+            </div>
+          </div>
+        </article>
       </section>
     </main>
 
@@ -239,7 +452,9 @@
         card2Title: "Live quota", card2Text: "Refreshes local Codex quota, reset time, balance, and reset credits every second.",
         card3Title: "Private by design", card3Text: "Runs locally and stores only redacted account fingerprints, never raw account IDs or tokens.",
         card4Title: "Easy updates", card4Text: "Use the app menu to check GitHub releases and update directly from the installer package.",
-        deploy: "<strong>Recommended free deployment:</strong> Cloudflare Pages project <code>quota-bubble</code>, production branch <code>main</code>, build command <code>exit 0</code>, output directory <code>public</code>. Suggested free domain: <code>quotabubble.dpdns.org</code> with <code>CNAME</code> to the Pages domain after Cloudflare custom-domain setup.",
+        poster1Kicker: "Focus", poster1Title: "Quota without context switching.", poster1Text: "Keep the numbers beside your work, not buried in settings.",
+        poster2Kicker: "Private", poster2Title: "Local first, account safe.", poster2Text: "Quota Bubble watches local Codex data and keeps account details redacted.",
+        poster3Kicker: "Updates", poster3Title: "Install once, stay current.", poster3Text: "Download the installer or copy one command, then update from the app menu.",
         footer: "Quota Bubble is an independent local tool for viewing Codex quota information."
       },
       zh: {
@@ -251,7 +466,9 @@
         card2Title: "实时配额", card2Text: "每秒同步本机 Codex 配额、重置时间、余额和可用重置次数。",
         card3Title: "隐私优先", card3Text: "只在本机运行，只保存脱敏账号指纹，不保存原始账号 ID 或 token。",
         card4Title: "轻松更新", card4Text: "通过应用菜单检查 GitHub Release，并直接用安装器完成更新。",
-        deploy: "<strong>推荐免费部署：</strong>Cloudflare Pages 项目 <code>quota-bubble</code>，生产分支 <code>main</code>，构建命令 <code>exit 0</code>，输出目录 <code>public</code>。推荐免费域名：<code>quotabubble.dpdns.org</code>，在 Cloudflare 绑定自定义域名后用 <code>CNAME</code> 指向 Pages 域名。",
+        poster1Kicker: "专注", poster1Title: "不用切换窗口，也能看见配额。", poster1Text: "把关键数字放在工作区旁边，不再藏在设置里。",
+        poster2Kicker: "隐私", poster2Title: "本地优先，账号安全。", poster2Text: "只观察本机 Codex 数据，并对账号信息做脱敏处理。",
+        poster3Kicker: "更新", poster3Title: "安装一次，持续跟进。", poster3Text: "可以下载安装器，也可以复制一行命令，并通过应用菜单更新。",
         footer: "Quota Bubble 是一个独立的本地工具，用来查看 Codex 配额信息。"
       },
       ja: {
@@ -263,7 +480,9 @@
         card2Title: "ライブクォータ", card2Text: "Codex のクォータ、リセット時刻、残高、リセット回数を毎秒更新します。",
         card3Title: "プライバシー重視", card3Text: "ローカルで動作し、匿名化されたアカウント指紋のみを保存します。",
         card4Title: "簡単アップデート", card4Text: "アプリメニューから GitHub Release を確認し、インストーラーで直接更新できます。",
-        deploy: "<strong>推奨の無料デプロイ:</strong> Cloudflare Pages プロジェクト <code>quota-bubble</code>、本番ブランチ <code>main</code>、ビルドコマンド <code>exit 0</code>、出力ディレクトリ <code>public</code>。推奨無料ドメインは <code>quotabubble.dpdns.org</code> です。",
+        poster1Kicker: "集中", poster1Title: "切り替えなしでクォータ確認。", poster1Text: "必要な数字を作業のそばに置き、設定画面に埋もれさせません。",
+        poster2Kicker: "プライベート", poster2Title: "ローカル優先、アカウント安全。", poster2Text: "ローカルの Codex データを見守り、アカウント情報は匿名化します。",
+        poster3Kicker: "更新", poster3Title: "一度入れれば、常に最新へ。", poster3Text: "インストーラーか一行コマンドで導入し、アプリメニューから更新できます。",
         footer: "Quota Bubble は Codex のクォータ情報を表示する独立したローカルツールです。"
       },
       ko: {
@@ -275,7 +494,9 @@
         card2Title: "실시간 할당량", card2Text: "Codex 할당량, 재설정 시간, 잔액, 재설정 횟수를 매초 새로 고칩니다.",
         card3Title: "개인정보 보호", card3Text: "로컬에서 실행되며 익명화된 계정 지문만 저장합니다.",
         card4Title: "쉬운 업데이트", card4Text: "앱 메뉴에서 GitHub Release를 확인하고 설치 프로그램으로 바로 업데이트합니다.",
-        deploy: "<strong>권장 무료 배포:</strong> Cloudflare Pages 프로젝트 <code>quota-bubble</code>, 프로덕션 브랜치 <code>main</code>, 빌드 명령 <code>exit 0</code>, 출력 디렉터리 <code>public</code>. 추천 무료 도메인: <code>quotabubble.dpdns.org</code>.",
+        poster1Kicker: "집중", poster1Title: "전환 없이 할당량 확인.", poster1Text: "중요한 숫자를 작업 공간 옆에 두고 설정에 숨기지 않습니다.",
+        poster2Kicker: "비공개", poster2Title: "로컬 우선, 계정 안전.", poster2Text: "로컬 Codex 데이터를 확인하고 계정 정보는 익명화합니다.",
+        poster3Kicker: "업데이트", poster3Title: "한 번 설치하고 계속 최신으로.", poster3Text: "설치 프로그램이나 한 줄 명령으로 설치하고 앱 메뉴에서 업데이트합니다.",
         footer: "Quota Bubble은 Codex 할당량 정보를 확인하는 독립 로컬 도구입니다."
       },
       de: {
@@ -287,7 +508,9 @@
         card2Title: "Live-Kontingent", card2Text: "Aktualisiert Codex-Kontingent, Reset-Zeit, Guthaben und Reset-Credits jede Sekunde.",
         card3Title: "Privat by Design", card3Text: "Läuft lokal und speichert nur anonymisierte Konto-Fingerprints.",
         card4Title: "Einfache Updates", card4Text: "Prüfe GitHub Releases im App-Menü und aktualisiere direkt per Installer.",
-        deploy: "<strong>Empfohlenes kostenloses Deployment:</strong> Cloudflare Pages Projekt <code>quota-bubble</code>, Branch <code>main</code>, Build-Befehl <code>exit 0</code>, Ausgabeordner <code>public</code>. Empfohlene Domain: <code>quotabubble.dpdns.org</code>.",
+        poster1Kicker: "Fokus", poster1Title: "Quota ohne Kontextwechsel.", poster1Text: "Behalte die Zahlen direkt neben deiner Arbeit statt in den Einstellungen.",
+        poster2Kicker: "Privat", poster2Title: "Lokal zuerst, Konto geschützt.", poster2Text: "Quota Bubble liest lokale Codex-Daten und anonymisiert Kontodetails.",
+        poster3Kicker: "Updates", poster3Title: "Einmal installieren, aktuell bleiben.", poster3Text: "Lade den Installer oder kopiere einen Befehl und aktualisiere im App-Menü.",
         footer: "Quota Bubble ist ein unabhängiges lokales Tool zum Anzeigen von Codex-Kontingenten."
       },
       fr: {
@@ -299,7 +522,9 @@
         card2Title: "Quota en direct", card2Text: "Actualise chaque seconde le quota Codex, le temps de réinitialisation, le solde et les crédits.",
         card3Title: "Confidentialité d’abord", card3Text: "Fonctionne localement et ne stocke que des empreintes de compte anonymisées.",
         card4Title: "Mises à jour simples", card4Text: "Vérifiez les releases GitHub depuis le menu et mettez à jour avec l’installateur.",
-        deploy: "<strong>Déploiement gratuit recommandé :</strong> projet Cloudflare Pages <code>quota-bubble</code>, branche <code>main</code>, commande <code>exit 0</code>, dossier <code>public</code>. Domaine conseillé : <code>quotabubble.dpdns.org</code>.",
+        poster1Kicker: "Focus", poster1Title: "Le quota sans changer de contexte.", poster1Text: "Gardez les chiffres près de votre travail, pas enfouis dans les réglages.",
+        poster2Kicker: "Privé", poster2Title: "Local d’abord, compte protégé.", poster2Text: "Quota Bubble lit les données Codex locales et anonymise les détails du compte.",
+        poster3Kicker: "Mises à jour", poster3Title: "Installez une fois, restez à jour.", poster3Text: "Téléchargez l’installateur ou copiez une commande, puis mettez à jour depuis le menu.",
         footer: "Quota Bubble est un outil local indépendant pour afficher les informations de quota Codex."
       },
       es: {
@@ -311,7 +536,9 @@
         card2Title: "Cuota en vivo", card2Text: "Actualiza cada segundo la cuota de Codex, reinicio, saldo y créditos.",
         card3Title: "Privacidad por diseño", card3Text: "Funciona localmente y solo guarda huellas de cuenta anonimizadas.",
         card4Title: "Actualizaciones fáciles", card4Text: "Consulta GitHub Releases desde el menú y actualiza con el instalador.",
-        deploy: "<strong>Despliegue gratuito recomendado:</strong> Cloudflare Pages <code>quota-bubble</code>, rama <code>main</code>, comando <code>exit 0</code>, salida <code>public</code>. Dominio sugerido: <code>quotabubble.dpdns.org</code>.",
+        poster1Kicker: "Enfoque", poster1Title: "Cuota sin cambiar de contexto.", poster1Text: "Mantén los números junto a tu trabajo, no escondidos en ajustes.",
+        poster2Kicker: "Privado", poster2Title: "Local primero, cuenta segura.", poster2Text: "Quota Bubble observa datos locales de Codex y anonimiza la cuenta.",
+        poster3Kicker: "Updates", poster3Title: "Instala una vez y mantente al día.", poster3Text: "Descarga el instalador o copia un comando y actualiza desde el menú.",
         footer: "Quota Bubble es una herramienta local independiente para ver la cuota de Codex."
       },
       pt: {
@@ -323,7 +550,9 @@
         card2Title: "Cota ao vivo", card2Text: "Atualiza a cada segundo a cota do Codex, redefinição, saldo e créditos.",
         card3Title: "Privacidade por design", card3Text: "Roda localmente e salva apenas impressões de conta anonimizadas.",
         card4Title: "Atualizações fáceis", card4Text: "Confira releases do GitHub no menu e atualize pelo instalador.",
-        deploy: "<strong>Deploy gratuito recomendado:</strong> Cloudflare Pages <code>quota-bubble</code>, branch <code>main</code>, comando <code>exit 0</code>, saída <code>public</code>. Domínio sugerido: <code>quotabubble.dpdns.org</code>.",
+        poster1Kicker: "Foco", poster1Title: "Cota sem trocar de contexto.", poster1Text: "Mantenha os números ao lado do trabalho, não escondidos nas configurações.",
+        poster2Kicker: "Privado", poster2Title: "Local primeiro, conta segura.", poster2Text: "Quota Bubble observa dados locais do Codex e anonimiza detalhes da conta.",
+        poster3Kicker: "Updates", poster3Title: "Instale uma vez e fique atualizado.", poster3Text: "Baixe o instalador ou copie um comando e atualize pelo menu do app.",
         footer: "Quota Bubble é uma ferramenta local independente para ver cotas do Codex."
       },
       it: {
@@ -335,7 +564,9 @@
         card2Title: "Quota live", card2Text: "Aggiorna ogni secondo quota Codex, reset, saldo e crediti.",
         card3Title: "Privacy by design", card3Text: "Funziona localmente e salva solo impronte account anonimizzate.",
         card4Title: "Aggiornamenti semplici", card4Text: "Controlla le release GitHub dal menu e aggiorna con l’installer.",
-        deploy: "<strong>Deploy gratuito consigliato:</strong> Cloudflare Pages <code>quota-bubble</code>, branch <code>main</code>, comando <code>exit 0</code>, output <code>public</code>. Dominio suggerito: <code>quotabubble.dpdns.org</code>.",
+        poster1Kicker: "Focus", poster1Title: "Quota senza cambiare contesto.", poster1Text: "Tieni i numeri accanto al lavoro, non nascosti nelle impostazioni.",
+        poster2Kicker: "Privato", poster2Title: "Prima locale, account al sicuro.", poster2Text: "Quota Bubble osserva i dati Codex locali e anonimizza i dettagli account.",
+        poster3Kicker: "Update", poster3Title: "Installa una volta, resta aggiornato.", poster3Text: "Scarica l’installer o copia un comando e aggiorna dal menu dell’app.",
         footer: "Quota Bubble è uno strumento locale indipendente per visualizzare le quote Codex."
       },
       nl: {
@@ -347,7 +578,9 @@
         card2Title: "Live quota", card2Text: "Ververst Codex-quota, resettijd, saldo en resetcredits elke seconde.",
         card3Title: "Privacygericht", card3Text: "Draait lokaal en bewaart alleen geanonimiseerde accountvingerafdrukken.",
         card4Title: "Eenvoudige updates", card4Text: "Controleer GitHub Releases in het appmenu en update via de installer.",
-        deploy: "<strong>Aanbevolen gratis deployment:</strong> Cloudflare Pages project <code>quota-bubble</code>, branch <code>main</code>, build <code>exit 0</code>, output <code>public</code>. Voorgesteld domein: <code>quotabubble.dpdns.org</code>.",
+        poster1Kicker: "Focus", poster1Title: "Quota zonder contextwissel.", poster1Text: "Houd de cijfers naast je werk, niet verborgen in instellingen.",
+        poster2Kicker: "Privé", poster2Title: "Lokaal eerst, account veilig.", poster2Text: "Quota Bubble bekijkt lokale Codex-data en anonimiseert accountdetails.",
+        poster3Kicker: "Updates", poster3Title: "Eenmaal installeren, actueel blijven.", poster3Text: "Download de installer of kopieer een opdracht en update via het appmenu.",
         footer: "Quota Bubble is een onafhankelijke lokale tool voor Codex-quota-informatie."
       }
     };
