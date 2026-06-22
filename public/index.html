@@ -123,25 +123,20 @@
       min-width: 0;
       display: flex;
       align-items: center;
-      padding: 13px 14px 10px;
+      padding: 13px 14px;
       border: 1px solid var(--line);
       border-radius: 14px;
       background: rgba(0, 0, 0, 0.32);
       color: rgba(255, 255, 255, 0.86);
       overflow-x: auto;
       overflow-y: hidden;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(246, 251, 255, 0.20) transparent;
+      scrollbar-width: none;
       font: 12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       white-space: nowrap;
+      -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 26px), transparent 100%);
+      mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 26px), transparent 100%);
     }
-    .terminal::-webkit-scrollbar { height: 2px; }
-    .terminal::-webkit-scrollbar-track { background: transparent; }
-    .terminal::-webkit-scrollbar-thumb {
-      border-radius: 999px;
-      background: rgba(246, 251, 255, 0.18);
-    }
-    .terminal::-webkit-scrollbar-thumb:hover { background: rgba(246, 251, 255, 0.30); }
+    .terminal::-webkit-scrollbar { display: none; }
     .terminal code {
       flex: 0 0 auto;
       min-width: 100%;
