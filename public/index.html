@@ -146,14 +146,32 @@
     }
     .preview {
       position: relative;
-      padding: 20px;
+      padding: clamp(18px, 4vw, 32px);
       border: 1px solid var(--line);
       border-radius: 28px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+      background:
+        radial-gradient(circle at 72% 18%, rgba(16, 240, 47, 0.20), transparent 16rem),
+        radial-gradient(circle at 24% 82%, rgba(74, 168, 220, 0.18), transparent 15rem),
+        linear-gradient(155deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
       box-shadow: 0 28px 90px rgba(0, 0, 0, 0.38);
       backdrop-filter: blur(18px);
     }
-    .preview img { display: block; width: 100%; border-radius: 18px; }
+    .preview::after {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+    }
+    .preview img {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      border-radius: 18px;
+      filter: drop-shadow(0 24px 38px rgba(0, 0, 0, 0.34));
+    }
     .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 0 0 30px; }
     .card { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 20px; min-height: 146px; }
     .card strong { display: block; margin-bottom: 10px; font-size: 16px; }
@@ -234,7 +252,6 @@
       border-radius: 12px;
       filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.22));
     }
-    footer { padding: 0 0 30px; color: rgba(255,255,255,0.48); font-size: 13px; }
     @media (max-width: 860px) {
       .hero { grid-template-columns: 1fr; padding-top: 38px; gap: 30px; }
       .grid { grid-template-columns: 1fr 1fr; }
@@ -299,7 +316,7 @@
             <button class="copy-command" id="copyCommandButton" type="button" data-i18n="copyCommand">Copy</button>
           </div>
         </div>
-        <div class="preview"><img src="assets/preview-plus.png?v=20260621-1" alt="Quota Bubble preview"></div>
+        <div class="preview"><img src="assets/hero-widget.png?v=20260622-1" alt="Quota Bubble preview"></div>
       </section>
 
       <section id="features" class="grid">
@@ -342,8 +359,6 @@
         </article>
       </section>
     </main>
-
-    <footer data-i18n="footer">Quota Bubble is an independent local tool for viewing Codex quota information.</footer>
   </div>
   <script>
     const translations = {

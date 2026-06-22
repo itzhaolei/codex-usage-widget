@@ -3,9 +3,6 @@
 
 import Cocoa
 
-let posterRenderOutputDirectory = ProcessInfo.processInfo.environment["QUOTA_BUBBLE_RENDER_POSTERS_DIR"]
-let isPosterRenderMode = posterRenderOutputDirectory != nil
-
 // MARK: — 快照模型
 struct UsageSnapshot: Codable {
     var updated_at: String?
@@ -480,9 +477,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         installClickActivationMonitor()
         panel.makeKeyAndOrderFront(nil)
         panel.orderFrontRegardless()
-        if !isPosterRenderMode {
-            refreshVersionUpdateStatus(force: true)
-        }
+        refreshVersionUpdateStatus(force: true)
     }
 
     func installClickActivationMonitor() {
@@ -826,62 +821,6 @@ class WindowController: NSWindowController, NSWindowDelegate {
         )
     }
 
-    func renderWebsitePosters(to outputDirectory: String) {
-        language = zhLanguage
-        languageIdentity = "zh"
-        isLightMode = false
-        isPinned = true
-        applyTheme()
-        applyPinnedState()
-        versionLabel.stringValue = "v2.0.0"
-        versionUpdateDot.isHidden = true
-
-        let now = Date().timeIntervalSince1970
-        let samples: [(String, UsageSnapshot)] = [
-            ("poster-focus", UsageSnapshot(
-                updated_at: nil,
-                plan_type: "plus",
-                balance_usd: "0.00",
-                five_hour: UsageWindow(used_percentage: 13, resets_at: now + 4 * 3600 + 3 * 60),
-                seven_day: UsageWindow(used_percentage: 20, resets_at: now + 6 * 86400 + 9 * 3600),
-                reset_credits: ResetCredits(available_count: 1)
-            )),
-            ("poster-private", UsageSnapshot(
-                updated_at: nil,
-                plan_type: "free",
-                balance_usd: "0.00",
-                five_hour: UsageWindow(used_percentage: 59, resets_at: now + 2 * 3600 + 18 * 60),
-                seven_day: UsageWindow(used_percentage: 71, resets_at: now + 5 * 86400 + 12 * 3600),
-                reset_credits: ResetCredits(available_count: 0)
-            )),
-            ("poster-updates", UsageSnapshot(
-                updated_at: nil,
-                plan_type: "pro20x",
-                balance_usd: "3.50",
-                five_hour: UsageWindow(used_percentage: 82, resets_at: now + 51 * 60),
-                seven_day: UsageWindow(used_percentage: 34, resets_at: now + 3 * 86400 + 8 * 3600),
-                reset_credits: ResetCredits(available_count: 2)
-            ))
-        ]
-
-        for (name, sample) in samples {
-            render(sample)
-            rootView.needsLayout = true
-            rootView.layoutSubtreeIfNeeded()
-            rootView.displayIfNeeded()
-            savePosterImage(named: name, to: outputDirectory)
-        }
-    }
-
-    func savePosterImage(named name: String, to outputDirectory: String) {
-        guard let rep = rootView.bitmapImageRepForCachingDisplay(in: rootView.bounds) else { return }
-        rootView.cacheDisplay(in: rootView.bounds, to: rep)
-        guard let data = rep.representation(using: .png, properties: [:]) else { return }
-        let url = URL(fileURLWithPath: outputDirectory).appendingPathComponent("\(name).png")
-        try? FileManager.default.createDirectory(at: URL(fileURLWithPath: outputDirectory), withIntermediateDirectories: true)
-        try? data.write(to: url)
-    }
-
     func refreshSnapshotIfNeeded(force: Bool = false, redrawAfterCompletion: Bool = false) {
         guard !snapshotRefreshInFlight,
               (force || -lastSnapshotRefresh.timeIntervalSinceNow >= 1),
@@ -1138,12 +1077,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.accessory)
 
         windowController = WindowController()
-        if let outputDirectory = posterRenderOutputDirectory {
-            windowController.renderWebsitePosters(to: outputDirectory)
-            NSApp.terminate(nil)
-        } else {
-            windowController.startRefresh()
-        }
+        windowController.startRefresh()
     }
 }
 
