@@ -118,20 +118,35 @@
       gap: 12px;
     }
     .terminal {
+      position: relative;
       flex: 1;
       min-width: 0;
       display: flex;
       align-items: center;
-      padding: 13px 14px;
+      padding: 13px 14px 10px;
       border: 1px solid var(--line);
       border-radius: 14px;
       background: rgba(0, 0, 0, 0.32);
       color: rgba(255, 255, 255, 0.86);
-      overflow: auto;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(246, 251, 255, 0.20) transparent;
       font: 12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       white-space: nowrap;
     }
-    .terminal code { flex: 1; overflow: auto; }
+    .terminal::-webkit-scrollbar { height: 2px; }
+    .terminal::-webkit-scrollbar-track { background: transparent; }
+    .terminal::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(246, 251, 255, 0.18);
+    }
+    .terminal::-webkit-scrollbar-thumb:hover { background: rgba(246, 251, 255, 0.30); }
+    .terminal code {
+      flex: 0 0 auto;
+      min-width: 100%;
+      padding-right: 18px;
+    }
     .copy-command {
       flex: 0 0 auto;
       border: 1px solid rgba(16, 240, 47, 0.32);
