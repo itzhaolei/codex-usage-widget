@@ -224,99 +224,175 @@
       line-height: 1.55;
     }
     .poster-visual {
-      min-height: 112px;
+      min-height: 142px;
       margin-top: 22px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 18px;
-      background: rgba(3, 9, 12, 0.44);
-      padding: 14px;
-      backdrop-filter: blur(16px);
     }
-    .poster-window-head {
+    .mini-widget {
+      position: relative;
+      min-height: 142px;
+      border: 1px solid rgba(131, 172, 194, 0.28);
+      border-radius: 17px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.08), transparent 13rem),
+        linear-gradient(145deg, rgba(27, 53, 68, 0.96), rgba(16, 32, 44, 0.98));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 18px 38px rgba(0, 0, 0, 0.28);
+      padding: 12px 12px 18px;
+      overflow: hidden;
+    }
+    .mini-widget-head {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 13px;
-      color: rgba(255, 255, 255, 0.62);
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 9px;
+    }
+    .mini-widget-brand {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 5px;
+      color: #f7fbff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+    }
+    .mini-plan {
+      flex: 0 0 auto;
+      border-radius: 2px;
+      padding: 2px 5px 3px;
+      background: var(--green);
+      color: #fff;
+      font-size: 8px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .mini-plan.free { background: rgba(255, 255, 255, 0.28); }
+    .mini-plan.pro { background: #ff8a28; }
+    .mini-controls {
+      display: inline-flex;
+      align-items: center;
+      height: 23px;
+      border: 1px solid rgba(255, 255, 255, 0.17);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.72);
+      overflow: hidden;
       font-size: 11px;
       font-weight: 800;
     }
-    .poster-dots { display: flex; gap: 5px; }
-    .poster-dots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.35); }
-    .poster-meter {
-      height: 13px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.13);
-      overflow: hidden;
-      margin-bottom: 9px;
-    }
-    .poster-meter span {
-      display: block;
-      height: 100%;
-      width: var(--value);
-      background: var(--green);
-      box-shadow: 0 0 22px rgba(16, 240, 47, 0.42);
-    }
-    .poster-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .poster-chip {
-      min-height: 44px;
-      border-radius: 12px;
-      padding: 9px 10px;
-      background: rgba(255, 255, 255, 0.09);
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 12px;
-      font-weight: 850;
-    }
-    .poster-chip small {
-      display: block;
-      margin-bottom: 4px;
-      color: rgba(255, 255, 255, 0.56);
-      font-size: 10px;
-      font-weight: 800;
-    }
-    .poster-badges {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-content: flex-end;
-      min-height: 88px;
-    }
-    .poster-badge {
+    .mini-controls span {
       display: inline-flex;
       align-items: center;
-      height: 30px;
-      padding: 0 10px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.09);
-      color: rgba(255, 255, 255, 0.86);
-      font-size: 12px;
-      font-weight: 830;
+      justify-content: center;
+      width: 24px;
+      height: 100%;
     }
-    .poster-badge.green { background: rgba(16, 240, 47, 0.14); color: var(--green); }
-    .poster-update {
-      display: grid;
-      gap: 10px;
-      min-height: 88px;
-      align-content: end;
-    }
-    .poster-update-line {
+    .mini-controls span + span { border-left: 1px solid rgba(255, 255, 255, 0.14); }
+    .mini-line {
       display: flex;
       align-items: center;
-      gap: 9px;
+      gap: 6px;
+      min-width: 0;
+      margin: 0 0 4px;
       color: rgba(255, 255, 255, 0.72);
+      font-size: 9px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .mini-line strong {
+      flex: 0 0 auto;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 950;
+    }
+    .mini-separator { color: rgba(255, 255, 255, 0.42); }
+    .mini-reset {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mini-percent {
+      flex: 0 0 auto;
+      margin-left: auto;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .mini-progress {
+      display: flex;
+      height: 13px;
+      margin-bottom: 7px;
+      border-radius: 2px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.10);
+    }
+    .mini-progress .fill {
+      width: var(--value);
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+        var(--green);
+      background-size: 20% 100%, auto;
+      box-shadow: 0 0 18px rgba(16, 240, 47, 0.24);
+    }
+    .mini-progress .empty {
+      flex: 1;
+      background:
+        repeating-linear-gradient(135deg, rgba(16, 240, 47, 0.95) 0 2px, transparent 2px 4px),
+        rgba(16, 240, 47, 0.08);
+    }
+    .mini-progress.danger .fill {
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+        #ff3131;
+      background-size: 20% 100%, auto;
+      box-shadow: 0 0 18px rgba(255, 49, 49, 0.22);
+    }
+    .mini-progress.danger .empty {
+      background:
+        repeating-linear-gradient(135deg, rgba(255, 49, 49, 0.95) 0 2px, transparent 2px 4px),
+        rgba(255, 49, 49, 0.08);
+    }
+    .mini-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-top: 3px;
+      padding-right: 30px;
+    }
+    .mini-card {
+      min-height: 31px;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 8px 18px rgba(0, 0, 0, 0.12);
+      text-align: center;
+      padding: 5px 6px 4px;
+    }
+    .mini-card span {
+      display: block;
+      color: rgba(255, 255, 255, 0.58);
+      font-size: 8px;
+      font-weight: 850;
+      line-height: 1.1;
+    }
+    .mini-card strong {
+      display: block;
+      margin-top: 2px;
+      color: #fff;
+      font: 900 12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      line-height: 1.1;
+    }
+    .mini-version {
+      position: absolute;
+      right: 12px;
+      bottom: 8px;
+      color: rgba(255, 255, 255, 0.62);
       font-size: 12px;
       font-weight: 800;
-    }
-    .poster-update-line span:first-child {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 22px rgba(16, 240, 47, 0.3);
+      transform: scale(0.72);
+      transform-origin: right bottom;
     }
     footer { padding: 0 0 30px; color: rgba(255,255,255,0.48); font-size: 13px; }
     @media (max-width: 860px) {
@@ -401,10 +477,18 @@
             <p class="poster-text" data-i18n="poster1Text">Keep the numbers beside your work, not buried in settings.</p>
           </div>
           <div class="poster-visual" aria-hidden="true">
-            <div class="poster-window-head"><span>Codex</span><div class="poster-dots"><span></span><span></span><span></span></div></div>
-            <div class="poster-meter"><span style="--value: 87%"></span></div>
-            <div class="poster-meter"><span style="--value: 68%"></span></div>
-            <div class="poster-row"><div class="poster-chip"><small>Balance</small>$0.00</div><div class="poster-chip"><small>Resets</small>1</div></div>
+            <div class="mini-widget">
+              <div class="mini-widget-head">
+                <div class="mini-widget-brand"><span>Codex 额度</span><span class="mini-plan">Plus</span></div>
+                <div class="mini-controls"><span>☀</span><span>●</span><span>×</span></div>
+              </div>
+              <div class="mini-line"><strong>5h</strong><span class="mini-separator">|</span><span class="mini-reset">重置 4小时 03分钟后</span><span class="mini-percent">87%</span></div>
+              <div class="mini-progress" style="--value: 87%"><span class="fill"></span><span class="empty"></span></div>
+              <div class="mini-line"><strong>周</strong><span class="mini-separator">|</span><span class="mini-reset">重置 6天 09小时后</span><span class="mini-percent">80%</span></div>
+              <div class="mini-progress" style="--value: 80%"><span class="fill"></span><span class="empty"></span></div>
+              <div class="mini-cards"><div class="mini-card"><span>余额 ($)</span><strong>0.00</strong></div><div class="mini-card"><span>可用重置 (次)</span><strong>1</strong></div></div>
+              <div class="mini-version">v2.0.0</div>
+            </div>
           </div>
         </article>
         <article class="poster">
@@ -414,11 +498,17 @@
             <p class="poster-text" data-i18n="poster2Text">Quota Bubble watches local Codex data and keeps account details redacted.</p>
           </div>
           <div class="poster-visual" aria-hidden="true">
-            <div class="poster-badges">
-              <span class="poster-badge green">Local</span>
-              <span class="poster-badge">Redacted</span>
-              <span class="poster-badge">No token storage</span>
-              <span class="poster-badge">Theme aware</span>
+            <div class="mini-widget">
+              <div class="mini-widget-head">
+                <div class="mini-widget-brand"><span>Codex 额度</span><span class="mini-plan free">Free</span></div>
+                <div class="mini-controls"><span>☾</span><span>●</span><span>×</span></div>
+              </div>
+              <div class="mini-line"><strong>5h</strong><span class="mini-separator">|</span><span class="mini-reset">重置 2小时 18分钟后</span><span class="mini-percent">41%</span></div>
+              <div class="mini-progress" style="--value: 41%"><span class="fill"></span><span class="empty"></span></div>
+              <div class="mini-line"><strong>周</strong><span class="mini-separator">|</span><span class="mini-reset">重置 5天 12小时后</span><span class="mini-percent">29%</span></div>
+              <div class="mini-progress" style="--value: 29%"><span class="fill"></span><span class="empty"></span></div>
+              <div class="mini-cards"><div class="mini-card"><span>余额 ($)</span><strong>0.00</strong></div><div class="mini-card"><span>可用重置 (次)</span><strong>0</strong></div></div>
+              <div class="mini-version">v2.0.0</div>
             </div>
           </div>
         </article>
@@ -429,10 +519,17 @@
             <p class="poster-text" data-i18n="poster3Text">Download the installer or copy one command, then update from the app menu.</p>
           </div>
           <div class="poster-visual" aria-hidden="true">
-            <div class="poster-update">
-              <div class="poster-update-line"><span></span><strong>v2.0.0</strong><em>Latest release</em></div>
-              <div class="poster-meter"><span style="--value: 100%"></span></div>
-              <div class="poster-update-line"><span></span><strong>Ready</strong><em>Direct install</em></div>
+            <div class="mini-widget">
+              <div class="mini-widget-head">
+                <div class="mini-widget-brand"><span>Codex 额度</span><span class="mini-plan pro">Pro20x</span></div>
+                <div class="mini-controls"><span>☀</span><span>●</span><span>×</span></div>
+              </div>
+              <div class="mini-line"><strong>5h</strong><span class="mini-separator">|</span><span class="mini-reset">重置 51分钟后</span><span class="mini-percent">18%</span></div>
+              <div class="mini-progress danger" style="--value: 18%"><span class="fill"></span><span class="empty"></span></div>
+              <div class="mini-line"><strong>周</strong><span class="mini-separator">|</span><span class="mini-reset">重置 3天 08小时后</span><span class="mini-percent">66%</span></div>
+              <div class="mini-progress" style="--value: 66%"><span class="fill"></span><span class="empty"></span></div>
+              <div class="mini-cards"><div class="mini-card"><span>余额 ($)</span><strong>3.50</strong></div><div class="mini-card"><span>可用重置 (次)</span><strong>2</strong></div></div>
+              <div class="mini-version">v2.0.0</div>
             </div>
           </div>
         </article>
