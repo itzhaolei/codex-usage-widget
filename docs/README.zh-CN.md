@@ -2,7 +2,7 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-一个 macOS 悬浮配额窗口，用来直接查看 Codex 的 5 小时额度、每周额度和可用重置次数。
+一个支持 macOS 和 Windows 的悬浮配额窗口，用来直接查看 Codex 的 5 小时额度、每周额度和可用重置次数。
 
 ![Quota Bubble 预览](../assets/preview-plus.png)
 
@@ -30,6 +30,8 @@
 README 始终指向最新版本发布页。如果需要安装旧版本，请打开[所有版本页面](https://github.com/itzhaolei/codex-usage-widget/releases)，进入对应版本页面下载该版本的安装器。
 
 工具会读取当前用户本机的 Codex 配额数据。如果本机还没有可用的 Codex CLI 本地数据，工具会显示初始化遮罩，引导用户安装 Codex CLI 并完成登录。
+
+Windows 用户可以从同一个发布页面下载 `QuotaBubble-*-Windows.zip`，解压后运行 `windows/install.ps1`。
 
 ### 方式二：一行命令安装
 

@@ -2,7 +2,7 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Een zwevend macOS-venster voor Codex-gebruik over 5 uur, weekgebruik en beschikbare resets.
+Een zwevend venster voor macOS en Windows voor Codex-gebruik over 5 uur, weekgebruik en beschikbare resets.
 
 ![Quota Bubble preview](../assets/preview-plus.png)
 
@@ -26,6 +26,8 @@ Als je Terminal niet wilt gebruiken, open dan de nieuwste releasepagina en downl
 [Open de nieuwste releasepagina](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Pak het bestand uit en dubbelklik op `Install Quota Bubble.app`. Quota Bubble leest lokale Codex-quotagegevens van het huidige gebruikersaccount. Als lokale Codex CLI-gegevens nog niet beschikbaar zijn, toont de widget een setup-overlay om Codex CLI te installeren en in te loggen.
+
+Op Windows download je `QuotaBubble-*-Windows.zip` vanaf dezelfde releasepagina, pak je het uit en voer je `windows/install.ps1` uit.
 
 De README verwijst altijd naar de nieuwste releasepagina. Voor een oudere versie open je [alle releases](https://github.com/itzhaolei/codex-usage-widget/releases) en download je de installer vanaf de pagina van die versie.
 

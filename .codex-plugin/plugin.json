@@ -1,18 +1,18 @@
 {
   "name": "codex-usage-widget",
-  "version": "2.0.1",
-  "description": "A macOS floating quota widget for Codex usage limits.",
+  "version": "2.1.0",
+  "description": "A floating quota widget for Codex usage limits on macOS and Windows.",
   "author": {
     "name": "itzhaolei"
   },
   "license": "MIT",
-  "keywords": ["codex", "usage", "quota", "macos", "widget"],
+  "keywords": ["codex", "usage", "quota", "macos", "windows", "widget"],
   "skills": "./skills/",
   "apps": "./.app.json",
   "interface": {
     "displayName": "Quota Bubble",
-    "shortDescription": "Show Codex quota usage in a floating macOS widget.",
-    "longDescription": "Quota Bubble installs a local macOS HUD that stays optionally pinned, remembers its position, and displays 5-hour, weekly, balance, and reset-credit quota information.",
+    "shortDescription": "Show Codex quota usage in a floating desktop widget.",
+    "longDescription": "Quota Bubble installs a local desktop HUD that stays optionally pinned, remembers its position, and displays 5-hour, weekly, balance, and reset-credit quota information.",
     "developerName": "itzhaolei",
     "category": "Productivity",
     "capabilities": ["Write", "Automation"],

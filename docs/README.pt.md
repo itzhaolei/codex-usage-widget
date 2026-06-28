@@ -2,7 +2,7 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Uma janela flutuante para macOS que mostra o uso de 5 horas, o uso semanal e as redefinições disponíveis do Codex.
+Uma janela flutuante para macOS e Windows que mostra o uso de 5 horas, o uso semanal e as redefinições disponíveis do Codex.
 
 ![Quota Bubble preview](../assets/preview-plus.png)
 
@@ -26,6 +26,8 @@ Se você não quiser usar o Terminal, abra a página da versão mais recente e b
 [Abrir a página da versão mais recente](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Descompacte e dê dois cliques em `Install Quota Bubble.app`. O Quota Bubble lê os dados locais de cota do Codex da conta do usuário atual. Se os dados locais do Codex CLI ainda não estiverem disponíveis, o widget mostra uma tela de configuração para instalar o Codex CLI e fazer login.
+
+No Windows, baixe `QuotaBubble-*-Windows.zip` na mesma página de versão, descompacte e execute `windows/install.ps1`.
 
 O README sempre aponta para a página da versão mais recente. Para instalar uma versão antiga, abra [todas as versões](https://github.com/itzhaolei/codex-usage-widget/releases) e baixe o instalador na página da versão desejada.
 

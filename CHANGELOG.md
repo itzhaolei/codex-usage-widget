@@ -4,6 +4,18 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 2.1.0 - 2026-06-28
+
+### Added
+
+- Added a Windows PowerShell/WPF floating widget that mirrors the macOS quota layout, refreshes the shared snapshot every second, supports topmost mode, light/dark theme switching, tray controls, saved position, and Codex CLI install/login guidance.
+- Added Windows install, uninstall, and release packaging scripts.
+- Added Windows release packaging alongside the existing macOS installer.
+
+### Changed
+
+- Updated project metadata, README, and website copy from macOS-only wording to macOS and Windows support.
+
 ## 2.0.1 - 2026-06-28
 
 ### Added
