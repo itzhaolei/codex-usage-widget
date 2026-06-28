@@ -14,7 +14,7 @@ BUILD_DIR="${TMPDIR:-/tmp}/codex-usage-widget-installer-$VERSION"
 DIST_DIR="$PLUGIN_DIR/dist"
 INSTALLER_APP="$BUILD_DIR/$APP_NAME.app"
 PAYLOAD_DIR="$INSTALLER_APP/Contents/Resources/payload"
-ZIP_PATH="$DIST_DIR/QuotaBubble-$VERSION-Installer.zip"
+ZIP_PATH="$DIST_DIR/QuotaBubble-$VERSION-macOS-Installer.zip"
 
 rm -rf "$BUILD_DIR" "$ZIP_PATH"
 mkdir -p "$INSTALLER_APP/Contents/MacOS" "$INSTALLER_APP/Contents/Resources" "$PAYLOAD_DIR/scripts" "$PAYLOAD_DIR/apps" "$DIST_DIR"

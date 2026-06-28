@@ -40,7 +40,7 @@ Website source lives in `public/` and is ready for Cloudflare Pages. Recommended
 
 #### Method 1: App Installer
 
-For users who do not want to use Terminal, open the latest release page and download the installer asset:
+For users who do not want to use Terminal, open the latest release page and download the macOS installer asset named `QuotaBubble-*-macOS-Installer.zip`:
 
 [Open the latest release page](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
