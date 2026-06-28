@@ -46,7 +46,7 @@ Unzip it, then double-click `Install Quota Bubble.app`. The installer copies the
 
 The README always links to the latest release page. To install an older version, open [all releases](https://github.com/itzhaolei/codex-usage-widget/releases) and download the installer from that version's page.
 
-Codex Desktop should already be installed and signed in. After installation, the widget reads the local Codex quota data from the current user account.
+Quota Bubble reads local Codex quota data from the current user account. If the local Codex CLI data is not available yet, the widget shows a setup overlay that can install Codex CLI and guide the user to log in.
 
 ### Method 2: One-Line Install
 

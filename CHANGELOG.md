@@ -2,6 +2,19 @@
 
 All notable changes to Quota Bubble are documented here.
 
+## Unreleased
+
+## 2.0.1 - 2026-06-28
+
+### Added
+
+- Added a first-run setup overlay that detects whether Codex CLI local data is available, guides users to install Codex CLI, and rechecks automatically after installation.
+- Added an in-widget Codex CLI install and login handoff flow for machines that only have Codex Desktop data unavailable locally.
+
+### Fixed
+
+- Improved setup overlay button contrast so the install action stays readable on the dark translucent panel.
+
 ## 2.0.0 - 2026-06-21
 
 ### Changed

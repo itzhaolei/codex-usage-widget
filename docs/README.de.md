@@ -25,7 +25,7 @@ Wenn Sie Terminal nicht verwenden möchten, öffnen Sie die neueste Release-Seit
 
 [Neueste Release-Seite öffnen](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
-Entpacken Sie die Datei und doppelklicken Sie auf `Install Quota Bubble.app`. Codex Desktop sollte bereits installiert und angemeldet sein.
+Entpacken Sie die Datei und doppelklicken Sie auf `Install Quota Bubble.app`. Quota Bubble liest die lokalen Codex-Kontingentdaten des aktuellen Benutzerkontos. Wenn lokale Codex-CLI-Daten noch nicht verfügbar sind, zeigt das Widget ein Setup-Overlay für Installation und Anmeldung.
 
 Die README verweist immer auf die neueste Release-Seite. Für ältere Versionen öffnen Sie [alle Releases](https://github.com/itzhaolei/codex-usage-widget/releases) und laden den Installer auf der jeweiligen Versionsseite herunter.
 

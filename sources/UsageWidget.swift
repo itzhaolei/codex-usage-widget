@@ -337,6 +337,12 @@ class WindowController: NSWindowController, NSWindowDelegate {
     var versionUpdateDot: NSView!
     var balanceCardView: MetricCardView!
     var resetCardView: MetricCardView!
+    var setupOverlayView: NSView!
+    var setupTitleLabel: NSTextField!
+    var setupMessageLabel: NSTextField!
+    var setupStepLabels: [NSTextField] = []
+    var setupStepDots: [NSView] = []
+    var setupActionButton: NSButton!
     var rootView: NSView!
     var vibrancyView: NSVisualEffectView!
     var capsuleView: NSView!
@@ -350,6 +356,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
     var snapshotRefreshInFlight = false
     var lastVersionCheck = Date.distantPast
     var versionCheckInFlight = false
+    var cliInstallInFlight = false
     var isPinned = true
     var isLightMode = false
     var language = localizedLanguage()
@@ -360,6 +367,16 @@ class WindowController: NSWindowController, NSWindowDelegate {
     let snapshotPath = NSString(string: "~/.codex/codex-usage-snapshot.json").expandingTildeInPath
     let snapshotScriptPath = NSString(string: "~/.codex/scripts/codex-usage-snapshot.mjs").expandingTildeInPath
     let closedMarkerPath = NSString(string: "~/.codex/usage-widget/.closed-by-user").expandingTildeInPath
+    let codexHomePath = NSString(string: "~/.codex").expandingTildeInPath
+    let codexAuthPath = NSString(string: "~/.codex/auth.json").expandingTildeInPath
+
+    enum SetupIssue {
+        case ready
+        case missingCli
+        case missingLogin
+        case installing
+        case installFailed
+    }
 
     convenience init() {
         let w: CGFloat = 330
@@ -448,6 +465,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
         versionUpdateDot.layer?.backgroundColor = NSColor.systemRed.cgColor
         versionUpdateDot.isHidden = true
         rootView.addSubview(versionUpdateDot)
+
+        setupOverlayView = makeSetupOverlay(frame: contentRect)
+        setupOverlayView.autoresizingMask = [.width, .height]
+        setupOverlayView.isHidden = true
+        rootView.addSubview(setupOverlayView)
 
         let controls = makeControlCapsule(frame: NSRect(x: w - 125, y: h - 38, width: 111, height: 28))
         controls.autoresizingMask = [.minXMargin, .minYMargin]
@@ -561,6 +583,269 @@ class WindowController: NSWindowController, NSWindowDelegate {
             button.font = NSFont.systemFont(ofSize: 12, weight: .semibold)
         }
         return button
+    }
+
+    func makeSetupOverlay(frame: NSRect) -> NSView {
+        let overlay = NSView(frame: frame)
+        overlay.wantsLayer = true
+        overlay.layer?.backgroundColor = NSColor.black.withAlphaComponent(0.64).cgColor
+        overlay.layer?.cornerRadius = 12
+        overlay.layer?.masksToBounds = true
+
+        let panel = NSView(frame: NSRect(x: 18, y: 36, width: frame.width - 36, height: 158))
+        panel.autoresizingMask = [.width, .minYMargin, .maxYMargin]
+        panel.wantsLayer = true
+        panel.layer?.cornerRadius = 12
+        panel.layer?.backgroundColor = NSColor(calibratedRed: 0.06, green: 0.09, blue: 0.11, alpha: 0.92).cgColor
+        panel.layer?.borderWidth = 1
+        panel.layer?.borderColor = NSColor.white.withAlphaComponent(0.14).cgColor
+        panel.layer?.shadowColor = NSColor.black.cgColor
+        panel.layer?.shadowOpacity = 0.28
+        panel.layer?.shadowRadius = 18
+        panel.layer?.shadowOffset = NSSize(width: 0, height: -8)
+        overlay.addSubview(panel)
+
+        setupTitleLabel = NSTextField(labelWithString: "")
+        setupTitleLabel.frame = NSRect(x: 18, y: 118, width: panel.frame.width - 36, height: 22)
+        setupTitleLabel.autoresizingMask = [.width, .minYMargin]
+        setupTitleLabel.font = NSFont.systemFont(ofSize: 14, weight: .bold)
+        setupTitleLabel.textColor = NSColor.white
+        setupTitleLabel.backgroundColor = .clear
+        setupTitleLabel.isBezeled = false
+        setupTitleLabel.isEditable = false
+        setupTitleLabel.isSelectable = false
+        panel.addSubview(setupTitleLabel)
+
+        setupMessageLabel = NSTextField(labelWithString: "")
+        setupMessageLabel.frame = NSRect(x: 18, y: 78, width: panel.frame.width - 36, height: 38)
+        setupMessageLabel.autoresizingMask = [.width, .minYMargin]
+        setupMessageLabel.font = NSFont.systemFont(ofSize: 11, weight: .regular)
+        setupMessageLabel.textColor = NSColor.white.withAlphaComponent(0.72)
+        setupMessageLabel.backgroundColor = .clear
+        setupMessageLabel.isBezeled = false
+        setupMessageLabel.isEditable = false
+        setupMessageLabel.isSelectable = false
+        setupMessageLabel.maximumNumberOfLines = 2
+        setupMessageLabel.lineBreakMode = .byWordWrapping
+        panel.addSubview(setupMessageLabel)
+
+        let steps = ["安装 CLI", "完成登录", "同步配额"]
+        for (index, step) in steps.enumerated() {
+            let x = CGFloat(18 + index * 84)
+            let dot = NSView(frame: NSRect(x: x, y: 53, width: 7, height: 7))
+            dot.wantsLayer = true
+            dot.layer?.cornerRadius = 3.5
+            dot.layer?.masksToBounds = true
+            panel.addSubview(dot)
+            setupStepDots.append(dot)
+
+            let stepLabel = NSTextField(labelWithString: step)
+            stepLabel.frame = NSRect(x: x + 12, y: 47, width: 66, height: 18)
+            stepLabel.font = NSFont.systemFont(ofSize: 10, weight: .semibold)
+            stepLabel.textColor = NSColor.white.withAlphaComponent(0.62)
+            stepLabel.backgroundColor = .clear
+            stepLabel.isBezeled = false
+            stepLabel.isEditable = false
+            stepLabel.isSelectable = false
+            panel.addSubview(stepLabel)
+            setupStepLabels.append(stepLabel)
+        }
+
+        setupActionButton = NSButton(frame: NSRect(x: panel.frame.width - 108, y: 14, width: 90, height: 28))
+        setupActionButton.autoresizingMask = [.minXMargin, .maxYMargin]
+        setupActionButton.isBordered = false
+        setupActionButton.bezelStyle = .regularSquare
+        setupActionButton.wantsLayer = true
+        setupActionButton.layer?.cornerRadius = 8
+        setupActionButton.layer?.masksToBounds = true
+        setupActionButton.layer?.backgroundColor = NSColor(calibratedRed: 0.05, green: 0.42, blue: 0.14, alpha: 0.72).cgColor
+        setupActionButton.layer?.borderWidth = 1
+        setupActionButton.layer?.borderColor = NSColor(calibratedRed: 0.12, green: 0.95, blue: 0.22, alpha: 0.62).cgColor
+        setupActionButton.font = NSFont.systemFont(ofSize: 11, weight: .semibold)
+        setupActionButton.target = self
+        setupActionButton.action = #selector(installCodexCliFromOverlay)
+        panel.addSubview(setupActionButton)
+
+        return overlay
+    }
+
+    func codexCliPath() -> String? {
+        let candidates = [
+            "~/.local/bin/codex",
+            "/opt/homebrew/bin/codex",
+            "/usr/local/bin/codex",
+            "/usr/bin/codex",
+        ].map { NSString(string: $0).expandingTildeInPath }
+        return candidates.first { FileManager.default.isExecutableFile(atPath: $0) }
+    }
+
+    func codexCliAvailable() -> Bool {
+        codexCliPath() != nil
+    }
+
+    func hasCodexSessionData() -> Bool {
+        let dirs = [
+            NSString(string: "~/.codex/sessions").expandingTildeInPath,
+            NSString(string: "~/.codex/archived_sessions").expandingTildeInPath,
+        ]
+        for dir in dirs {
+            guard let enumerator = FileManager.default.enumerator(atPath: dir) else { continue }
+            for case let file as String in enumerator {
+                if file.hasSuffix(".jsonl") { return true }
+            }
+        }
+        return false
+    }
+
+    func currentSetupIssue() -> SetupIssue {
+        if cliInstallInFlight { return .installing }
+        if !codexCliAvailable() { return .missingCli }
+        if !FileManager.default.fileExists(atPath: codexAuthPath) && !hasCodexSessionData() {
+            return .missingLogin
+        }
+        return .ready
+    }
+
+    func setupText(for issue: SetupIssue) -> (title: String, message: String, button: String) {
+        let zh = effectiveLanguageCode() == "zh"
+        switch issue {
+        case .ready:
+            return ("", "", "")
+        case .missingCli:
+            return zh
+                ? ("需要安装 Codex CLI", "Quota Bubble 需要 Codex CLI 创建本地数据目录，安装后会自动重新检测。", "安装")
+                : ("Codex CLI required", "Quota Bubble needs Codex CLI to create local Codex data. It will recheck automatically after install.", "Install")
+        case .missingLogin:
+            return zh
+                ? ("需要登录 Codex CLI", "已检测到 CLI，但还没有本地登录数据。请完成 codex login 后等待自动同步。", "打开登录")
+                : ("Codex CLI login required", "CLI is installed, but local login data is missing. Run codex login, then the widget will sync automatically.", "Log in")
+        case .installing:
+            return zh
+                ? ("正在安装 Codex CLI", "正在通过官方安装脚本安装。完成后会自动检测本地数据是否可用。", "安装中")
+                : ("Installing Codex CLI", "Installing with the official script. The widget will recheck local data when it finishes.", "Installing")
+        case .installFailed:
+            return zh
+                ? ("安装未完成", "无法自动安装 Codex CLI。请检查网络后重试，或在终端手动安装。", "重试")
+                : ("Install did not finish", "Could not install Codex CLI automatically. Check your network and retry, or install it from Terminal.", "Retry")
+        }
+    }
+
+    func updateSetupOverlay(_ forcedIssue: SetupIssue? = nil) {
+        let issue = forcedIssue ?? currentSetupIssue()
+        if issue == .ready {
+            setupOverlayView?.isHidden = true
+            setupActionButton?.isEnabled = true
+            return
+        }
+
+        let copy = setupText(for: issue)
+        setupTitleLabel.stringValue = copy.title
+        setupMessageLabel.stringValue = copy.message
+        setupActionButton.isEnabled = issue != .installing
+        setupActionButton.alphaValue = issue == .installing ? 0.58 : 1
+        setupActionButton.attributedTitle = NSAttributedString(
+            string: copy.button,
+            attributes: [
+                .font: NSFont.systemFont(ofSize: 11, weight: .bold),
+                .foregroundColor: NSColor(calibratedRed: 0.25, green: 1, blue: 0.34, alpha: 1),
+            ]
+        )
+        setupOverlayView.isHidden = false
+
+        let steps = effectiveLanguageCode() == "zh"
+            ? ["安装 CLI", "完成登录", "同步配额"]
+            : ["Install CLI", "Log in", "Sync quota"]
+        for index in setupStepLabels.indices {
+            setupStepLabels[index].stringValue = steps[index]
+        }
+
+        let activeIndex: Int
+        switch issue {
+        case .missingCli, .installing, .installFailed:
+            activeIndex = 0
+        case .missingLogin:
+            activeIndex = 1
+        case .ready:
+            activeIndex = 2
+        }
+
+        for index in setupStepDots.indices {
+            let completed = index < activeIndex
+            let active = index == activeIndex
+            let failed = issue == .installFailed && index == 0
+            let color: NSColor
+            if failed {
+                color = NSColor.systemRed
+            } else if completed {
+                color = NSColor.green
+            } else if active {
+                color = NSColor(calibratedRed: 0.12, green: 0.95, blue: 0.22, alpha: 1)
+            } else {
+                color = NSColor.white.withAlphaComponent(0.22)
+            }
+            setupStepDots[index].layer?.backgroundColor = color.cgColor
+            setupStepLabels[index].textColor = (completed || active)
+                ? NSColor.white.withAlphaComponent(0.86)
+                : NSColor.white.withAlphaComponent(0.44)
+        }
+    }
+
+    @objc func installCodexCliFromOverlay() {
+        let issue = currentSetupIssue()
+        if issue == .missingLogin {
+            openCodexLoginInTerminal()
+            updateSetupOverlay()
+            return
+        }
+
+        cliInstallInFlight = true
+        updateSetupOverlay(.installing)
+
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+            process.arguments = ["-lc", "curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh"]
+            process.standardOutput = Pipe()
+            process.standardError = Pipe()
+
+            var success = false
+            do {
+                try process.run()
+                process.waitUntilExit()
+                success = process.terminationStatus == 0
+            } catch {
+                success = false
+            }
+
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.cliInstallInFlight = false
+                if success {
+                    self.refreshSnapshotIfNeeded(force: true, redrawAfterCompletion: true)
+                    self.updateSetupOverlay()
+                } else {
+                    self.updateSetupOverlay(.installFailed)
+                }
+            }
+        }
+    }
+
+    func openCodexLoginInTerminal() {
+        let command = "\(shellQuoted(codexCliPath() ?? "codex")) login"
+        let script = """
+        tell application "Terminal"
+            activate
+            do script "\(command)"
+        end tell
+        """
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+        process.arguments = ["-e", script]
+        try? process.run()
+    }
+
+    func shellQuoted(_ value: String) -> String {
+        "'\(value.replacingOccurrences(of: "'", with: "'\\''"))'"
     }
 
     var primaryTextColor: NSColor {
@@ -684,6 +969,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
     }
 
     func startRefresh() {
+        updateSetupOverlay()
         refreshSnapshotIfNeeded(force: true, redrawAfterCompletion: true)
         renderSnapshot()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
@@ -693,6 +979,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     func refresh() {
         reloadLanguageIfNeeded()
+        updateSetupOverlay()
         refreshVersionUpdateStatus()
         refreshSnapshotIfNeeded(redrawAfterCompletion: true)
         renderSnapshot()

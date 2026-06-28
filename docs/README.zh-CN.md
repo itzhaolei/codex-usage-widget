@@ -29,7 +29,7 @@
 
 README 始终指向最新版本发布页。如果需要安装旧版本，请打开[所有版本页面](https://github.com/itzhaolei/codex-usage-widget/releases)，进入对应版本页面下载该版本的安装器。
 
-使用前需要已经安装并登录 Codex Desktop。安装完成后，工具会读取当前用户本机的 Codex 配额数据并自动显示。
+工具会读取当前用户本机的 Codex 配额数据。如果本机还没有可用的 Codex CLI 本地数据，工具会显示初始化遮罩，引导用户安装 Codex CLI 并完成登录。
 
 ### 方式二：一行命令安装
 
