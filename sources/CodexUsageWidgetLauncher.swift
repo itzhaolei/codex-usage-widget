@@ -334,7 +334,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let assets = json["assets"] as? [[String: Any]] ?? []
         let assetURL = assets.first { asset in
             let name = asset["name"] as? String ?? ""
-            return name.hasSuffix("Installer.zip")
+            return name.hasSuffix("macOS-Installer.zip")
         }?["browser_download_url"] as? String
 
         return ReleaseInfo(tagName: tagName, installerAssetURL: assetURL)

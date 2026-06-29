@@ -20,7 +20,7 @@ if (-not $NoSingleInstance) {
     }
 }
 
-$script:Version = "2.1.0"
+$script:Version = "2.1.1"
 $script:CodexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USERPROFILE ".codex" }
 $script:InstallDir = Join-Path $script:CodexHome "usage-widget"
 $script:StatePath = Join-Path $script:InstallDir "windows-state.json"
@@ -270,7 +270,7 @@ $xaml = @"
           </StackPanel>
         </Border>
       </Grid>
-      <TextBlock x:Name="VersionLabel" Grid.Row="4" Text="v2.1.0" Foreground="#BBC4CE" FontSize="9" HorizontalAlignment="Right"/>
+      <TextBlock x:Name="VersionLabel" Grid.Row="4" Text="v2.1.1" Foreground="#BBC4CE" FontSize="9" HorizontalAlignment="Right"/>
       <Grid x:Name="Overlay" Grid.RowSpan="5" Background="#A0000000" Visibility="Collapsed">
         <Border Width="294" Height="158" CornerRadius="12" BorderBrush="#3D5360" BorderThickness="1" Background="#111D24" Padding="18">
           <Grid>

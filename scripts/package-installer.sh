@@ -305,8 +305,7 @@ chmod +x "$INSTALLER_APP/Contents/MacOS/$APP_NAME"
 
 (
     cd "$BUILD_DIR"
-    ln -s "$APP_NAME.app" "Install Codex Usage Widget.app"
-    zip -qry "$ZIP_PATH" "$APP_NAME.app" "Install Codex Usage Widget.app"
+    zip -qry "$ZIP_PATH" "$APP_NAME.app"
 )
 
 echo "$ZIP_PATH"

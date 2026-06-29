@@ -4,6 +4,13 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 2.1.1 - 2026-06-29
+
+### Fixed
+
+- Removed the legacy `Install Codex Usage Widget.app` compatibility entry from the macOS installer zip so new users only see and launch `Install Quota Bubble.app`.
+- Updated the macOS updater to select only `macOS-Installer.zip` release assets now that Windows packages are published alongside macOS packages.
+
 ## 2.1.0 - 2026-06-28
 
 ### Added
