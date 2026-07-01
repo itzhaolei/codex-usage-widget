@@ -354,6 +354,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
     var clickMonitor: Any?
     var lastSnapshotRefresh = Date.distantPast
     var snapshotRefreshInFlight = false
+    var lastNodeCheck = Date.distantPast
+    var cachedNodeAvailable = false
     var lastVersionCheck = Date.distantPast
     var versionCheckInFlight = false
     var cliInstallInFlight = false
@@ -372,8 +374,10 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     enum SetupIssue {
         case ready
+        case missingNode
         case missingCli
         case missingLogin
+        case waitingForSnapshot
         case installing
         case installFailed
     }
@@ -683,6 +687,37 @@ class WindowController: NSWindowController, NSWindowDelegate {
         codexCliPath() != nil
     }
 
+    func nodeAvailable() -> Bool {
+        if Date().timeIntervalSince(lastNodeCheck) < 5 {
+            return cachedNodeAvailable
+        }
+        lastNodeCheck = Date()
+
+        let candidates = [
+            "/opt/homebrew/bin/node",
+            "/usr/local/bin/node",
+            "/usr/bin/node",
+        ]
+        if candidates.contains(where: { FileManager.default.isExecutableFile(atPath: $0) }) {
+            cachedNodeAvailable = true
+            return true
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        process.arguments = ["-lc", "command -v node >/dev/null 2>&1"]
+        process.standardOutput = Pipe()
+        process.standardError = Pipe()
+        do {
+            try process.run()
+            process.waitUntilExit()
+            cachedNodeAvailable = process.terminationStatus == 0
+        } catch {
+            cachedNodeAvailable = false
+        }
+        return cachedNodeAvailable
+    }
+
     func hasCodexSessionData() -> Bool {
         let dirs = [
             NSString(string: "~/.codex/sessions").expandingTildeInPath,
@@ -699,9 +734,13 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     func currentSetupIssue() -> SetupIssue {
         if cliInstallInFlight { return .installing }
+        if !nodeAvailable() { return .missingNode }
         if !codexCliAvailable() { return .missingCli }
         if !FileManager.default.fileExists(atPath: codexAuthPath) && !hasCodexSessionData() {
             return .missingLogin
+        }
+        if !FileManager.default.fileExists(atPath: snapshotPath) {
+            return .waitingForSnapshot
         }
         return .ready
     }
@@ -711,6 +750,10 @@ class WindowController: NSWindowController, NSWindowDelegate {
         switch issue {
         case .ready:
             return ("", "", "")
+        case .missingNode:
+            return zh
+                ? ("需要安装 Node.js", "Quota Bubble 需要 Node.js 运行本地同步脚本。安装后会自动重新检测。", "打开下载")
+                : ("Node.js required", "Quota Bubble needs Node.js to run the local sync script. It will recheck automatically after install.", "Download")
         case .missingCli:
             return zh
                 ? ("需要安装 Codex CLI", "Quota Bubble 需要 Codex CLI 创建本地数据目录，安装后会自动重新检测。", "安装")
@@ -719,6 +762,10 @@ class WindowController: NSWindowController, NSWindowDelegate {
             return zh
                 ? ("需要登录 Codex CLI", "已检测到 CLI，但还没有本地登录数据。请完成 codex login 后等待自动同步。", "打开登录")
                 : ("Codex CLI login required", "CLI is installed, but local login data is missing. Run codex login, then the widget will sync automatically.", "Log in")
+        case .waitingForSnapshot:
+            return zh
+                ? ("正在同步配额", "本地配额快照还没有生成。工具会自动重试，Codex CLI 登录完成后会恢复显示。", "重试")
+                : ("Syncing quota", "The local quota snapshot has not been created yet. The widget will keep retrying after Codex CLI login is ready.", "Retry")
         case .installing:
             return zh
                 ? ("正在安装 Codex CLI", "正在通过官方安装脚本安装。完成后会自动检测本地数据是否可用。", "安装中")
@@ -761,11 +808,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
         let activeIndex: Int
         switch issue {
-        case .missingCli, .installing, .installFailed:
+        case .missingNode, .missingCli, .installing, .installFailed:
             activeIndex = 0
         case .missingLogin:
             activeIndex = 1
-        case .ready:
+        case .waitingForSnapshot, .ready:
             activeIndex = 2
         }
 
@@ -792,8 +839,20 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     @objc func installCodexCliFromOverlay() {
         let issue = currentSetupIssue()
+        if issue == .missingNode {
+            if let url = URL(string: "https://nodejs.org/") {
+                NSWorkspace.shared.open(url)
+            }
+            updateSetupOverlay()
+            return
+        }
         if issue == .missingLogin {
             openCodexLoginInTerminal()
+            updateSetupOverlay()
+            return
+        }
+        if issue == .waitingForSnapshot {
+            refreshSnapshotIfNeeded(force: true, redrawAfterCompletion: true)
             updateSetupOverlay()
             return
         }
@@ -1059,7 +1118,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
     func renderSnapshot() {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: snapshotPath)),
               let snap = try? JSONDecoder().decode(UsageSnapshot.self, from: data) else {
-            updateText("⚠ \(language.unableToReadSnapshot):\n\(snapshotPath)")
+            updateText("")
+            updateSetupOverlay()
             return
         }
 

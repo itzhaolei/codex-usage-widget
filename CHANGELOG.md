@@ -4,6 +4,14 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 2.1.2 - 2026-07-01
+
+### Fixed
+
+- Replaced the first-run `Unable to read snapshot` path error with the setup overlay when the local quota snapshot has not been generated yet.
+- Added first-run detection for missing Node.js, with a download action instead of showing the raw snapshot path.
+- Made Node.js detection compatible with shell-managed installs such as nvm while caching the check to avoid per-second process churn.
+
 ## 2.1.1 - 2026-06-29
 
 ### Fixed
