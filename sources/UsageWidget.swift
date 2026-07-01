@@ -752,8 +752,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
             return ("", "", "")
         case .missingNode:
             return zh
-                ? ("需要安装 Node.js", "Quota Bubble 需要 Node.js 运行本地同步脚本。安装后会自动重新检测。", "打开下载")
-                : ("Node.js required", "Quota Bubble needs Node.js to run the local sync script. It will recheck automatically after install.", "Download")
+                ? ("需要安装 Node.js", "Quota Bubble 需要 Node.js 运行本地同步脚本。点击安装后会优先通过 Homebrew 安装。", "安装")
+                : ("Node.js required", "Quota Bubble needs Node.js to run the local sync script. Click install to install with Homebrew when available.", "Install")
         case .missingCli:
             return zh
                 ? ("需要安装 Codex CLI", "Quota Bubble 需要 Codex CLI 创建本地数据目录，安装后会自动重新检测。", "安装")
@@ -840,9 +840,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
     @objc func installCodexCliFromOverlay() {
         let issue = currentSetupIssue()
         if issue == .missingNode {
-            if let url = URL(string: "https://nodejs.org/") {
-                NSWorkspace.shared.open(url)
-            }
+            installNodeFromOverlay()
             updateSetupOverlay()
             return
         }
@@ -891,6 +889,35 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     func openCodexLoginInTerminal() {
         let command = "\(shellQuoted(codexCliPath() ?? "codex")) login"
+        let script = """
+        tell application "Terminal"
+            activate
+            do script "\(command)"
+        end tell
+        """
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+        process.arguments = ["-e", script]
+        try? process.run()
+    }
+
+    func homebrewPath() -> String? {
+        let candidates = [
+            "/opt/homebrew/bin/brew",
+            "/usr/local/bin/brew",
+        ]
+        return candidates.first { FileManager.default.isExecutableFile(atPath: $0) }
+    }
+
+    func installNodeFromOverlay() {
+        guard let brew = homebrewPath() else {
+            if let url = URL(string: "https://nodejs.org/") {
+                NSWorkspace.shared.open(url)
+            }
+            return
+        }
+
+        let command = "\(shellQuoted(brew)) install node; echo; echo 'Node.js install finished. Quota Bubble will recheck automatically.'"
         let script = """
         tell application "Terminal"
             activate

@@ -50,7 +50,7 @@ The README always links to the latest release page. To install an older version,
 
 Quota Bubble reads local Codex quota data from the current user account. If the local Codex CLI data is not available yet, the widget shows a setup overlay that can install Codex CLI and guide the user to log in.
 
-If Node.js is missing on macOS, the widget now shows the same setup overlay and links to the Node.js download page instead of showing a raw missing snapshot path.
+If Node.js is missing on macOS, the widget now shows the same setup overlay. The install button tries `brew install node` when Homebrew is available, and falls back to the Node.js download page otherwise.
 
 #### Method 2: One-Line Install
 

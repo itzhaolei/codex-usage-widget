@@ -4,6 +4,12 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 2.1.3 - 2026-07-01
+
+### Changed
+
+- Changed the macOS first-run Node.js setup action from opening the download page to a direct install attempt with Homebrew when Homebrew is available, falling back to the Node.js download page otherwise.
+
 ## 2.1.2 - 2026-07-01
 
 ### Fixed
