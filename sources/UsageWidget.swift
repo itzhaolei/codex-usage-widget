@@ -438,7 +438,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         vibrancyView.layer?.masksToBounds = true
         rootView.addSubview(vibrancyView)
 
-        label = NSTextView(frame: NSRect(x: 12, y: 112, width: w - 24, height: h - 128))
+        label = NSTextView(frame: NSRect(x: 12, y: 152, width: w - 24, height: h - 128))
         label.autoresizingMask = [.width, .height]
         label.drawsBackground = false
         label.isEditable = false
@@ -448,36 +448,36 @@ class WindowController: NSWindowController, NSWindowDelegate {
         label.backgroundColor = NSColor.clear
         rootView.addSubview(label)
 
-        balanceCardView = MetricCardView(frame: NSRect(x: 12, y: 58, width: 131, height: 47))
+        balanceCardView = MetricCardView(frame: NSRect(x: 12, y: 98, width: 131, height: 47))
         balanceCardView.autoresizingMask = [.maxXMargin, .maxYMargin]
         rootView.addSubview(balanceCardView)
 
-        resetCardView = MetricCardView(frame: NSRect(x: 153, y: 58, width: 131, height: 47))
+        resetCardView = MetricCardView(frame: NSRect(x: 153, y: 98, width: 131, height: 47))
         resetCardView.autoresizingMask = [.minXMargin, .maxYMargin]
         rootView.addSubview(resetCardView)
 
         let infoSymbolConfiguration = NSImage.SymbolConfiguration(pointSize: 11, weight: .medium)
-        accountIconView = NSImageView(frame: NSRect(x: 12, y: 37, width: 13, height: 13))
+        accountIconView = NSImageView(frame: NSRect(x: 12, y: 77, width: 13, height: 13))
         accountIconView.image = NSImage(systemSymbolName: "person.crop.circle.fill", accessibilityDescription: "Account")?
             .withSymbolConfiguration(infoSymbolConfiguration)
         accountIconView.imageScaling = .scaleProportionallyDown
         rootView.addSubview(accountIconView)
 
         accountValueLabel = NSTextField(labelWithString: "—")
-        accountValueLabel.frame = NSRect(x: 31, y: 34, width: 205, height: 17)
+        accountValueLabel.frame = NSRect(x: 31, y: 74, width: 205, height: 17)
         accountValueLabel.font = NSFont.monospacedSystemFont(ofSize: 10, weight: .regular)
         accountValueLabel.lineBreakMode = .byTruncatingTail
         accountValueLabel.maximumNumberOfLines = 1
         rootView.addSubview(accountValueLabel)
 
-        subscriptionIconView = NSImageView(frame: NSRect(x: 12, y: 19, width: 13, height: 13))
+        subscriptionIconView = NSImageView(frame: NSRect(x: 12, y: 59, width: 13, height: 13))
         subscriptionIconView.image = NSImage(systemSymbolName: "calendar.badge.clock", accessibilityDescription: "Subscription expiration")?
             .withSymbolConfiguration(infoSymbolConfiguration)
         subscriptionIconView.imageScaling = .scaleProportionallyDown
         rootView.addSubview(subscriptionIconView)
 
         subscriptionValueLabel = NSTextField(labelWithString: "—")
-        subscriptionValueLabel.frame = NSRect(x: 31, y: 16, width: 205, height: 17)
+        subscriptionValueLabel.frame = NSRect(x: 31, y: 56, width: 205, height: 17)
         subscriptionValueLabel.font = NSFont.monospacedSystemFont(ofSize: 10, weight: .regular)
         subscriptionValueLabel.lineBreakMode = .byTruncatingTail
         subscriptionValueLabel.maximumNumberOfLines = 1
