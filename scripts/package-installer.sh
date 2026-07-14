@@ -15,6 +15,10 @@ DIST_DIR="$PLUGIN_DIR/dist"
 INSTALLER_APP="$BUILD_DIR/$APP_NAME.app"
 PAYLOAD_DIR="$INSTALLER_APP/Contents/Resources/payload"
 ZIP_PATH="$DIST_DIR/QuotaBubble-$VERSION-macOS-Installer.zip"
+SWIFT_TARGET_ARGS=()
+if [ -n "${QUOTA_BUBBLE_SWIFT_TARGET:-}" ]; then
+    SWIFT_TARGET_ARGS=(-target "$QUOTA_BUBBLE_SWIFT_TARGET")
+fi
 
 rm -rf "$BUILD_DIR" "$ZIP_PATH"
 mkdir -p "$INSTALLER_APP/Contents/MacOS" "$INSTALLER_APP/Contents/Resources" "$PAYLOAD_DIR/scripts" "$PAYLOAD_DIR/apps" "$DIST_DIR"
@@ -73,7 +77,7 @@ WIDGET_MACOS="$WIDGET_APP/Contents/MacOS"
 WIDGET_RESOURCES="$WIDGET_APP/Contents/Resources"
 mkdir -p "$WIDGET_MACOS" "$WIDGET_RESOURCES"
 WIDGET_BINARY="$BUILD_DIR/UsageWidgetBinary"
-swiftc -parse-as-library -o "$WIDGET_BINARY" "$PLUGIN_DIR/sources/UsageWidget.swift" -framework Cocoa
+swiftc -parse-as-library "${SWIFT_TARGET_ARGS[@]}" -o "$WIDGET_BINARY" "$PLUGIN_DIR/sources/UsageWidget.swift" -framework Cocoa
 cp "$WIDGET_BINARY" "$WIDGET_MACOS/UsageWidget"
 chmod +x "$WIDGET_MACOS/UsageWidget"
 cp "$ICON_ICNS" "$WIDGET_RESOURCES/AppIcon.icns"
@@ -107,7 +111,7 @@ LAUNCHER_MACOS="$LAUNCHER_APP/Contents/MacOS"
 LAUNCHER_RESOURCES="$LAUNCHER_APP/Contents/Resources"
 mkdir -p "$LAUNCHER_MACOS" "$LAUNCHER_RESOURCES"
 LAUNCHER_BINARY="$BUILD_DIR/QuotaBubbleLauncherBinary"
-swiftc -parse-as-library -o "$LAUNCHER_BINARY" "$PLUGIN_DIR/sources/CodexUsageWidgetLauncher.swift" -framework Cocoa
+swiftc -parse-as-library "${SWIFT_TARGET_ARGS[@]}" -o "$LAUNCHER_BINARY" "$PLUGIN_DIR/sources/CodexUsageWidgetLauncher.swift" -framework Cocoa
 cp "$LAUNCHER_BINARY" "$LAUNCHER_MACOS/Quota Bubble"
 chmod +x "$LAUNCHER_MACOS/Quota Bubble"
 cp "$ICON_ICNS" "$LAUNCHER_RESOURCES/AppIcon.icns"

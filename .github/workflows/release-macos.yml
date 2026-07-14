@@ -1,0 +1,38 @@
+name: Release macOS installer
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-14
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v4
+
+      - name: Build arm64 installer
+        env:
+          QUOTA_BUBBLE_SWIFT_TARGET: arm64-apple-macosx13.0
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          bash scripts/package-installer.sh "$VERSION"
+          file "dist/QuotaBubble-$VERSION-macOS-Installer.zip"
+          shasum -a 256 "dist/QuotaBubble-$VERSION-macOS-Installer.zip"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          ASSET="dist/QuotaBubble-$VERSION-macOS-Installer.zip"
+          NOTES="docs/releases/$VERSION.md"
+          if [ -f "$NOTES" ]; then
+            gh release create "$GITHUB_REF_NAME" "$ASSET" --title "Quota Bubble $GITHUB_REF_NAME" --notes-file "$NOTES" --verify-tag
+          else
+            gh release create "$GITHUB_REF_NAME" "$ASSET" --title "Quota Bubble $GITHUB_REF_NAME" --generate-notes --verify-tag
+          fi
