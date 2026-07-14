@@ -211,6 +211,8 @@ func planBadgeText(_ planType: String?) -> String {
         return "Free"
     case "plus":
         return "Plus"
+    case "pro":
+        return "Pro"
     case "pro5x":
         return "Pro5x"
     case "pro20x":
@@ -224,18 +226,24 @@ func normalizedPlanType(_ planType: String?) -> String? {
     guard let raw = planType?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !raw.isEmpty else {
         return nil
     }
-    switch raw {
+    let compact = raw.replacingOccurrences(of: #"[\s_-]+"#, with: "", options: .regularExpression)
+    switch compact {
     case "free":
         return "free"
     case "plus":
         return "plus"
-    case "pro", "pro5x", "pro_5x", "pro-5x":
-        return "pro5x"
-    case "pro20x", "pro_20x", "pro-20x":
-        return "pro20x"
+    case "pro":
+        return "pro"
     default:
-        return nil
+        break
     }
+    if compact.contains("20x") || compact.contains("pro20") {
+        return "pro20x"
+    }
+    if compact.contains("5x") || compact.contains("pro5") {
+        return "pro5x"
+    }
+    return nil
 }
 
 class MetricCardView: NSView {
@@ -1350,7 +1358,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         case "plus":
             planColor = NSColor(calibratedRed: 0.0, green: 0.72, blue: 0.08, alpha: 1.0)
             planTextColor = NSColor.white
-        case "pro5x", "pro20x":
+        case "pro", "pro5x", "pro20x":
             planColor = NSColor.systemOrange
             planTextColor = NSColor.white
         default:

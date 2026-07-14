@@ -126,11 +126,42 @@ function toUsageWindow(window) {
 function normalizePlanType(planType) {
   if (typeof planType !== "string") return null;
   const value = planType.trim().toLowerCase();
-  if (value === "free") return "free";
-  if (value === "plus") return "plus";
-  if (value === "pro" || value === "pro5x" || value === "pro_5x" || value === "pro-5x") return "pro5x";
-  if (value === "pro20x" || value === "pro_20x" || value === "pro-20x") return "pro20x";
+  const compact = value.replace(/[\s_-]+/g, "");
+  if (compact === "free") return "free";
+  if (compact === "plus") return "plus";
+  if (compact.includes("20x") || compact.includes("pro20")) return "pro20x";
+  if (compact.includes("5x") || compact.includes("pro5")) return "pro5x";
+  if (compact === "pro") return "pro";
   return null;
+}
+
+function pickPlanType(body) {
+  const candidates = [
+    body?.plan_type,
+    body?.plan,
+    body?.plan?.type,
+    body?.plan?.id,
+    body?.plan?.name,
+    body?.plan?.tier,
+    body?.subscription?.plan,
+    body?.subscription?.plan_type,
+    body?.subscription?.plan_id,
+    body?.subscription?.tier,
+    body?.account?.plan,
+    body?.account?.plan_type,
+    body?.account?.plan_id,
+    body?.account?.tier,
+  ];
+
+  const normalized = candidates
+    .map((candidate) => normalizePlanType(candidate))
+    .filter(Boolean);
+  return normalized.find((value) => value === "pro20x")
+    ?? normalized.find((value) => value === "pro5x")
+    ?? normalized.find((value) => value === "plus")
+    ?? normalized.find((value) => value === "free")
+    ?? normalized.find((value) => value === "pro")
+    ?? null;
 }
 
 function normalizeBalanceUsd(balance) {
@@ -332,7 +363,7 @@ async function fetchUsage() {
     const rateLimit = body?.rate_limit;
     const fiveHour = toUsageWindow(rateLimit?.primary_window);
     const sevenDay = toUsageWindow(rateLimit?.secondary_window);
-    const planType = normalizePlanType(body?.plan_type);
+    const planType = pickPlanType(body);
     const balanceUsd = normalizeBalanceUsd(body?.credits?.balance);
     const availableCount = body?.rate_limit_reset_credits?.available_count;
     const resetCredits = typeof availableCount === "number"
