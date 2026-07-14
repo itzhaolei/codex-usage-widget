@@ -14,7 +14,7 @@ Een zwevend venster voor macOS en Windows voor Codex-gebruik over 5 uur, weekgeb
 - Houdt quotawaarden stabiel bij het wisselen tussen live gebruik en het lokale sessielogboek.
 - Draait zelfstandig en leest lokale Codex-quotagegevens.
 - Onthoudt positie, thema en vastzetstatus.
-- Houdt slechts één HUD en één Dock-launcher actief.
+- Eén SwiftUI-app beheert de HUD, het Dock-pictogram, menu's en de levenscyclus.
 - Biedt menuacties voor bijwerken, verwijderen en taal wisselen.
 - Toont een kleine rode stip naast de versie wanneer er een nieuwere GitHub-release beschikbaar is.
 - Ondersteunt donker en licht thema.

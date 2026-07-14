@@ -14,7 +14,7 @@ Ein schwebendes Fenster für macOS und Windows zum Anzeigen des Codex 5-Stunden-
 - Hält Kontingentwerte beim Wechsel zwischen Live-Nutzung und lokalem Sitzungsprotokoll stabil.
 - Läuft unabhängig und liest lokale Codex-Kontingentdaten.
 - Speichert Fensterposition, Theme und Anheftstatus.
-- Hält jeweils nur ein HUD und einen Dock-Launcher aktiv.
+- Eine SwiftUI-App verwaltet HUD, Dock-Symbol, Menüs und Lebenszyklus gemeinsam.
 - Bietet Menüaktionen für Updates, Deinstallation und Sprachwechsel.
 - Zeigt einen kleinen roten Punkt neben der Versionsnummer, wenn auf GitHub eine neuere Version verfügbar ist.
 - Unterstützt dunkles und helles Theme.

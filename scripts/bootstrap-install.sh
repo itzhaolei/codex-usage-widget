@@ -85,7 +85,33 @@ data["plugins"] = plugins
 marketplace_path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
 PY
 
-bash "$PLUGIN_DIR/scripts/install.sh"
+RELEASE_JSON="$TMP_DIR/latest-release.json"
+INSTALLER_ZIP="$TMP_DIR/macos-installer.zip"
+INSTALLER_DIR="$TMP_DIR/macos-installer"
+INSTALLER_URL=""
+if curl -fsSL "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases/latest" -o "$RELEASE_JSON"; then
+    INSTALLER_URL="$(/usr/bin/python3 - "$RELEASE_JSON" <<'PY'
+import json, sys
+release = json.load(open(sys.argv[1], encoding="utf-8"))
+for asset in release.get("assets", []):
+    if asset.get("name", "").endswith("macOS-Installer.zip"):
+        print(asset.get("browser_download_url", ""))
+        break
+PY
+)"
+fi
+
+if [ -n "$INSTALLER_URL" ]; then
+    mkdir -p "$INSTALLER_DIR"
+    curl -fsSL "$INSTALLER_URL" -o "$INSTALLER_ZIP"
+    ditto -x -k "$INSTALLER_ZIP" "$INSTALLER_DIR"
+    /bin/bash "$INSTALLER_DIR/Install Quota Bubble.app/Contents/Resources/install-packaged.sh"
+elif command -v swiftc >/dev/null 2>&1; then
+    bash "$PLUGIN_DIR/scripts/install.sh"
+else
+    echo "Could not download the prebuilt macOS installer, and swiftc is unavailable." >&2
+    exit 1
+fi
 
 echo
 echo "Installed $PLUGIN_NAME."

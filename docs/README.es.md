@@ -14,7 +14,7 @@ Una ventana flotante para macOS y Windows que muestra el uso de Codex en 5 horas
 - Mantiene estables los valores al alternar entre el uso en vivo y el registro de sesión local.
 - Se ejecuta de forma independiente y lee datos locales de cuota de Codex.
 - Recuerda posición, tema y estado fijado.
-- Mantiene solo un HUD y un lanzador de Dock.
+- Una sola app SwiftUI gestiona el HUD, el icono del Dock, los menús y el ciclo de vida.
 - Añade acciones de menú para actualizar, desinstalar y cambiar idioma.
 - Muestra un pequeño punto rojo junto a la versión cuando hay una release más reciente en GitHub.
 - Soporta tema claro y oscuro.

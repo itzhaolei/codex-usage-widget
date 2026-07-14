@@ -9,11 +9,10 @@ This plugin provides a local macOS floating widget for Codex quota visibility.
 
 ## What It Installs
 
-- `~/.codex/usage-widget/UsageWidget.app`: the macOS floating HUD.
-- `~/Applications/Quota Bubble.app`: a Dock-visible launcher app with the plugin icon.
+- `~/Applications/Quota Bubble.app`: the single SwiftUI macOS app that owns the HUD, Dock icon, and menus.
 - `~/.codex/scripts/codex-usage-snapshot.mjs`: reads Codex session usage and reset-credit information.
-- `~/.codex/usage-widget/ensure-usage-widget.sh`: keeps one widget running while Codex desktop is running.
-- `~/Library/LaunchAgents/com.codex.usage-widget.autostart.plist`: launches the ensure script every 10 seconds.
+- `~/.codex/usage-widget/ensure-usage-widget.sh`: opens the single app when explicitly invoked.
+- `~/Library/LaunchAgents/com.codex.usage-widget.autostart.plist`: opens the app once at user login.
 
 ## Commands
 
@@ -27,11 +26,7 @@ bash scripts/install.sh
 
 One-line install for other users is documented in `ONE_LINE_INSTALL.md`. It uses `scripts/bootstrap-install.sh` after the plugin is published as a downloadable archive.
 
-By default, install also adds `Quota Bubble.app` to the Dock. To skip Dock pinning:
-
-```bash
-PIN_TO_DOCK=0 bash scripts/install.sh
-```
+Install also adds `Quota Bubble.app` to the Dock and removes duplicate legacy entries.
 
 Restart the widget:
 
@@ -54,10 +49,10 @@ bash scripts/status.sh
 ## Behavior
 
 - The widget can run independently of the Codex desktop app lifecycle.
-- The Dock launcher can be clicked to restart/show the widget.
+- The Dock app can be clicked to activate the same running HUD process.
 - Closing Codex does not close Quota Bubble.
 - Only one widget instance is kept alive.
-- The close button hides the widget for the current Codex run.
+- The close button terminates the app, so its Dock running state clears immediately.
 - The widget refreshes the visible countdown every second and refreshes the snapshot in the background.
 - Reset-credit cache is scoped by Codex account ID when available.
 

@@ -30,8 +30,8 @@ Website source lives in `public/` and is ready for Cloudflare Pages. Recommended
 - Stabilizes quota values when switching between live usage and local session-log fallback data.
 - Runs independently while reading local Codex quota data.
 - Remembers position, theme, and pinned state.
-- Keeps only one HUD and one Dock launcher instance running.
-- Includes a renamed Dock launcher app and refreshed Quota Bubble icon.
+- Runs as one native SwiftUI macOS app: the HUD, Dock icon, menus, and lifecycle share one process.
+- Keeps a single Quota Bubble instance running and preserves the floating window position, theme, and pin state.
 - Adds menu-bar actions for updates, uninstall, and language switching.
 - Shows a small red dot next to the version label when a newer GitHub release is available.
 - Supports dark and light themes.
@@ -47,7 +47,7 @@ For users who do not want to use Terminal, open the latest release page and down
 
 [Open the latest release page](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
-Unzip it, then double-click `Install Quota Bubble.app`. The installer copies the prebuilt widget and Dock launcher, registers the background launch agent, adds the launcher to Dock, and opens the widget.
+Unzip it, then double-click `Install Quota Bubble.app`. The installer copies the prebuilt SwiftUI app, registers login startup, adds Quota Bubble to Dock, and opens the widget.
 
 The README always links to the latest release page. To install an older version, open [all releases](https://github.com/itzhaolei/codex-usage-widget/releases) and download the installer from that version's page.
 
@@ -61,6 +61,8 @@ If Node.js is missing on macOS, the widget now shows the same setup overlay. The
 CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"
 ```
 
+This installs the prebuilt app from the latest macOS release, so end users do not need Xcode Command Line Tools.
+
 #### Method 3: Local Install
 
 ```bash
@@ -69,7 +71,6 @@ bash scripts/install.sh
 
 The installer builds:
 
-- `~/.codex/usage-widget/UsageWidget.app`
 - `~/Applications/Quota Bubble.app`
 - `~/Library/LaunchAgents/com.codex.usage-widget.autostart.plist`
 

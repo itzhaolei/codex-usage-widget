@@ -11,7 +11,7 @@ What the installer does:
 - Downloads the plugin archive.
 - Installs it to `~/plugins/codex-usage-widget`.
 - Adds it to `~/.agents/plugins/marketplace.json`.
-- Builds and installs the macOS Dock launcher and floating HUD.
+- Builds and installs one native SwiftUI macOS app for both the Dock icon and floating HUD.
 
 For local testing from a checked-out plugin directory:
 

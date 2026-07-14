@@ -15,9 +15,9 @@ jobs:
       - name: Check out tagged source
         uses: actions/checkout@v4
 
-      - name: Build arm64 installer
+      - name: Build universal installer
         env:
-          QUOTA_BUBBLE_SWIFT_TARGET: arm64-apple-macosx13.0
+          QUOTA_BUBBLE_UNIVERSAL: "1"
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           bash scripts/package-installer.sh "$VERSION"

@@ -14,7 +14,7 @@ Uma janela flutuante para macOS e Windows que mostra o uso de 5 horas, o uso sem
 - Mantém os valores estáveis ao alternar entre o uso ao vivo e o log de sessão local.
 - Roda de forma independente e lê dados locais de cota do Codex.
 - Lembra posição, tema e estado fixado.
-- Mantém apenas um HUD e um lançador no Dock.
+- Um único app SwiftUI gerencia o HUD, o ícone do Dock, os menus e o ciclo de vida.
 - Adiciona ações de menu para atualizar, desinstalar e trocar idioma.
 - Mostra um pequeno ponto vermelho ao lado da versão quando há uma versão mais recente no GitHub.
 - Suporta tema claro e escuro.

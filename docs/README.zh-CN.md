@@ -14,7 +14,7 @@
 - 在实时接口与本地会话日志切换时保持配额数值稳定。
 - 可独立运行，并读取本机 Codex 配额数据。
 - 记住窗口位置、黑白模式和置顶状态。
-- 只保留一个悬浮窗和一个 Dock 启动器实例。
+- 使用单一 SwiftUI 应用统一管理悬浮窗、Dock 图标、菜单和生命周期。
 - 在菜单栏提供版本更新、卸载和语言切换。
 - 当 GitHub 上有新版本时，在版本号旁显示小红点。
 - 支持深色和浅色模式。
@@ -28,7 +28,7 @@
 
 [打开最新版本发布页面](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
-解压后，双击 `Install Quota Bubble.app` 即可安装。安装器会复制预编译好的悬浮窗和 Dock 启动器，注册后台自启动任务，把启动器放入 Dock，并打开工具。
+解压后，双击 `Install Quota Bubble.app` 即可安装。安装器会复制预编译好的 SwiftUI 应用，注册登录自启动，把应用放入 Dock，并打开工具。
 
 README 始终指向最新版本发布页。如果需要安装旧版本，请打开[所有版本页面](https://github.com/itzhaolei/codex-usage-widget/releases)，进入对应版本页面下载该版本的安装器。
 
@@ -41,6 +41,8 @@ Windows 暂时保持在 v2.1.3，请从 [Windows v2.1.3 发布页](https://githu
 ```bash
 CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"
 ```
+
+该方式会安装最新 macOS Release 中的预编译应用，普通用户无需安装 Xcode Command Line Tools。
 
 ### 方式三：本地安装
 
