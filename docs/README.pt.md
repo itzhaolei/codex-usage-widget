@@ -9,6 +9,9 @@ Uma janela flutuante para macOS e Windows que mostra o uso de 5 horas, o uso sem
 ## Recursos
 
 - Mostra o uso de 5 horas, o uso semanal e as redefinições disponíveis do Codex.
+- No macOS, mostra a validade de cada redefinição, com ponto vermelho quando expira em até três dias e verde nos demais casos.
+- No macOS, mostra localmente a conta atual e o vencimento da assinatura sem salvar credenciais no snapshot de cota.
+- Mantém os valores estáveis ao alternar entre o uso ao vivo e o log de sessão local.
 - Roda de forma independente e lê dados locais de cota do Codex.
 - Lembra posição, tema e estado fixado.
 - Mantém apenas um HUD e um lançador no Dock.
@@ -27,7 +30,7 @@ Se você não quiser usar o Terminal, abra a página da versão mais recente e b
 
 Descompacte e dê dois cliques em `Install Quota Bubble.app`. O Quota Bubble lê os dados locais de cota do Codex da conta do usuário atual. Se os dados locais do Codex CLI ainda não estiverem disponíveis, o widget mostra uma tela de configuração para instalar o Codex CLI e fazer login.
 
-No Windows, baixe `QuotaBubble-*-Windows.zip` na mesma página de versão, descompacte e execute `windows/install.ps1`.
+O Windows permanece por enquanto na v2.1.3. Baixe `QuotaBubble-*-Windows.zip` na [versão Windows v2.1.3](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v2.1.3), descompacte e execute `windows/install.ps1`.
 
 O README sempre aponta para a página da versão mais recente. Para instalar uma versão antiga, abra [todas as versões](https://github.com/itzhaolei/codex-usage-widget/releases) e baixe o instalador na página da versão desejada.
 

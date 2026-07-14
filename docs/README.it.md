@@ -9,6 +9,9 @@ Una finestra flottante per macOS e Windows che mostra l’uso Codex su 5 ore, l�
 ## Funzionalità
 
 - Mostra l’uso Codex su 5 ore, l’uso settimanale e i ripristini disponibili.
+- Su macOS mostra la scadenza di ogni ripristino, con un punto rosso entro tre giorni e verde negli altri casi.
+- Su macOS mostra localmente l’account corrente e la scadenza dell’abbonamento senza salvare credenziali nello snapshot della quota.
+- Mantiene stabili i valori passando tra utilizzo live e registro locale della sessione.
 - Funziona in modo indipendente e legge i dati locali della quota Codex.
 - Ricorda posizione, tema e stato fissato.
 - Mantiene un solo HUD e un solo launcher Dock.
@@ -27,7 +30,7 @@ Se non vuoi usare il Terminale, apri la pagina dell’ultima release e scarica d
 
 Decomprimi il file e fai doppio clic su `Install Quota Bubble.app`. Quota Bubble legge i dati quota locali di Codex dall'account utente corrente. Se i dati locali di Codex CLI non sono ancora disponibili, il widget mostra una schermata di configurazione per installare Codex CLI ed effettuare l'accesso.
 
-Su Windows, scarica `QuotaBubble-*-Windows.zip` dalla stessa pagina release, decomprimilo ed esegui `windows/install.ps1`.
+Windows resta per ora alla v2.1.3. Scarica `QuotaBubble-*-Windows.zip` dalla [release Windows v2.1.3](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v2.1.3), decomprimilo ed esegui `windows/install.ps1`.
 
 Il README punta sempre alla pagina dell’ultima release. Per installare una versione precedente, apri [tutte le release](https://github.com/itzhaolei/codex-usage-widget/releases) e scarica l’installer dalla pagina della versione desiderata.
 

@@ -9,6 +9,9 @@ Ein schwebendes Fenster für macOS und Windows zum Anzeigen des Codex 5-Stunden-
 ## Funktionen
 
 - Zeigt Codex 5-Stunden-Nutzung, Wochennutzung und verfügbare Reset-Credits.
+- Zeigt unter macOS die Ablaufdaten einzelner Reset-Credits mit einem roten Punkt innerhalb von drei Tagen und sonst mit einem grünen Punkt.
+- Zeigt unter macOS das aktuelle Konto und das Ablaufdatum des Abonnements lokal an, ohne Anmeldedaten im Kontingent-Snapshot zu speichern.
+- Hält Kontingentwerte beim Wechsel zwischen Live-Nutzung und lokalem Sitzungsprotokoll stabil.
 - Läuft unabhängig und liest lokale Codex-Kontingentdaten.
 - Speichert Fensterposition, Theme und Anheftstatus.
 - Hält jeweils nur ein HUD und einen Dock-Launcher aktiv.
@@ -27,7 +30,7 @@ Wenn Sie Terminal nicht verwenden möchten, öffnen Sie die neueste Release-Seit
 
 Entpacken Sie die Datei und doppelklicken Sie auf `Install Quota Bubble.app`. Quota Bubble liest die lokalen Codex-Kontingentdaten des aktuellen Benutzerkontos. Wenn lokale Codex-CLI-Daten noch nicht verfügbar sind, zeigt das Widget ein Setup-Overlay für Installation und Anmeldung.
 
-Unter Windows laden Sie `QuotaBubble-*-Windows.zip` von derselben Release-Seite herunter, entpacken es und führen `windows/install.ps1` aus.
+Windows bleibt vorerst auf v2.1.3. Laden Sie `QuotaBubble-*-Windows.zip` von der [Windows-v2.1.3-Release-Seite](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v2.1.3) herunter, entpacken Sie es und führen Sie `windows/install.ps1` aus.
 
 Die README verweist immer auf die neueste Release-Seite. Für ältere Versionen öffnen Sie [alle Releases](https://github.com/itzhaolei/codex-usage-widget/releases) und laden den Installer auf der jeweiligen Versionsseite herunter.
 

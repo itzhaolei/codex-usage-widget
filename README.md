@@ -25,6 +25,9 @@ Website source lives in `public/` and is ready for Cloudflare Pages. Recommended
 
 - Floating quota HUD for Codex desktop.
 - Shows 5-hour usage, weekly usage, USD balance, and available reset credits.
+- Lists reset-credit expiration dates with red and green urgency indicators on macOS.
+- Shows the current account and subscription expiration locally on macOS without copying credentials into the quota snapshot.
+- Stabilizes quota values when switching between live usage and local session-log fallback data.
 - Runs independently while reading local Codex quota data.
 - Remembers position, theme, and pinned state.
 - Keeps only one HUD and one Dock launcher instance running.
@@ -72,9 +75,9 @@ The installer builds:
 
 ### Windows
 
-Open the latest release page and download the Windows package:
+Windows remains on v2.1.3 while the v2.2.0 release is macOS-only. Open the Windows v2.1.3 release page and download its package:
 
-[Open the latest release page](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
+[Open the Windows v2.1.3 release](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v2.1.3)
 
 Unzip `QuotaBubble-*-Windows.zip`, then run:
 

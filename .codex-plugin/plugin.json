@@ -1,6 +1,6 @@
 {
   "name": "codex-usage-widget",
-  "version": "2.1.3",
+  "version": "2.2.0",
   "description": "A floating quota widget for Codex usage limits on macOS and Windows.",
   "author": {
     "name": "itzhaolei"

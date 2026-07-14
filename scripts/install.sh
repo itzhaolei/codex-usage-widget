@@ -156,7 +156,7 @@ cat > "$APP_DIR/Contents/Info.plist" <<'PLIST'
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>2.1.3</string>
+    <string>2.2.0</string>
     <key>LSUIElement</key>
     <true/>
     <key>NSHighResolutionCapable</key>
@@ -183,7 +183,7 @@ cat > "$LAUNCHER_APP/Contents/Info.plist" <<'PLIST'
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>2.1.3</string>
+    <string>2.2.0</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>

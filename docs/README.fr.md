@@ -9,6 +9,9 @@ Une fenêtre flottante pour macOS et Windows afin d’afficher l’usage Codex s
 ## Fonctionnalités
 
 - Affiche l’usage Codex sur 5 heures, l’usage hebdomadaire et les réinitialisations disponibles.
+- Affiche sous macOS la date d’expiration de chaque réinitialisation, avec un point rouge à moins de trois jours et vert au-delà.
+- Affiche localement sous macOS le compte actuel et l’expiration de l’abonnement sans enregistrer les identifiants dans l’instantané de quota.
+- Stabilise les valeurs lors du basculement entre l’usage en direct et le journal de session local.
 - Fonctionne indépendamment et lit les données locales de quota Codex.
 - Mémorise la position, le thème et l’état épinglé.
 - Conserve un seul HUD et un seul lanceur Dock.
@@ -27,7 +30,7 @@ Si vous ne souhaitez pas utiliser Terminal, ouvrez la dernière page de release 
 
 Décompressez-le, puis double-cliquez sur `Install Quota Bubble.app`. Quota Bubble lit les données locales de quota Codex du compte utilisateur actuel. Si les données locales de Codex CLI ne sont pas encore disponibles, le widget affiche un écran de configuration pour installer Codex CLI et se connecter.
 
-Sous Windows, téléchargez `QuotaBubble-*-Windows.zip` depuis la même page de release, décompressez-le, puis lancez `windows/install.ps1`.
+Windows reste pour le moment en v2.1.3. Téléchargez `QuotaBubble-*-Windows.zip` depuis la [release Windows v2.1.3](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v2.1.3), décompressez-le, puis lancez `windows/install.ps1`.
 
 Le README pointe toujours vers la dernière page de release. Pour installer une ancienne version, ouvrez [toutes les releases](https://github.com/itzhaolei/codex-usage-widget/releases) et téléchargez l’installateur depuis la page de cette version.
 

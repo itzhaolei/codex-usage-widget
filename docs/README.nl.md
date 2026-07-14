@@ -9,6 +9,9 @@ Een zwevend venster voor macOS en Windows voor Codex-gebruik over 5 uur, weekgeb
 ## Functies
 
 - Toont Codex-gebruik over 5 uur, weekgebruik en beschikbare resets.
+- Toont op macOS de vervaldatum van elke reset, met een rode stip binnen drie dagen en anders een groene stip.
+- Toont op macOS lokaal het huidige account en de vervaldatum van het abonnement zonder aanmeldgegevens in de quota-snapshot op te slaan.
+- Houdt quotawaarden stabiel bij het wisselen tussen live gebruik en het lokale sessielogboek.
 - Draait zelfstandig en leest lokale Codex-quotagegevens.
 - Onthoudt positie, thema en vastzetstatus.
 - Houdt slechts één HUD en één Dock-launcher actief.
@@ -27,7 +30,7 @@ Als je Terminal niet wilt gebruiken, open dan de nieuwste releasepagina en downl
 
 Pak het bestand uit en dubbelklik op `Install Quota Bubble.app`. Quota Bubble leest lokale Codex-quotagegevens van het huidige gebruikersaccount. Als lokale Codex CLI-gegevens nog niet beschikbaar zijn, toont de widget een setup-overlay om Codex CLI te installeren en in te loggen.
 
-Op Windows download je `QuotaBubble-*-Windows.zip` vanaf dezelfde releasepagina, pak je het uit en voer je `windows/install.ps1` uit.
+Windows blijft voorlopig op v2.1.3. Download `QuotaBubble-*-Windows.zip` via de [Windows v2.1.3-release](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v2.1.3), pak het uit en voer `windows/install.ps1` uit.
 
 De README verwijst altijd naar de nieuwste releasepagina. Voor een oudere versie open je [alle releases](https://github.com/itzhaolei/codex-usage-widget/releases) en download je de installer vanaf de pagina van die versie.
 

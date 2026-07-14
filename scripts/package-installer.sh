@@ -55,20 +55,26 @@ cp "$PLUGIN_DIR/scripts/uninstall.sh" "$PAYLOAD_DIR/scripts/uninstall.sh"
 ICON_PNG="$PAYLOAD_DIR/icon.png"
 ICONSET="$BUILD_DIR/AppIcon.iconset"
 ICON_ICNS="$BUILD_DIR/AppIcon.icns"
-mkdir -p "$ICONSET"
-for size in 16 32 128 256 512; do
-    sips -z "$size" "$size" "$ICON_PNG" --out "$ICONSET/icon_${size}x${size}.png" >/dev/null
-    double_size=$((size * 2))
-    sips -z "$double_size" "$double_size" "$ICON_PNG" --out "$ICONSET/icon_${size}x${size}@2x.png" >/dev/null
-done
-iconutil -c icns "$ICONSET" -o "$ICON_ICNS"
+if [ -f "$PLUGIN_DIR/assets/AppIcon.icns" ]; then
+    cp "$PLUGIN_DIR/assets/AppIcon.icns" "$ICON_ICNS"
+else
+    mkdir -p "$ICONSET"
+    for size in 16 32 128 256 512; do
+        sips -z "$size" "$size" "$ICON_PNG" --out "$ICONSET/icon_${size}x${size}.png" >/dev/null
+        double_size=$((size * 2))
+        sips -z "$double_size" "$double_size" "$ICON_PNG" --out "$ICONSET/icon_${size}x${size}@2x.png" >/dev/null
+    done
+    iconutil -c icns "$ICONSET" -o "$ICON_ICNS"
+fi
 cp "$ICON_ICNS" "$INSTALLER_APP/Contents/Resources/AppIcon.icns"
 
 WIDGET_APP="$PAYLOAD_DIR/apps/UsageWidget.app"
 WIDGET_MACOS="$WIDGET_APP/Contents/MacOS"
 WIDGET_RESOURCES="$WIDGET_APP/Contents/Resources"
 mkdir -p "$WIDGET_MACOS" "$WIDGET_RESOURCES"
-swiftc -parse-as-library -o "$WIDGET_MACOS/UsageWidget" "$PLUGIN_DIR/sources/UsageWidget.swift" -framework Cocoa
+WIDGET_BINARY="$BUILD_DIR/UsageWidgetBinary"
+swiftc -parse-as-library -o "$WIDGET_BINARY" "$PLUGIN_DIR/sources/UsageWidget.swift" -framework Cocoa
+cp "$WIDGET_BINARY" "$WIDGET_MACOS/UsageWidget"
 chmod +x "$WIDGET_MACOS/UsageWidget"
 cp "$ICON_ICNS" "$WIDGET_RESOURCES/AppIcon.icns"
 cat > "$WIDGET_APP/Contents/Info.plist" <<PLIST
@@ -100,7 +106,9 @@ LAUNCHER_APP="$PAYLOAD_DIR/apps/Quota Bubble.app"
 LAUNCHER_MACOS="$LAUNCHER_APP/Contents/MacOS"
 LAUNCHER_RESOURCES="$LAUNCHER_APP/Contents/Resources"
 mkdir -p "$LAUNCHER_MACOS" "$LAUNCHER_RESOURCES"
-swiftc -parse-as-library -o "$LAUNCHER_MACOS/Quota Bubble" "$PLUGIN_DIR/sources/CodexUsageWidgetLauncher.swift" -framework Cocoa
+LAUNCHER_BINARY="$BUILD_DIR/QuotaBubbleLauncherBinary"
+swiftc -parse-as-library -o "$LAUNCHER_BINARY" "$PLUGIN_DIR/sources/CodexUsageWidgetLauncher.swift" -framework Cocoa
+cp "$LAUNCHER_BINARY" "$LAUNCHER_MACOS/Quota Bubble"
 chmod +x "$LAUNCHER_MACOS/Quota Bubble"
 cp "$ICON_ICNS" "$LAUNCHER_RESOURCES/AppIcon.icns"
 cat > "$LAUNCHER_APP/Contents/Info.plist" <<PLIST

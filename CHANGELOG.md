@@ -4,6 +4,30 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 2.2.0 - 2026-07-14
+
+### Added
+
+- Added a macOS reset-credit expiration list with one row per available reset, using a red status dot for credits expiring within three days and green otherwise.
+- Added current-account and subscription-expiration rows below the macOS metric cards, read directly from the current local Codex token without writing those values to the quota snapshot.
+
+### Changed
+
+- Replaced the second macOS quota progress row with the reset-credit expiration list and made the fixed-width window grow vertically with the list.
+- Switched reset countdowns to compact unit formatting and omitted zero-value units.
+- Refined vertical spacing around the progress bar, expiration list, metric cards, account, and subscription rows.
+
+### Fixed
+
+- Prevented transient empty snapshots from clearing the widget and added atomic snapshot writes.
+- Corrected Pro20x subscription badge detection so it is not reported as Pro5x.
+- Stabilized quota percentages and reset countdowns while switching between the live usage endpoint and session-log fallback data.
+- Preserved account-specific quota state correctly while continuing to refresh after account changes.
+
+### Notes
+
+- Version 2.2.0 is released for macOS only. The latest Windows package remains v2.1.3.
+
 ## 2.1.3 - 2026-07-01
 
 ### Changed
