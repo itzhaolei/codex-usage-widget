@@ -1550,12 +1550,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
         for (index, row) in resetExpirationRows.enumerated() {
             let suffix = index == resetExpirationRows.count - 1 ? "" : "\n"
             let dotColor: NSColor
-            switch row.isExpiringSoon {
-            case true:
+            if row.isExpiringSoon == true {
                 dotColor = NSColor.systemRed
-            case false:
+            } else if row.isExpiringSoon == false {
                 dotColor = NSColor.green
-            case nil:
+            } else {
                 dotColor = secondaryTextColor
             }
             let dot = attrs(font: NSFont.systemFont(ofSize: 8, weight: .bold), color: dotColor, lineHeight: 17)
