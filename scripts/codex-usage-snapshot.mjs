@@ -242,14 +242,19 @@ function keepMonotonicUsage(existingWindow, nextWindow) {
   if (!nextWindow) return null;
   if (!existingWindow || typeof existingWindow.used_percentage !== "number") return nextWindow;
   if (existingWindow.resets_at == null || nextWindow.resets_at == null) return nextWindow;
-  if (existingWindow.resets_at !== nextWindow.resets_at) return nextWindow;
+  const resetDriftSeconds = Math.abs(existingWindow.resets_at - nextWindow.resets_at);
+  if (resetDriftSeconds > 5 * 60) return nextWindow;
+  const stabilizedWindow = {
+    ...nextWindow,
+    resets_at: existingWindow.resets_at,
+  };
   if (nextWindow.used_percentage < existingWindow.used_percentage) {
     return {
-      ...nextWindow,
+      ...stabilizedWindow,
       used_percentage: existingWindow.used_percentage,
     };
   }
-  return nextWindow;
+  return stabilizedWindow;
 }
 
 function mergeWindow(existingWindow, nextWindow, canKeepExisting) {
@@ -508,8 +513,8 @@ if (usage?.five_hour || usage?.seven_day) {
     stale_source: false,
     plan_type: keepExistingValue(existingSnapshot?.plan_type, usage.plan_type, existingSameAccount),
     balance_usd: keepExistingValue(existingSnapshot?.balance_usd, usage.balance_usd, existingSameAccount),
-    five_hour: usage.five_hour,
-    seven_day: usage.seven_day,
+    five_hour: mergeWindow(existingSnapshot?.five_hour, usage.five_hour, existingSameAccount),
+    seven_day: mergeWindow(existingSnapshot?.seven_day, usage.seven_day, existingSameAccount),
     reset_credits: effectiveResetCredits,
   };
 
