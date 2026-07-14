@@ -171,6 +171,73 @@ function normalizeBalanceUsd(balance) {
   return value.length > 0 ? value : null;
 }
 
+function normalizeTimestampToIso(value) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    const millis = value > 1_000_000_000_000 ? value : value * 1000;
+    const date = new Date(millis);
+    return Number.isFinite(date.getTime()) ? date.toISOString() : null;
+  }
+  if (typeof value === "string" && value.trim().length > 0) {
+    const millis = Date.parse(value);
+    return Number.isFinite(millis) ? new Date(millis).toISOString() : null;
+  }
+  return null;
+}
+
+function objectCount(value) {
+  const count = value?.count ?? value?.quantity ?? value?.available_count ?? value?.availableCount;
+  return typeof count === "number" && Number.isFinite(count) ? Math.max(1, Math.round(count)) : 1;
+}
+
+function collectResetCreditExpirations(value, output = []) {
+  if (!value || typeof value !== "object") return output;
+  if (Array.isArray(value)) {
+    for (const item of value) collectResetCreditExpirations(item, output);
+    return output;
+  }
+
+  const expirationKeys = [
+    "expires_at",
+    "expire_at",
+    "expiration_at",
+    "expiresAt",
+    "expires_on",
+    "valid_until",
+    "validUntil",
+  ];
+  for (const key of expirationKeys) {
+    const iso = normalizeTimestampToIso(value[key]);
+    if (!iso) continue;
+    const count = Math.min(50, objectCount(value));
+    for (let index = 0; index < count; index += 1) output.push(iso);
+    break;
+  }
+
+  const nestedKeys = [
+    "credits",
+    "items",
+    "grants",
+    "available",
+    "reset_credits",
+    "rate_limit_reset_credits",
+    "reset_credit_grants",
+  ];
+  for (const key of nestedKeys) {
+    if (value[key]) collectResetCreditExpirations(value[key], output);
+  }
+  return output;
+}
+
+function normalizeResetCreditExpirations(value) {
+  const expirations = collectResetCreditExpirations(value)
+    .sort((left, right) => Date.parse(left) - Date.parse(right));
+  const availableCount = value?.available_count ?? value?.availableCount;
+  if (typeof availableCount === "number" && Number.isFinite(availableCount)) {
+    return expirations.slice(0, Math.max(0, Math.round(availableCount)));
+  }
+  return expirations;
+}
+
 function keepMonotonicUsage(existingWindow, nextWindow) {
   if (!nextWindow) return null;
   if (!existingWindow || typeof existingWindow.used_percentage !== "number") return nextWindow;
@@ -262,6 +329,7 @@ function sanitizeResetCreditsCache(cached) {
   writeJson(resetCreditsCachePath, {
     account_fingerprint: currentAccountFingerprint,
     available_count: cached.available_count,
+    expires_at: Array.isArray(cached.expires_at) ? cached.expires_at : [],
     fetched_at: cached.fetched_at ?? new Date(cached.fetched_at_ms).toISOString(),
     fetched_at_ms: cached.fetched_at_ms,
   });
@@ -291,6 +359,7 @@ function readFreshResetCreditsCache() {
   sanitizeResetCreditsCache(cached);
   return {
     available_count: cached.available_count,
+    expires_at: Array.isArray(cached.expires_at) ? cached.expires_at : [],
     fetched_at: cached.fetched_at ?? new Date(cached.fetched_at_ms).toISOString(),
   };
 }
@@ -306,6 +375,7 @@ function readAnyResetCreditsCache() {
   sanitizeResetCreditsCache(cached);
   return {
     available_count: cached.available_count,
+    expires_at: Array.isArray(cached.expires_at) ? cached.expires_at : [],
     fetched_at: cached.fetched_at ?? null,
     stale: true,
   };
@@ -333,16 +403,19 @@ async function fetchResetCredits() {
 
     const body = await response.json();
     if (typeof body?.available_count !== "number") return readAnyResetCreditsCache();
+    const expiresAt = normalizeResetCreditExpirations(body);
 
     const value = {
       account_fingerprint: currentAccountFingerprint,
       available_count: Math.max(0, Math.round(body.available_count)),
+      expires_at: expiresAt,
       fetched_at: new Date().toISOString(),
       fetched_at_ms: Date.now(),
     };
     writeJson(resetCreditsCachePath, value);
     return {
       available_count: value.available_count,
+      expires_at: value.expires_at,
       fetched_at: value.fetched_at,
     };
   } catch {
@@ -375,6 +448,7 @@ async function fetchUsage() {
     const resetCredits = typeof availableCount === "number"
       ? {
           available_count: Math.max(0, Math.round(availableCount)),
+          expires_at: normalizeResetCreditExpirations(body?.rate_limit_reset_credits),
           fetched_at: new Date().toISOString(),
         }
       : null;
@@ -411,7 +485,18 @@ for (const filePath of listJsonlFiles(searchDirs)) {
 }
 
 const usage = await fetchUsage();
-const resetCredits = usage?.reset_credits ?? await fetchResetCredits();
+const usageResetCredits = usage?.reset_credits ?? null;
+const needsResetCreditDetails = !usageResetCredits
+  || ((usageResetCredits.available_count ?? 0) > 0 && (usageResetCredits.expires_at?.length ?? 0) === 0);
+const detailedResetCredits = needsResetCreditDetails ? await fetchResetCredits() : null;
+const resetCredits = usageResetCredits
+  ? {
+      ...usageResetCredits,
+      expires_at: usageResetCredits.expires_at?.length
+        ? usageResetCredits.expires_at
+        : detailedResetCredits?.expires_at ?? [],
+    }
+  : detailedResetCredits;
 const effectiveResetCredits = keepExistingValue(existingSnapshot?.reset_credits, resetCredits, existingSameAccount);
 
 if (usage?.five_hour || usage?.seven_day) {

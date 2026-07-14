@@ -20,6 +20,7 @@ struct UsageWindow: Codable {
 
 struct ResetCredits: Codable {
     var available_count: Int?
+    var expires_at: [String]?
 }
 
 // MARK: — Localization
@@ -392,8 +393,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        panel.minSize = NSSize(width: w, height: h)
-        panel.maxSize = NSSize(width: w, height: h)
+        panel.minSize = NSSize(width: w, height: 190)
+        panel.maxSize = NSSize(width: w, height: 1000)
         panel.isFloatingPanel = true
         panel.level = .statusBar
         panel.isOpaque = false
@@ -1028,7 +1029,9 @@ class WindowController: NSWindowController, NSWindowDelegate {
         if frame.width <= 0 || frame.height <= 0 {
             frame.size = defaultSize
         }
+        let savedTop = frame.maxY
         frame.size = defaultSize
+        frame.origin.y = savedTop - defaultSize.height
 
         let isVisible = NSScreen.screens.contains { screen in
             screen.visibleFrame.intersects(frame)
@@ -1158,13 +1161,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     func render(_ snap: UsageSnapshot) {
         let five = snap.five_hour
-        let seven = snap.seven_day
 
         let fivePct = remainingPercent(fromUsedPercent: five?.used_percentage)
-        let sevenPct = remainingPercent(fromUsedPercent: seven?.used_percentage)
         let fiveReset = formatFiveHourReset(five?.resets_at, language: language)
-        let sevenReset = formatSevenDayReset(seven?.resets_at, language: language)
         let resetCredits = snap.reset_credits?.available_count
+        let resetExpirationRows = formattedResetExpirationRows(snap.reset_credits)
         let balance = formatUSDBalanceValue(snap.balance_usd)
         let resetText = resetCredits.map { "\($0)" } ?? "—"
         let hasResetCredits = (resetCredits ?? 0) > 0
@@ -1189,13 +1190,49 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
         let emptyBar = String(repeating: "░", count: 15)
         let fiveBar = fivePct >= 0 ? progressBar(percent: fivePct) : emptyBar
-        let sevenBar = sevenPct >= 0 ? progressBar(percent: sevenPct) : emptyBar
+
+        adjustWindowHeight(forResetExpirationCount: resetExpirationRows.count)
 
         buildAttributedText(
             planType: snap.plan_type,
             fiveBar: fiveBar, fivePct: fivePct, fiveReset: fiveReset,
-            sevenBar: sevenBar, sevenPct: sevenPct, sevenReset: sevenReset
+            resetExpirationRows: resetExpirationRows
         )
+    }
+
+    func formattedResetExpirationRows(_ credits: ResetCredits?) -> [String] {
+        let rawValues = credits?.expires_at ?? []
+        let expectedCount = max(0, credits?.available_count ?? rawValues.count)
+        guard expectedCount > 0 else { return [] }
+
+        let fractionalFormatter = ISO8601DateFormatter()
+        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let standardFormatter = ISO8601DateFormatter()
+        standardFormatter.formatOptions = [.withInternetDateTime]
+        let displayFormatter = DateFormatter()
+        displayFormatter.locale = Locale(identifier: languageIdentity)
+        displayFormatter.dateStyle = .medium
+        displayFormatter.timeStyle = .short
+
+        return (0..<expectedCount).map { index in
+            guard index < rawValues.count else { return "\(language.reset) \(index + 1)  —" }
+            let rawValue = rawValues[index]
+            let date = fractionalFormatter.date(from: rawValue) ?? standardFormatter.date(from: rawValue)
+            let displayValue = date.map(displayFormatter.string(from:)) ?? rawValue
+            return "\(language.reset) \(index + 1)  \(displayValue)"
+        }
+    }
+
+    func adjustWindowHeight(forResetExpirationCount count: Int) {
+        guard let window else { return }
+        let desiredHeight = min(window.maxSize.height, 190 + CGFloat(count) * 17)
+        guard abs(window.frame.height - desiredHeight) >= 0.5 else { return }
+
+        var frame = window.frame
+        let top = frame.maxY
+        frame.size = NSSize(width: 330, height: desiredHeight)
+        frame.origin.y = top - desiredHeight
+        window.setFrame(frame, display: true, animate: false)
     }
 
     func refreshSnapshotIfNeeded(force: Bool = false, redrawAfterCompletion: Bool = false) {
@@ -1250,7 +1287,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     func buildAttributedText(planType: String?,
                              fiveBar: String, fivePct: Int, fiveReset: String,
-                             sevenBar: String, sevenPct: Int, sevenReset: String) {
+                             resetExpirationRows: [String]) {
         func fixedParagraph(height: CGFloat, spacing: CGFloat = 0) -> NSMutableParagraphStyle {
             let style = NSMutableParagraphStyle()
             style.minimumLineHeight = height
@@ -1393,12 +1430,10 @@ class WindowController: NSWindowController, NSWindowDelegate {
         let titleText = ellipsized(language.title, font: titleFont, maxWidth: titleMaxWidth)
         let fiveLabel = language.week
         let fiveSeparator = "  ┃  "
-        let weekSeparator = "   ┃  "
         let rowPadding: CGFloat = 2
         let fiveResetMaxWidth = max(80, label.bounds.width - textWidth(fiveLabel, font: rowLabelFont) - textWidth(fiveSeparator, font: separatorFont) - rowPadding)
-        let sevenResetMaxWidth = max(80, label.bounds.width - textWidth(language.week, font: rowLabelFont) - textWidth(weekSeparator, font: separatorFont) - rowPadding)
         let fiveResetText = ellipsized("\(language.reset) \(fiveReset)", font: dimFont, maxWidth: fiveResetMaxWidth)
-        let sevenResetText = ellipsized("\(language.reset) \(sevenReset)", font: dimFont, maxWidth: sevenResetMaxWidth)
+        let expirationRow = attrs(font: dimFont, color: secondaryTextColor, lineHeight: 17)
 
         let mas = NSMutableAttributedString()
         mas.append(NSAttributedString(string: titleText, attributes: title))
@@ -1414,13 +1449,10 @@ class WindowController: NSWindowController, NSWindowDelegate {
         mas.append(NSAttributedString(attachment: barAttachment(percent: fivePct, font: barFont, color: fivePct <= 20 ? NSColor.systemRed : NSColor.green)))
         mas.append(NSAttributedString(string: "  \(fivePct >= 0 ? "\(fivePct)%" : "—")\n", attributes: percent))
         mas.append(NSAttributedString(string: " \n", attributes: barBottomSpacer))
-        mas.append(NSAttributedString(string: language.week, attributes: rowLabel))
-        mas.append(NSAttributedString(string: weekSeparator, attributes: separator))
-        mas.append(NSAttributedString(string: "\(sevenResetText)\n", attributes: dim))
-        mas.append(NSAttributedString(string: " \n", attributes: barTopSpacer))
-        mas.append(NSAttributedString(attachment: barAttachment(percent: sevenPct, font: barFont, color: sevenPct <= 20 ? NSColor.systemRed : NSColor.green)))
-        mas.append(NSAttributedString(string: "  \(sevenPct >= 0 ? "\(sevenPct)%" : "—")\n", attributes: percent))
-        mas.append(NSAttributedString(string: " ", attributes: barBottomSpacer))
+        for (index, row) in resetExpirationRows.enumerated() {
+            let suffix = index == resetExpirationRows.count - 1 ? "" : "\n"
+            mas.append(NSAttributedString(string: row + suffix, attributes: expirationRow))
+        }
 
         label.textStorage?.setAttributedString(mas)
     }
