@@ -159,41 +159,31 @@ func secondsUntil(_ timestamp: TimeInterval?) -> Int? {
     return Int(ceil(date.timeIntervalSinceNow))
 }
 
-func formatFiveHourReset(_ timestamp: TimeInterval?, language: AppLanguage) -> String {
-    guard let rawInterval = secondsUntil(timestamp) else { return "—" }
-    if rawInterval <= 0 { return language.alreadyReset }
-
-    let normalized = rawInterval - 1
+func formatCompactDuration(_ interval: Int) -> String {
+    let normalized = max(interval, 1)
     let d = normalized / 86400
     let h = (normalized % 86400) / 3600
     let m = (normalized % 3600) / 60
-    let s = (normalized % 60) + 1
+    let s = normalized % 60
 
     var parts: [String] = []
-    if d > 0 { parts.append(language.day(d)) }
-    if h > 0 { parts.append(language.hour(h)) }
-    if m > 0 { parts.append(language.minute(m)) }
-    parts.append(language.second(s))
-    return "\(parts.joined(separator: language.separator))\(language.afterSuffix)"
+    if d > 0 { parts.append("\(d)d") }
+    if h > 0 { parts.append("\(h)h") }
+    if m > 0 { parts.append("\(m)m") }
+    if s > 0 || parts.isEmpty { parts.append("\(s)s") }
+    return parts.joined(separator: " ")
+}
+
+func formatFiveHourReset(_ timestamp: TimeInterval?, language: AppLanguage) -> String {
+    guard let rawInterval = secondsUntil(timestamp) else { return "—" }
+    if rawInterval <= 0 { return language.alreadyReset }
+    return formatCompactDuration(rawInterval)
 }
 
 func formatSevenDayReset(_ timestamp: TimeInterval?, language: AppLanguage) -> String {
     guard let interval = secondsUntil(timestamp) else { return "—" }
     if interval <= 0 { return language.alreadyReset }
-    if interval < 60 { return "\(language.second(interval))\(language.afterSuffix)" }
-
-    let d = interval / 86400
-    let h = (interval % 86400) / 3600
-    let m = (interval % 3600) / 60
-
-    var parts: [String] = []
-    if d > 0 { parts.append(language.day(d)) }
-    if h > 0 { parts.append(language.hour(h)) }
-    if m > 0 { parts.append(language.minute(m)) }
-    if parts.isEmpty {
-        return "\(language.minute(1))\(language.afterSuffix)"
-    }
-    return "\(parts.joined(separator: language.separator))\(language.afterSuffix)"
+    return formatCompactDuration(interval)
 }
 
 func progressBar(percent: Int, width: Int = 15) -> String {
