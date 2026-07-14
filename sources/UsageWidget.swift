@@ -23,6 +23,11 @@ struct ResetCredits: Codable {
     var expires_at: [String]?
 }
 
+struct ResetExpirationRow {
+    var dateText: String
+    var isExpiringSoon: Bool?
+}
+
 // MARK: — Localization
 struct AppLanguage {
     let title: String
@@ -1200,7 +1205,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         )
     }
 
-    func formattedResetExpirationRows(_ credits: ResetCredits?) -> [String] {
+    func formattedResetExpirationRows(_ credits: ResetCredits?) -> [ResetExpirationRow] {
         let rawValues = credits?.expires_at ?? []
         let expectedCount = max(0, credits?.available_count ?? rawValues.count)
         guard expectedCount > 0 else { return [] }
@@ -1215,11 +1220,14 @@ class WindowController: NSWindowController, NSWindowDelegate {
         displayFormatter.timeStyle = .short
 
         return (0..<expectedCount).map { index in
-            guard index < rawValues.count else { return "\(language.reset) \(index + 1)  —" }
+            guard index < rawValues.count else {
+                return ResetExpirationRow(dateText: "—", isExpiringSoon: nil)
+            }
             let rawValue = rawValues[index]
             let date = fractionalFormatter.date(from: rawValue) ?? standardFormatter.date(from: rawValue)
             let displayValue = date.map(displayFormatter.string(from:)) ?? rawValue
-            return "\(language.reset) \(index + 1)  \(displayValue)"
+            let isExpiringSoon = date.map { $0.timeIntervalSinceNow <= 3 * 24 * 60 * 60 }
+            return ResetExpirationRow(dateText: displayValue, isExpiringSoon: isExpiringSoon)
         }
     }
 
@@ -1288,7 +1296,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     func buildAttributedText(planType: String?,
                              fiveBar: String, fivePct: Int, fiveReset: String,
-                             resetExpirationRows: [String]) {
+                             resetExpirationRows: [ResetExpirationRow]) {
         func fixedParagraph(height: CGFloat, spacing: CGFloat = 0) -> NSMutableParagraphStyle {
             let style = NSMutableParagraphStyle()
             style.minimumLineHeight = height
@@ -1452,7 +1460,18 @@ class WindowController: NSWindowController, NSWindowDelegate {
         mas.append(NSAttributedString(string: " \n", attributes: barBottomSpacer))
         for (index, row) in resetExpirationRows.enumerated() {
             let suffix = index == resetExpirationRows.count - 1 ? "" : "\n"
-            mas.append(NSAttributedString(string: row + suffix, attributes: expirationRow))
+            let dotColor: NSColor
+            switch row.isExpiringSoon {
+            case true:
+                dotColor = NSColor.systemRed
+            case false:
+                dotColor = NSColor.green
+            case nil:
+                dotColor = secondaryTextColor
+            }
+            let dot = attrs(font: NSFont.systemFont(ofSize: 8, weight: .bold), color: dotColor, lineHeight: 17)
+            mas.append(NSAttributedString(string: "●", attributes: dot))
+            mas.append(NSAttributedString(string: "  " + row.dateText + suffix, attributes: expirationRow))
         }
 
         label.textStorage?.setAttributedString(mas)
