@@ -1225,7 +1225,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     func adjustWindowHeight(forResetExpirationCount count: Int) {
         guard let window else { return }
-        let desiredHeight = min(window.maxSize.height, 200 + CGFloat(count) * 17)
+        let listSpacing: CGFloat = count > 0 ? 18 : 0
+        let desiredHeight = min(window.maxSize.height, 200 + listSpacing + CGFloat(count) * 18)
         guard abs(window.frame.height - desiredHeight) >= 0.5 else { return }
 
         var frame = window.frame
