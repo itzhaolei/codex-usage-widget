@@ -1391,7 +1391,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         let titlePlanGap: CGFloat = planBadge.isEmpty ? 0 : 5
         let titleMaxWidth = max(20, titleRowMaxWidth - planBadgeWidth - titlePlanGap)
         let titleText = ellipsized(language.title, font: titleFont, maxWidth: titleMaxWidth)
-        let fiveLabel = "5h"
+        let fiveLabel = language.week
         let fiveSeparator = "  ┃  "
         let weekSeparator = "   ┃  "
         let rowPadding: CGFloat = 2
