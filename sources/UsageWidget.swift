@@ -393,7 +393,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        panel.minSize = NSSize(width: w, height: 190)
+        panel.minSize = NSSize(width: w, height: 200)
         panel.maxSize = NSSize(width: w, height: 1000)
         panel.isFloatingPanel = true
         panel.level = .statusBar
@@ -1225,7 +1225,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     func adjustWindowHeight(forResetExpirationCount count: Int) {
         guard let window else { return }
-        let desiredHeight = min(window.maxSize.height, 190 + CGFloat(count) * 17)
+        let desiredHeight = min(window.maxSize.height, 200 + CGFloat(count) * 17)
         guard abs(window.frame.height - desiredHeight) >= 0.5 else { return }
 
         var frame = window.frame
