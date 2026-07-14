@@ -28,6 +28,11 @@ struct ResetExpirationRow {
     var isExpiringSoon: Bool?
 }
 
+struct AuthDisplayInfo {
+    var email: String?
+    var subscriptionExpiresAt: String?
+}
+
 // MARK: — Localization
 struct AppLanguage {
     let title: String
@@ -341,6 +346,10 @@ class WindowController: NSWindowController, NSWindowDelegate {
     var versionUpdateDot: NSView!
     var balanceCardView: MetricCardView!
     var resetCardView: MetricCardView!
+    var accountIconView: NSImageView!
+    var accountValueLabel: NSTextField!
+    var subscriptionIconView: NSImageView!
+    var subscriptionValueLabel: NSTextField!
     var setupOverlayView: NSView!
     var setupTitleLabel: NSTextField!
     var setupMessageLabel: NSTextField!
@@ -389,7 +398,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
     convenience init() {
         let w: CGFloat = 330
-        let h: CGFloat = 240
+        let h: CGFloat = 234
         let contentRect = NSRect(x: 0, y: 0, width: w, height: h)
 
         let panel = NSPanel(
@@ -398,7 +407,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        panel.minSize = NSSize(width: w, height: 200)
+        panel.minSize = NSSize(width: w, height: 234)
         panel.maxSize = NSSize(width: w, height: 1000)
         panel.isFloatingPanel = true
         panel.level = .statusBar
@@ -429,7 +438,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         vibrancyView.layer?.masksToBounds = true
         rootView.addSubview(vibrancyView)
 
-        label = NSTextView(frame: NSRect(x: 12, y: 78, width: w - 24, height: h - 94))
+        label = NSTextView(frame: NSRect(x: 12, y: 112, width: w - 24, height: h - 128))
         label.autoresizingMask = [.width, .height]
         label.drawsBackground = false
         label.isEditable = false
@@ -439,13 +448,40 @@ class WindowController: NSWindowController, NSWindowDelegate {
         label.backgroundColor = NSColor.clear
         rootView.addSubview(label)
 
-        balanceCardView = MetricCardView(frame: NSRect(x: 12, y: 38, width: 131, height: 47))
+        balanceCardView = MetricCardView(frame: NSRect(x: 12, y: 58, width: 131, height: 47))
         balanceCardView.autoresizingMask = [.maxXMargin, .maxYMargin]
         rootView.addSubview(balanceCardView)
 
-        resetCardView = MetricCardView(frame: NSRect(x: 153, y: 38, width: 131, height: 47))
+        resetCardView = MetricCardView(frame: NSRect(x: 153, y: 58, width: 131, height: 47))
         resetCardView.autoresizingMask = [.minXMargin, .maxYMargin]
         rootView.addSubview(resetCardView)
+
+        let infoSymbolConfiguration = NSImage.SymbolConfiguration(pointSize: 11, weight: .medium)
+        accountIconView = NSImageView(frame: NSRect(x: 12, y: 37, width: 13, height: 13))
+        accountIconView.image = NSImage(systemSymbolName: "person.crop.circle.fill", accessibilityDescription: "Account")?
+            .withSymbolConfiguration(infoSymbolConfiguration)
+        accountIconView.imageScaling = .scaleProportionallyDown
+        rootView.addSubview(accountIconView)
+
+        accountValueLabel = NSTextField(labelWithString: "—")
+        accountValueLabel.frame = NSRect(x: 31, y: 34, width: 205, height: 17)
+        accountValueLabel.font = NSFont.monospacedSystemFont(ofSize: 10, weight: .regular)
+        accountValueLabel.lineBreakMode = .byTruncatingTail
+        accountValueLabel.maximumNumberOfLines = 1
+        rootView.addSubview(accountValueLabel)
+
+        subscriptionIconView = NSImageView(frame: NSRect(x: 12, y: 19, width: 13, height: 13))
+        subscriptionIconView.image = NSImage(systemSymbolName: "calendar.badge.clock", accessibilityDescription: "Subscription expiration")?
+            .withSymbolConfiguration(infoSymbolConfiguration)
+        subscriptionIconView.imageScaling = .scaleProportionallyDown
+        rootView.addSubview(subscriptionIconView)
+
+        subscriptionValueLabel = NSTextField(labelWithString: "—")
+        subscriptionValueLabel.frame = NSRect(x: 31, y: 16, width: 205, height: 17)
+        subscriptionValueLabel.font = NSFont.monospacedSystemFont(ofSize: 10, weight: .regular)
+        subscriptionValueLabel.lineBreakMode = .byTruncatingTail
+        subscriptionValueLabel.maximumNumberOfLines = 1
+        rootView.addSubview(subscriptionValueLabel)
 
         let versionText = appVersionText()
         let versionFont = NSFont.monospacedSystemFont(ofSize: 9, weight: .regular)
@@ -972,6 +1008,10 @@ class WindowController: NSWindowController, NSWindowDelegate {
         }
         balanceCardView?.applyAppearance(secondaryTextColor: secondaryTextColor)
         resetCardView?.applyAppearance(secondaryTextColor: secondaryTextColor)
+        accountIconView?.contentTintColor = secondaryTextColor
+        subscriptionIconView?.contentTintColor = secondaryTextColor
+        accountValueLabel?.textColor = secondaryTextColor
+        subscriptionValueLabel?.textColor = secondaryTextColor
         versionLabel?.textColor = secondaryTextColor
         versionUpdateDot?.layer?.backgroundColor = NSColor.systemRed.cgColor
         if let image = NSImage(systemSymbolName: isLightMode ? "moon.fill" : "sun.max.fill", accessibilityDescription: nil) {
@@ -1174,6 +1214,10 @@ class WindowController: NSWindowController, NSWindowDelegate {
         let balance = formatUSDBalanceValue(snap.balance_usd)
         let resetText = resetCredits.map { "\($0)" } ?? "—"
         let hasResetCredits = (resetCredits ?? 0) > 0
+        let authDisplayInfo = currentAuthDisplayInfo()
+        let accountText = authDisplayInfo.email?.trimmingCharacters(in: .whitespacesAndNewlines)
+        accountValueLabel.stringValue = accountText?.isEmpty == false ? accountText! : "—"
+        subscriptionValueLabel.stringValue = formattedSnapshotDate(authDisplayInfo.subscriptionExpiresAt)
         balanceCardView.configure(
             title: "\(language.balance)（$）",
             value: balance,
@@ -1231,10 +1275,55 @@ class WindowController: NSWindowController, NSWindowDelegate {
         }
     }
 
+    func formattedSnapshotDate(_ rawValue: String?) -> String {
+        guard let rawValue, !rawValue.isEmpty else { return "—" }
+        let fractionalFormatter = ISO8601DateFormatter()
+        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let standardFormatter = ISO8601DateFormatter()
+        standardFormatter.formatOptions = [.withInternetDateTime]
+        guard let date = fractionalFormatter.date(from: rawValue) ?? standardFormatter.date(from: rawValue) else {
+            return rawValue
+        }
+
+        let displayFormatter = DateFormatter()
+        displayFormatter.locale = Locale(identifier: languageIdentity)
+        displayFormatter.dateStyle = .medium
+        displayFormatter.timeStyle = .short
+        return displayFormatter.string(from: date)
+    }
+
+    func currentAuthDisplayInfo() -> AuthDisplayInfo {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: codexAuthPath)),
+              let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let tokens = root["tokens"] as? [String: Any],
+              let idToken = tokens["id_token"] as? String else {
+            return AuthDisplayInfo()
+        }
+
+        let parts = idToken.split(separator: ".", omittingEmptySubsequences: false)
+        guard parts.count > 1 else { return AuthDisplayInfo() }
+        var payload = String(parts[1])
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        let padding = (4 - payload.count % 4) % 4
+        payload += String(repeating: "=", count: padding)
+
+        guard let payloadData = Data(base64Encoded: payload),
+              let claims = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any] else {
+            return AuthDisplayInfo()
+        }
+
+        let authClaims = claims["https://api.openai.com/auth"] as? [String: Any]
+        return AuthDisplayInfo(
+            email: claims["email"] as? String,
+            subscriptionExpiresAt: authClaims?["chatgpt_subscription_active_until"] as? String
+        )
+    }
+
     func adjustWindowHeight(forResetExpirationCount count: Int) {
         guard let window else { return }
         let listSpacing: CGFloat = count > 0 ? 18 : 0
-        let desiredHeight = min(window.maxSize.height, 200 + listSpacing + CGFloat(count) * 18)
+        let desiredHeight = min(window.maxSize.height, 234 + listSpacing + CGFloat(count) * 18)
         guard abs(window.frame.height - desiredHeight) >= 0.5 else { return }
 
         var frame = window.frame
