@@ -351,6 +351,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
     var timer: Timer!
     var clickMonitor: Any?
     var lastSnapshotRefresh = Date.distantPast
+    var lastGoodSnapshot: UsageSnapshot?
     var snapshotRefreshInFlight = false
     var lastNodeCheck = Date.distantPast
     var cachedNodeAvailable = false
@@ -1143,11 +1144,15 @@ class WindowController: NSWindowController, NSWindowDelegate {
     func renderSnapshot() {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: snapshotPath)),
               let snap = try? JSONDecoder().decode(UsageSnapshot.self, from: data) else {
-            updateText("")
-            updateSetupOverlay()
+            if let lastGoodSnapshot {
+                render(lastGoodSnapshot)
+            } else {
+                updateSetupOverlay()
+            }
             return
         }
 
+        lastGoodSnapshot = snap
         render(snap)
     }
 

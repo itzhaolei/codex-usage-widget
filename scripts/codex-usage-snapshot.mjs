@@ -199,7 +199,13 @@ function readJson(filePath) {
 }
 
 function writeJson(filePath, value) {
-  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
+  const tempPath = `${filePath}.tmp-${process.pid}`;
+  fs.writeFileSync(tempPath, `${JSON.stringify(value, null, 2)}\n`);
+  fs.renameSync(tempPath, filePath);
+}
+
+function keepExistingValue(existingValue, nextValue, canKeepExisting) {
+  return nextValue ?? (canKeepExisting ? existingValue ?? null : null);
 }
 
 function readAccountState(existingSnapshot) {
@@ -406,6 +412,7 @@ for (const filePath of listJsonlFiles(searchDirs)) {
 
 const usage = await fetchUsage();
 const resetCredits = usage?.reset_credits ?? await fetchResetCredits();
+const effectiveResetCredits = keepExistingValue(existingSnapshot?.reset_credits, resetCredits, existingSameAccount);
 
 if (usage?.five_hour || usage?.seven_day) {
   const snapshot = {
@@ -414,11 +421,11 @@ if (usage?.five_hour || usage?.seven_day) {
     auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
     source: "wham_usage",
     stale_source: false,
-    plan_type: usage.plan_type,
-    balance_usd: usage.balance_usd,
+    plan_type: keepExistingValue(existingSnapshot?.plan_type, usage.plan_type, existingSameAccount),
+    balance_usd: keepExistingValue(existingSnapshot?.balance_usd, usage.balance_usd, existingSameAccount),
     five_hour: usage.five_hour,
     seven_day: usage.seven_day,
-    reset_credits: resetCredits,
+    reset_credits: effectiveResetCredits,
   };
 
   writeJson(outputPath, snapshot);
@@ -437,11 +444,11 @@ if (selectedLimits) {
     source_file: selectedLimits.filePath,
     source_timestamp: selectedLimits.timestampMs ? new Date(selectedLimits.timestampMs).toISOString() : null,
     stale_source: false,
-    plan_type: null,
-    balance_usd: usage?.balance_usd ?? null,
+    plan_type: keepExistingValue(existingSnapshot?.plan_type, usage?.plan_type, existingSameAccount),
+    balance_usd: keepExistingValue(existingSnapshot?.balance_usd, usage?.balance_usd, existingSameAccount),
     five_hour: fiveHour,
     seven_day: sevenDay,
-    reset_credits: resetCredits,
+    reset_credits: effectiveResetCredits,
   };
 
   writeJson(outputPath, snapshot);
@@ -455,11 +462,11 @@ try {
     auth_last_refresh: Number.isFinite(authLastRefreshMs) && authLastRefreshMs > 0 ? new Date(authLastRefreshMs).toISOString() : null,
     source: "unavailable",
     stale_source: true,
-    plan_type: usage?.plan_type ?? null,
-    balance_usd: usage?.balance_usd ?? null,
-    five_hour: null,
-    seven_day: null,
-    reset_credits: resetCredits,
+    plan_type: keepExistingValue(existingSnapshot?.plan_type, usage?.plan_type, existingSameAccount),
+    balance_usd: keepExistingValue(existingSnapshot?.balance_usd, usage?.balance_usd, existingSameAccount),
+    five_hour: existingSameAccount ? existingSnapshot?.five_hour ?? null : null,
+    seven_day: existingSameAccount ? existingSnapshot?.seven_day ?? null : null,
+    reset_credits: effectiveResetCredits,
   });
 } catch {
   // No usable prior snapshot to keep alive.
