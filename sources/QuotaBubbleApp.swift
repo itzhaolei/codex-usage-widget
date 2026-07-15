@@ -67,7 +67,7 @@ struct QuotaBubbleApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        WindowGroup {
+        Window("Quota Bubble", id: "main") {
             QuotaBubbleRoot(appDelegate: appDelegate)
         }
         .windowStyle(.hiddenTitleBar)
