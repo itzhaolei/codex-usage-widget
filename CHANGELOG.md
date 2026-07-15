@@ -11,6 +11,10 @@ All notable changes to Quota Bubble are documented here.
 - Increased the macOS quota progress bar height by 15 points while keeping the window height fixed and consuming the existing bottom whitespace.
 - Increased the macOS quota progress bar width by 45 points while keeping the percentage on the same row.
 
+### Fixed
+
+- Prevented the macOS language submenu from closing while hovered by isolating menu state from the quota store's one-second refresh cycle.
+
 ## 3.0.0 - 2026-07-15
 
 ### Changed

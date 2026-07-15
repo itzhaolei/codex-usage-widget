@@ -24,17 +24,33 @@ private func lookupLatestRelease(currentVersion: String?) -> UpdateLookupResult 
     return .available(tag: tag, assetURL: assetURL)
 }
 
+@MainActor
+private final class LanguageMenuState: ObservableObject {
+    @Published private(set) var languageCode: String
+    @Published private(set) var selectedCode: String?
+
+    init() {
+        selectedCode = readLanguageOverride()
+        languageCode = effectiveLanguageCode()
+    }
+
+    var copy: AppCopy { localizedCopy(languageCode) }
+
+    func select(_ code: String?) {
+        writeLanguageOverride(code)
+        selectedCode = code
+        languageCode = effectiveLanguageCode()
+    }
+}
+
 @main
 struct QuotaBubbleApp: App {
-    @StateObject private var store = QuotaStore()
+    @StateObject private var languageMenu = LanguageMenuState()
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
         WindowGroup {
-            QuotaBubbleView(store: store)
-                .background(WindowAccessor { window in
-                    appDelegate.attach(window: window, store: store)
-                })
+            QuotaBubbleRoot(appDelegate: appDelegate)
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
@@ -42,32 +58,46 @@ struct QuotaBubbleApp: App {
             CommandGroup(replacing: .newItem) {}
             CommandGroup(after: .appInfo) {
                 Divider()
-                Menu(store.copy.language) {
+                Menu(languageMenu.copy.language) {
                     Button {
-                        store.selectLanguage(nil)
+                        languageMenu.select(nil)
+                        appDelegate.selectLanguage(nil)
                     } label: {
                         HStack {
-                            Text(store.copy.followSystem)
-                            if readLanguageOverride() == nil { Image(systemName: "checkmark") }
+                            Text(languageMenu.copy.followSystem)
+                            if languageMenu.selectedCode == nil { Image(systemName: "checkmark") }
                         }
                     }
                     Divider()
                     ForEach(supportedLanguages, id: \.code) { language in
                         Button {
-                            store.selectLanguage(language.code)
+                            languageMenu.select(language.code)
+                            appDelegate.selectLanguage(language.code)
                         } label: {
                             HStack {
                                 Text(language.name)
-                                if readLanguageOverride() == language.code { Image(systemName: "checkmark") }
+                                if languageMenu.selectedCode == language.code { Image(systemName: "checkmark") }
                             }
                         }
                     }
                 }
-                Button(store.copy.update) { appDelegate.checkForUpdates() }
+                Button(languageMenu.copy.update) { appDelegate.checkForUpdates() }
                 Divider()
-                Button(role: .destructive) { appDelegate.confirmUninstall() } label: { Text(store.copy.uninstall) }
+                Button(role: .destructive) { appDelegate.confirmUninstall() } label: { Text(languageMenu.copy.uninstall) }
             }
         }
+    }
+}
+
+private struct QuotaBubbleRoot: View {
+    @StateObject private var store = QuotaStore()
+    let appDelegate: AppDelegate
+
+    var body: some View {
+        QuotaBubbleView(store: store)
+            .background(WindowAccessor { window in
+                appDelegate.attach(window: window, store: store)
+            })
     }
 }
 
@@ -388,6 +418,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         window?.makeKeyAndOrderFront(nil)
         sender.activate(ignoringOtherApps: true)
         return true
+    }
+
+    func selectLanguage(_ code: String?) {
+        store?.selectLanguage(code)
     }
 
     func attach(window: NSWindow, store: QuotaStore) {
