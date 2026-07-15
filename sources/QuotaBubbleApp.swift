@@ -127,6 +127,9 @@ private struct QuotaBubbleView: View {
     private var glassTint: Color {
         store.isLightMode ? Color.white.opacity(0.28) : Color.black.opacity(0.38)
     }
+    private var liquidGlassTint: Color {
+        store.isLightMode ? Color.white.opacity(0.18) : Color.black.opacity(0.30)
+    }
     private var barColor: Color {
         guard let value = store.remainingPercentage else { return .red }
         return value <= 20 ? .red : Color(red: 0, green: 0.94, blue: 0.08)
@@ -134,8 +137,7 @@ private struct QuotaBubbleView: View {
 
     var body: some View {
         ZStack {
-            VisualEffectView(material: .hudWindow, appearance: store.isLightMode ? .vibrantLight : .vibrantDark)
-            glassTint
+            windowBackground
 
             VStack(alignment: .leading, spacing: 0) {
                 header
@@ -165,6 +167,20 @@ private struct QuotaBubbleView: View {
         .environment(\.colorScheme, store.isLightMode ? .light : .dark)
         .onAppear { store.start() }
         .onDisappear { store.stop() }
+    }
+
+    @ViewBuilder
+    private var windowBackground: some View {
+        if #available(macOS 26.0, *) {
+            Color.clear
+                .glassEffect(
+                    .regular.tint(liquidGlassTint).interactive(),
+                    in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                )
+        } else {
+            VisualEffectView(material: .hudWindow, appearance: store.isLightMode ? .vibrantLight : .vibrantDark)
+            glassTint
+        }
     }
 
     private var header: some View {

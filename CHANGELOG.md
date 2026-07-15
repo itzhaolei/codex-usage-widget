@@ -19,6 +19,7 @@ All notable changes to Quota Bubble are documented here.
 - Restored pin/unpin behavior by binding the window level directly to persisted `isPinned` state instead of relying on a global delegate callback from the button.
 - Top-aligned both metric-card descriptions within a shared title area so one-line and two-line localized labels remain visually aligned.
 - Replaced the nearly opaque macOS window tint with adaptive translucent glass: dark mode now uses deep glass and light mode uses bright glass while preserving the system blur behind the window.
+- Added native interactive Liquid Glass on macOS 26 with theme-aware tinting, while retaining the adaptive `NSVisualEffectView` fallback for macOS 13 through 15.
 - Prevented restarts from leaving a running App process without a window by using one explicit SwiftUI `Window` scene, quitting through the native app lifecycle before reopening, and relying on macOS `LSMultipleInstancesProhibited` instead of a stale-process-prone manual duplicate check.
 
 ## 3.0.0 - 2026-07-15
