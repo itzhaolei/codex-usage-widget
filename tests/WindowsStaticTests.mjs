@@ -3,22 +3,35 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
-const widget = fs.readFileSync(path.join(root, "windows/QuotaBubble.ps1"), "utf8");
-const installer = fs.readFileSync(path.join(root, "windows/install.ps1"), "utf8");
-const packager = fs.readFileSync(path.join(root, "scripts/package-windows.sh"), "utf8");
+const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
+const project = read("windows/QuotaBubble/QuotaBubble.csproj");
+const app = read("windows/QuotaBubble/App.xaml.cs");
+const window = read("windows/QuotaBubble/MainWindow.xaml.cs");
+const quota = read("windows/QuotaBubble/Services/QuotaService.cs");
+const auth = read("windows/QuotaBubble/Services/AuthService.cs");
+const updater = read("windows/QuotaBubble/Services/UpdateService.cs");
+const installer = read("windows/installer.iss");
+const workflow = read(".github/workflows/release-windows.yml");
 
-assert.match(widget, /\$script:Version = if \(Test-Path \$versionPath\)/, "version is loaded dynamically");
-assert.doesNotMatch(widget, /\$script:Version = "2\.1\.3"/, "legacy hard-coded version removed");
-assert.doesNotMatch(widget, /SetupOverlay|Get-SetupIssue|missingCli/, "legacy setup overlay removed");
-assert.match(widget, /Read-VerifiedSnapshot/, "snapshot is account verified");
-assert.match(widget, /\$credits\.expires_at/, "reset expiration list is rendered");
-assert.match(widget, /AccountText/, "account row is present");
-assert.match(widget, /SubscriptionText/, "subscription row is present");
-assert.match(widget, /Install-LatestUpdate/, "Windows updater is present");
+assert.match(project, /<OutputType>WinExe<\/OutputType>/, "Windows client is a compiled GUI app");
+assert.match(project, /<SelfContained>true<\/SelfContained>/, "runtime is self-contained");
+assert.match(project, /<PublishSingleFile>true<\/PublishSingleFile>/, "app publishes as a single executable");
+assert.match(app, /Local\\\\QuotaBubble\.Windows\.App/, "single-instance mutex is present");
+assert.match(auth, /accountId is null \? "token" : "account"/, "quota is bound to account identity");
+assert.match(quota, /if \(identity\?\.Fingerprint != CurrentIdentity\?\.Fingerprint\)/, "account changes clear cached values");
+assert.doesNotMatch(quota, /codex-usage-snapshot\.mjs|node\.exe|powershell/i, "native data service has no script runtime dependency");
+assert.match(window, /DispatcherTimer/, "one-second UI refresh timer is present");
+assert.match(window, /Forms\.NotifyIcon/, "native tray integration is present");
+assert.match(updater, /Windows-Setup\.exe/, "updater downloads the graphical installer");
+assert.match(installer, /PrivilegesRequired=lowest/, "installer supports non-admin per-user installation");
+assert.match(installer, /\[UninstallRun\]/, "installer provides graphical uninstall support");
+assert.match(workflow, /dotnet publish/, "Windows CI compiles the application");
+assert.match(workflow, /Smoke launch installed application/, "Windows CI launches the installed app");
 for (const code of ["en", "zh", "ja", "ko", "de", "fr", "es", "pt", "it", "nl"]) {
-  assert.match(widget, new RegExp(`\\b${code} = @\\{`), `${code} localization exists`);
+  assert.match(read("windows/QuotaBubble/Localization.cs"), new RegExp(`\\["${code}"\\]`), `${code} localization exists`);
 }
-assert.match(installer, /Set-Content -Path \(Join-Path \$installDir "VERSION"\)/, "installer writes dynamic version");
-assert.match(packager, /QuotaBubble-\$VERSION\/VERSION/, "package includes VERSION metadata");
+for (const legacy of ["windows/QuotaBubble.ps1", "windows/install.ps1", "windows/uninstall.ps1"]) {
+  assert.equal(fs.existsSync(path.join(root, legacy)), false, `${legacy} was removed`);
+}
 
-console.log("Windows static tests passed.");
+console.log("Windows native application static tests passed.");

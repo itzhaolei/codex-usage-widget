@@ -74,22 +74,17 @@ The installer builds:
 
 ### Windows
 
-The current macOS and Windows release is v3.0.2. Open the release page to download the Windows package:
+The current macOS and Windows release is v3.0.3. Open the release page to download the graphical Windows installer:
 
-[Open the v3.0.2 release](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v3.0.2)
+[Open the latest release](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
-Unzip `QuotaBubble-*-Windows.zip`, then run:
+Download and double-click `QuotaBubble-*-Windows-Setup.exe`. The setup wizard installs the app, creates shortcuts, offers launch-at-sign-in, and opens Quota Bubble. Updating and uninstalling are also graphical.
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\windows\install.ps1
-```
-
-The Windows installer copies the widget to `%USERPROFILE%\.codex\usage-widget`, installs the shared snapshot script under `%USERPROFILE%\.codex\scripts`, creates a Startup shortcut, and opens the floating widget. It uses the same local snapshot logic as the macOS widget.
+Quota Bubble for Windows is a compiled, self-contained `.NET 8` desktop application. End users do not need PowerShell, Node.js, npm, a terminal, or a separately installed .NET runtime.
 
 Windows requirements:
 
 - Windows 10 or later.
-- Node.js and npm available as `node` and `npm`.
 - Codex CLI local data under `%USERPROFILE%\.codex`, or `CODEX_HOME` pointing to a compatible Codex data directory.
 
 ## Uninstall

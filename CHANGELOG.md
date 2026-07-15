@@ -4,6 +4,26 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.0.3 - 2026-07-16
+
+### Added
+
+- Added a compiled Windows desktop application built with .NET 8 and WPF, distributed as a self-contained graphical `Setup.exe`.
+- Added a per-user Inno Setup installer with Start menu and optional desktop shortcuts, launch-at-sign-in, graphical uninstall, and in-app installer updates.
+- Added Windows CI coverage that compiles the application, launches the published executable, installs the graphical package, launches the installed application, and uninstalls it on a real Windows runner.
+
+### Changed
+
+- Moved Windows quota, account, plan, balance, reset-credit, and subscription parsing into the native application so end users no longer need PowerShell, Node.js, npm, a terminal, or a separately installed .NET runtime.
+- Replaced the Windows script archive with `QuotaBubble-3.0.3-Windows-Setup.exe` and updated all ten README languages.
+- Kept the fixed-width macOS-aligned widget, native tray menu, ten languages, one-second refresh, persistent theme/pin/position/language settings, and dynamic reset-expiration rows.
+
+### Fixed
+
+- Revalidates account identity after every quota response so a response from an account switched during an in-flight request cannot appear in the window.
+- Debounces transient `auth.json` reads for three seconds while still clearing old quota immediately after a confirmed account change.
+- Keeps quota fallback values only in memory and only for the same irreversible account fingerprint; tokens and account identifiers are never persisted by Quota Bubble.
+
 ## 3.0.2 - 2026-07-16
 
 ### Added

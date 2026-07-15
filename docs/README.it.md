@@ -30,7 +30,7 @@ Se non vuoi usare il Terminale, apri la pagina dell’ultima release e scarica d
 
 Decomprimi il file e fai doppio clic su `Install Quota Bubble.app`. Quota Bubble legge i dati quota locali di Codex dall'account utente corrente e si apre direttamente, senza schermate di configurazione.
 
-Windows è ora allineato a macOS nella v3.0.2. Scarica `QuotaBubble-*-Windows.zip` dalla [release v3.0.2](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v3.0.2), decomprimilo ed esegui `windows/install.ps1`.
+Windows è allineato a macOS nella v3.0.3. Scarica `QuotaBubble-*-Windows-Setup.exe` dall’[ultima release](https://github.com/itzhaolei/codex-usage-widget/releases/latest) e apri con doppio clic l’installer grafico. Non servono PowerShell, Node.js, terminale o un runtime .NET separato.
 
 Il README punta sempre alla pagina dell’ultima release. Per installare una versione precedente, apri [tutte le release](https://github.com/itzhaolei/codex-usage-widget/releases) e scarica l’installer dalla pagina della versione desiderata.
 

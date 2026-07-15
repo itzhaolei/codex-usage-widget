@@ -1,4 +1,4 @@
-name: Release Windows package
+name: Release Windows installer
 
 on:
   push:
@@ -9,6 +9,10 @@ on:
       version:
         description: Version without the v prefix
         required: true
+      validate_only:
+        description: Build and test without uploading a release asset
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -16,97 +20,109 @@ permissions:
 jobs:
   release:
     runs-on: windows-latest
+    env:
+      VERSION: ${{ inputs.version || github.ref_name }}
     steps:
       - name: Check out source
         uses: actions/checkout@v4
 
-      - name: Parse PowerShell and WPF XAML
+      - name: Resolve version
         shell: pwsh
         run: |
-          $tokens = $null
-          $errors = $null
-          [System.Management.Automation.Language.Parser]::ParseFile(
-            (Resolve-Path "windows/QuotaBubble.ps1"),
-            [ref]$tokens,
-            [ref]$errors
-          ) | Out-Null
-          if ($errors.Count -gt 0) {
-            $errors | Format-List | Out-String | Write-Error
-            exit 1
-          }
-          Add-Type -AssemblyName PresentationFramework
-          $source = Get-Content "windows/QuotaBubble.ps1" -Raw
-          $match = [regex]::Match($source, '(?s)\$xaml = @"\r?\n(.*?)\r?\n"@')
-          if (-not $match.Success) { throw "WPF XAML block not found" }
-          $reader = [System.Xml.XmlNodeReader]::new([xml]$match.Groups[1].Value)
-          $window = [Windows.Markup.XamlReader]::Load($reader)
-          if ($window.Width -ne 330) { throw "Unexpected window width" }
-          $window.Close()
+          $version = "$env:VERSION".TrimStart('v')
+          "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      - name: Run shared tests
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install packaging tools
+        shell: pwsh
+        run: |
+          if (-not (Get-Command magick -ErrorAction SilentlyContinue)) {
+            choco install imagemagick --no-progress -y
+          }
+          if (-not (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup --no-progress -y
+          }
+
+      - name: Generate Windows application icon
+        shell: pwsh
+        run: magick assets/icon.png -define icon:auto-resize=256,128,64,48,32,16 windows/QuotaBubble.ico
+
+      - name: Run shared and Windows static tests
         shell: bash
         run: |
           node tests/WindowsStaticTests.mjs
           node tests/SnapshotFallbackTests.mjs
           node --check scripts/codex-usage-snapshot.mjs
 
-      - name: Smoke launch Windows widget
+      - name: Build native Windows application
+        shell: pwsh
+        run: dotnet build windows/QuotaBubble/QuotaBubble.csproj --configuration Release -p:Version=$env:VERSION
+
+      - name: Publish self-contained Windows application
         shell: pwsh
         run: |
-          $smokeHome = Join-Path $env:RUNNER_TEMP "quota-bubble-smoke"
+          dotnet publish windows/QuotaBubble/QuotaBubble.csproj `
+            --configuration Release --runtime win-x64 --self-contained true `
+            -p:Version=$env:VERSION -p:PublishSingleFile=true `
+            --output windows/publish
+          if (-not (Test-Path windows/publish/QuotaBubble.exe)) { throw "QuotaBubble.exe was not published" }
+
+      - name: Smoke launch native application
+        shell: pwsh
+        run: |
+          $smokeHome = Join-Path $env:RUNNER_TEMP "quota-bubble-native-smoke"
           New-Item -ItemType Directory -Path $smokeHome -Force | Out-Null
           $env:CODEX_HOME = $smokeHome
-          $stdout = Join-Path $smokeHome "stdout.log"
-          $stderr = Join-Path $smokeHome "stderr.log"
-          $smokeScript = Join-Path $smokeHome "QuotaBubble.ps1"
-          $widgetContent = Get-Content "windows/QuotaBubble.ps1" -Raw -Encoding UTF8
-          [System.IO.File]::WriteAllText($smokeScript, $widgetContent, [System.Text.UTF8Encoding]::new($true))
-          $process = Start-Process powershell.exe -ArgumentList @(
-            "-NoProfile", "-ExecutionPolicy", "Bypass", "-STA",
-            "-File", $smokeScript, "-NoSingleInstance"
-          ) -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+          $process = Start-Process windows/publish/QuotaBubble.exe -PassThru
           Start-Sleep -Seconds 5
-          if ($process.HasExited) {
-            $details = (Get-Content $stderr -Raw -ErrorAction SilentlyContinue)
-            throw "Quota Bubble exited during smoke launch. $details"
-          }
+          if ($process.HasExited) { throw "Native Quota Bubble exited during smoke launch" }
           Stop-Process -Id $process.Id -Force
 
-      - name: Build Windows package
-        shell: bash
-        run: |
-          VERSION="${{ inputs.version }}"
-          if [ -z "$VERSION" ]; then VERSION="${GITHUB_REF_NAME#v}"; fi
-          bash scripts/package-windows.sh "$VERSION"
-
-      - name: Verify packaged Windows payload
+      - name: Build graphical installer
         shell: pwsh
         run: |
-          $version = "${{ inputs.version }}"
-          if (-not $version) { $version = $env:GITHUB_REF_NAME.TrimStart('v') }
-          $archive = "dist/QuotaBubble-$version-Windows.zip"
-          $output = Join-Path $env:RUNNER_TEMP "quota-bubble-package"
-          Expand-Archive -Path $archive -DestinationPath $output -Force
-          $root = Join-Path $output "QuotaBubble-$version"
-          if ((Get-Content (Join-Path $root "VERSION") -Raw).Trim() -ne $version) { throw "Packaged version mismatch" }
-          foreach ($relative in @("windows/QuotaBubble.ps1", "windows/install.ps1", "windows/uninstall.ps1", "scripts/codex-usage-snapshot.mjs")) {
-            if (-not (Test-Path (Join-Path $root $relative))) { throw "Missing packaged file: $relative" }
-          }
-          $widgetBytes = [System.IO.File]::ReadAllBytes((Join-Path $root "windows/QuotaBubble.ps1"))
-          if ($widgetBytes.Length -lt 3 -or $widgetBytes[0] -ne 0xEF -or $widgetBytes[1] -ne 0xBB -or $widgetBytes[2] -ne 0xBF) {
-            throw "Packaged Windows widget is missing its UTF-8 BOM"
-          }
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            "/DMyAppVersion=$env:VERSION" `
+            "/DPublishDir=$((Resolve-Path windows/publish).Path)" `
+            windows/installer.iss
+          $installer = "dist/QuotaBubble-$env:VERSION-Windows-Setup.exe"
+          if (-not (Test-Path $installer)) { throw "Graphical installer was not created" }
 
-      - name: Upload package to GitHub Release
+      - name: Install graphical package silently
+        shell: pwsh
+        run: |
+          $installer = (Resolve-Path "dist/QuotaBubble-$env:VERSION-Windows-Setup.exe").Path
+          $installDir = Join-Path $env:RUNNER_TEMP "Quota Bubble Installed"
+          $arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=`"$installDir`" /MERGETASKS=`"!startup,!desktopicon`""
+          $process = Start-Process $installer -ArgumentList $arguments -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "Installer exited with $($process.ExitCode)" }
+          if (-not (Test-Path (Join-Path $installDir "QuotaBubble.exe"))) { throw "Installed application is missing" }
+          "INSTALL_DIR=$installDir" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Smoke launch installed application
+        shell: pwsh
+        run: |
+          $process = Start-Process (Join-Path $env:INSTALL_DIR "QuotaBubble.exe") -PassThru
+          Start-Sleep -Seconds 5
+          if ($process.HasExited) { throw "Installed Quota Bubble exited during smoke launch" }
+          Stop-Process -Id $process.Id -Force
+          $uninstaller = Join-Path $env:INSTALL_DIR "unins000.exe"
+          $result = Start-Process $uninstaller -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART" -Wait -PassThru
+          if ($result.ExitCode -ne 0) { throw "Uninstaller exited with $($result.ExitCode)" }
+
+      - name: Upload installer to GitHub Release
+        if: github.event_name == 'push' || inputs.validate_only == false
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $version = "${{ inputs.version }}"
-          if (-not $version) { $version = $env:GITHUB_REF_NAME.TrimStart('v') }
-          $tag = "v$version"
-          $asset = "dist/QuotaBubble-$version-Windows.zip"
-          for ($attempt = 0; $attempt -lt 30; $attempt++) {
+          $tag = "v$env:VERSION"
+          $asset = "dist/QuotaBubble-$env:VERSION-Windows-Setup.exe"
+          for ($attempt = 0; $attempt -lt 60; $attempt++) {
             gh release view $tag *> $null
             if ($LASTEXITCODE -eq 0) { break }
             Start-Sleep -Seconds 2
