@@ -66,7 +66,7 @@ private struct QuotaBubbleView: View {
             VisualEffectView(material: .hudWindow, appearance: store.isLightMode ? .vibrantLight : .vibrantDark)
             (store.isLightMode ? Color.white.opacity(0.78) : Color.black.opacity(0.78))
 
-            VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
                 header
                 quota
                     .padding(.top, 11)

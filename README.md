@@ -76,7 +76,7 @@ The installer builds:
 
 ### Windows
 
-Windows remains on v2.1.3 while the v2.2.0 release is macOS-only. Open the Windows v2.1.3 release page and download its package:
+Windows remains on v2.1.3 while the v3.0.0 release is macOS-only. Open the Windows v2.1.3 release page and download its package:
 
 [Open the Windows v2.1.3 release](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v2.1.3)
 

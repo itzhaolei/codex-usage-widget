@@ -4,16 +4,23 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.0.0 - 2026-07-15
+
 ### Changed
 
 - Rebuilt the macOS client as one native SwiftUI app whose floating window, Dock icon, menus, update flow, and lifecycle share one process.
 - Split macOS quota models, local data synchronization, and presentation into focused modules while preserving the existing HUD layout and one-second refresh behavior.
 - Simplified local installation, login startup, restart, status, uninstall, and installer packaging around the single `Quota Bubble.app` bundle.
+- Aligned the quota row, progress bar, and reset-expiration list to the left edge of the metric cards.
+- Changed the macOS release package to a Universal Binary for Apple Silicon and Intel Macs.
+- Changed one-line installation to use the prebuilt release app, so end users no longer need Xcode Command Line Tools.
 
 ### Fixed
 
 - Eliminated Dock launcher and HUD process state drift by removing the legacy two-app architecture.
 - Added repeatable macOS model and build tests for plan badges, remaining percentages, countdown formatting, snapshot decoding, and SwiftUI compilation.
+- Prevented account switches from combining a new account identity with a previous account's quota snapshot by validating a local redacted account fingerprint.
+- Preserved the update progress and completion window while the installed app bundle is replaced.
 
 ## 2.2.0 - 2026-07-14
 
