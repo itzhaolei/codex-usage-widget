@@ -3,6 +3,24 @@ import Combine
 import SwiftUI
 
 private let widgetWidth: CGFloat = 330
+private let metricCardWidth: CGFloat = 131
+private let metricCardSingleLineHeight: CGFloat = 47
+private let metricCardDoubleLineHeight: CGFloat = 59
+
+private func metricCardHeight(for copy: AppCopy) -> CGFloat {
+    let font = NSFont.monospacedSystemFont(ofSize: 9, weight: .medium)
+    let availableWidth = metricCardWidth - 8
+    let titles = ["\(copy.balance)（$）", "\(copy.availableReset)（\(copy.times)）"]
+    let needsTwoLines = titles.contains {
+        ceil(($0 as NSString).size(withAttributes: [.font: font]).width) > availableWidth
+    }
+    return needsTwoLines ? metricCardDoubleLineHeight : metricCardSingleLineHeight
+}
+
+@MainActor
+private func widgetHeight(for store: QuotaStore) -> CGFloat {
+    store.desiredHeight + metricCardHeight(for: store.copy) - metricCardSingleLineHeight
+}
 
 private enum UpdateLookupResult: Sendable {
     case failed
@@ -138,7 +156,7 @@ private struct QuotaBubbleView: View {
 
             version
         }
-        .frame(width: widgetWidth, height: store.desiredHeight)
+        .frame(width: widgetWidth, height: widgetHeight(for: store))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(primary.opacity(0.14), lineWidth: 1))
         .environment(\.colorScheme, store.isLightMode ? .light : .dark)
@@ -264,11 +282,12 @@ private struct QuotaBubbleView: View {
     }
 
     private var metricCards: some View {
-        HStack(spacing: 10) {
-            MetricCard(title: "\(store.copy.balance)（$）", value: store.balanceText, lightMode: store.isLightMode, secondary: secondary)
-            MetricCard(title: "\(store.copy.availableReset)（\(store.copy.times)）", value: store.resetCountText, lightMode: store.isLightMode, secondary: secondary)
+        let height = metricCardHeight(for: store.copy)
+        return HStack(spacing: 10) {
+            MetricCard(title: "\(store.copy.balance)（$）", value: store.balanceText, height: height, lightMode: store.isLightMode, secondary: secondary)
+            MetricCard(title: "\(store.copy.availableReset)（\(store.copy.times)）", value: store.resetCountText, height: height, lightMode: store.isLightMode, secondary: secondary)
         }
-        .frame(width: 272, height: 47, alignment: .leading)
+        .frame(width: 272, height: height, alignment: .leading)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -286,7 +305,7 @@ private struct QuotaBubbleView: View {
                 .font(.system(size: 9, weight: .light, design: .monospaced))
                 .foregroundStyle(secondary)
         }
-        .position(x: widgetWidth - 29, y: store.desiredHeight - 15)
+        .position(x: widgetWidth - 29, y: widgetHeight(for: store) - 15)
     }
 
 }
@@ -294,6 +313,7 @@ private struct QuotaBubbleView: View {
 private struct MetricCard: View {
     let title: String
     let value: String
+    let height: CGFloat
     let lightMode: Bool
     let secondary: Color
 
@@ -302,13 +322,15 @@ private struct MetricCard: View {
             Text(title)
                 .font(.system(size: 9, weight: .medium, design: .monospaced))
                 .foregroundStyle(secondary)
-                .lineLimit(1)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .frame(maxWidth: metricCardWidth - 8)
             Text(value)
                 .font(.system(size: 13, weight: .semibold, design: .monospaced))
                 .foregroundStyle(lightMode ? Color.black : Color.white)
                 .lineLimit(1)
         }
-        .frame(width: 131, height: 47)
+        .frame(width: metricCardWidth, height: height)
         .background(lightMode ? Color.white.opacity(0.42) : Color.white.opacity(0.07))
         .clipShape(RoundedRectangle(cornerRadius: 9))
         .overlay(RoundedRectangle(cornerRadius: 9).stroke(Color.white.opacity(lightMode ? 0.46 : 0.12)))
@@ -447,6 +469,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         restoreWindowFrame()
         applyPinnedState()
         store.$resetRows.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeWindow() }.store(in: &cancellables)
+        store.$languageCode.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeWindow() }.store(in: &cancellables)
         window.makeKeyAndOrderFront(nil)
         DispatchQueue.main.async { [weak self] in self?.resizeWindow(force: true) }
     }
@@ -459,7 +482,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     private func resizeWindow(force: Bool = false) {
         guard let window, let store else { return }
-        let desired = store.desiredHeight
+        let desired = widgetHeight(for: store)
         let contentSize = window.contentView?.frame.size ?? .zero
         guard force || abs(contentSize.width - widgetWidth) > 0.5 || abs(contentSize.height - desired) > 0.5 else { return }
         let top = window.frame.maxY
@@ -471,10 +494,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         guard let window else { return }
         if let value = UserDefaults.standard.string(forKey: QuotaStore.savedFrameKey) {
             let saved = NSRectFromString(value)
-            window.setContentSize(NSSize(width: widgetWidth, height: store?.desiredHeight ?? 234))
+            window.setContentSize(NSSize(width: widgetWidth, height: store.map { widgetHeight(for: $0) } ?? 234))
             window.setFrameOrigin(NSPoint(x: saved.minX, y: saved.maxY - window.frame.height))
         } else {
-            window.setContentSize(NSSize(width: widgetWidth, height: store?.desiredHeight ?? 234))
+            window.setContentSize(NSSize(width: widgetWidth, height: store.map { widgetHeight(for: $0) } ?? 234))
             window.center()
         }
     }

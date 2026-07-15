@@ -15,6 +15,7 @@ All notable changes to Quota Bubble are documented here.
 
 - Prevented the macOS language submenu from closing while hovered by isolating menu state from the quota store's one-second refresh cycle.
 - Restored the Quota Bubble icon in Finder after installation by registering the `/Applications` bundle with Launch Services and providing complete bundle icon/version metadata.
+- Kept both metric-card backgrounds equal in height, allowed titles to wrap to two lines, and expanded the window when either localized title needs the second line.
 
 ## 3.0.0 - 2026-07-15
 
