@@ -32,15 +32,6 @@ ArchitecturesInstallIn64BitMode=x64compatible
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
-Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
-Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
-Name: "korean"; MessagesFile: "compiler:Languages\Korean.isl"
-Name: "german"; MessagesFile: "compiler:Languages\German.isl"
-Name: "french"; MessagesFile: "compiler:Languages\French.isl"
-Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
-Name: "portuguese"; MessagesFile: "compiler:Languages\Portuguese.isl"
-Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
-Name: "dutch"; MessagesFile: "compiler:Languages\Dutch.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
