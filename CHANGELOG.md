@@ -9,6 +9,7 @@ All notable changes to Quota Bubble are documented here.
 - Removed the macOS prerequisite overlay and its Node.js/Codex CLI detection, installation, and login handoff actions. The widget now opens directly and keeps local quota synchronization independent of setup prompts.
 - Changed the macOS installation target from the user-only Applications folder to `/Applications`, including administrator authorization when required, so Quota Bubble appears in Finder's standard Applications directory.
 - Increased the macOS quota progress bar height by 15 points while keeping the window height fixed and consuming the existing bottom whitespace.
+- Increased the macOS quota progress bar width by 60 points while keeping the percentage on the same row.
 
 ## 3.0.0 - 2026-07-15
 
