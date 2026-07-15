@@ -316,6 +316,10 @@ private struct MetricCard: View {
     let lightMode: Bool
     let secondary: Color
 
+    private var titleAreaHeight: CGFloat {
+        height > metricCardSingleLineHeight ? 22 : 11
+    }
+
     var body: some View {
         VStack(spacing: 3) {
             Text(title)
@@ -323,12 +327,15 @@ private struct MetricCard: View {
                 .foregroundStyle(secondary)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
-                .frame(maxWidth: metricCardWidth - 8)
+                .frame(width: metricCardWidth - 8, height: titleAreaHeight, alignment: .top)
             Text(value)
                 .font(.system(size: 13, weight: .semibold, design: .monospaced))
                 .foregroundStyle(lightMode ? Color.black : Color.white)
                 .lineLimit(1)
+            Spacer(minLength: 0)
         }
+        .padding(.top, 7)
+        .padding(.bottom, 5)
         .frame(width: metricCardWidth, height: height)
         .background(lightMode ? Color.white.opacity(0.42) : Color.white.opacity(0.07))
         .clipShape(RoundedRectangle(cornerRadius: 9))
