@@ -1,13 +1,25 @@
 #!/bin/bash
 set -euo pipefail
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
-APP="$HOME/Applications/Quota Bubble.app"
+APP="/Applications/Quota Bubble.app"
+LEGACY_USER_APP="$HOME/Applications/Quota Bubble.app"
 LAUNCH_AGENT="$HOME/Library/LaunchAgents/com.codex.usage-widget.autostart.plist"
 launchctl bootout "gui/$(id -u)" "$LAUNCH_AGENT" >/dev/null 2>&1 || true
 pkill -f "Quota Bubble.app/Contents/MacOS/Quota Bubble" >/dev/null 2>&1 || true
 pkill -f "UsageWidget.app/Contents/MacOS/UsageWidget" >/dev/null 2>&1 || true
 rm -f "$LAUNCH_AGENT"
-rm -rf "$APP" "$HOME/Applications/Codex Usage Widget.app" "$CODEX_HOME/usage-widget"
+rm -rf "$LEGACY_USER_APP" "$HOME/Applications/Codex Usage Widget.app" "$CODEX_HOME/usage-widget"
+if [ -e "$APP" ]; then
+    if [ -w "$APP" ]; then
+        rm -rf "$APP"
+    else
+        /usr/bin/osascript - "$APP" <<'APPLESCRIPT'
+on run argv
+    do shell script "/bin/rm -rf " & quoted form of (item 1 of argv) with administrator privileges
+end run
+APPLESCRIPT
+    fi
+fi
 rm -f "$CODEX_HOME/scripts/codex-usage-snapshot.mjs"
 /usr/bin/python3 - <<'PY'
 import plistlib, subprocess

@@ -74,7 +74,8 @@ RESOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
 PAYLOAD="$RESOURCE_DIR/payload"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 INSTALL_DIR="$CODEX_HOME/usage-widget"
-APP="$HOME/Applications/Quota Bubble.app"
+APP="/Applications/Quota Bubble.app"
+LEGACY_USER_APP="$HOME/Applications/Quota Bubble.app"
 LAUNCH_AGENT="$HOME/Library/LaunchAgents/com.codex.usage-widget.autostart.plist"
 
 launchctl bootout "gui/$(id -u)" "$LAUNCH_AGENT" >/dev/null 2>&1 || true
@@ -84,12 +85,23 @@ fi
 pkill -f "UsageWidget.app/Contents/MacOS/UsageWidget" >/dev/null 2>&1 || true
 pkill -f "Codex Usage Widget.app/Contents/MacOS/Codex Usage Widget" >/dev/null 2>&1 || true
 sleep 0.3
-rm -rf "$APP" "$HOME/Applications/Codex Usage Widget.app" "$INSTALL_DIR/UsageWidget.app"
-mkdir -p "$HOME/Applications" "$INSTALL_DIR" "$CODEX_HOME/scripts" "$HOME/Library/LaunchAgents"
-cp -R "$PAYLOAD/Quota Bubble.app" "$APP"
+rm -rf "$LEGACY_USER_APP" "$HOME/Applications/Codex Usage Widget.app" "$INSTALL_DIR/UsageWidget.app"
+mkdir -p "$INSTALL_DIR" "$CODEX_HOME/scripts" "$HOME/Library/LaunchAgents"
+if [ -w /Applications ] && { [ ! -e "$APP" ] || [ -w "$APP" ]; }; then
+    rm -rf "$APP"
+    cp -R "$PAYLOAD/Quota Bubble.app" "$APP"
+else
+    /usr/bin/osascript - "$PAYLOAD/Quota Bubble.app" "$APP" <<'APPLESCRIPT'
+on run argv
+    set sourcePath to item 1 of argv
+    set destinationPath to item 2 of argv
+    do shell script "/bin/rm -rf " & quoted form of destinationPath & " && /bin/cp -R " & quoted form of sourcePath & " " & quoted form of destinationPath with administrator privileges
+end run
+APPLESCRIPT
+fi
 cp "$PAYLOAD/scripts/codex-usage-snapshot.mjs" "$CODEX_HOME/scripts/"
 for script in ensure-usage-widget.sh start-usage-widget.sh restart.sh status.sh uninstall.sh; do cp "$PAYLOAD/scripts/$script" "$INSTALL_DIR/$script"; chmod +x "$INSTALL_DIR/$script"; done
-chmod +x "$APP/Contents/MacOS/Quota Bubble" "$CODEX_HOME/scripts/codex-usage-snapshot.mjs"
+chmod +x "$CODEX_HOME/scripts/codex-usage-snapshot.mjs"
 xattr -dr com.apple.quarantine "$APP" >/dev/null 2>&1 || true
 
 cat > "$LAUNCH_AGENT" <<PLIST

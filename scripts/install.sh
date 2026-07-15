@@ -5,7 +5,7 @@ PLUGIN_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 INSTALL_DIR="$CODEX_HOME/usage-widget"
 SCRIPTS_DIR="$CODEX_HOME/scripts"
-APP_DIR="$HOME/Applications/Quota Bubble.app"
+APP_DIR="/Applications/Quota Bubble.app"
 APP_EXE="$APP_DIR/Contents/MacOS/Quota Bubble"
 APP_PATTERN="Quota Bubble.app/Contents/MacOS/Quota Bubble"
 LAUNCH_AGENT="$HOME/Library/LaunchAgents/com.codex.usage-widget.autostart.plist"
@@ -60,7 +60,7 @@ pkill -f "UsageWidget.app/Contents/MacOS/UsageWidget" >/dev/null 2>&1 || true
 pkill -f "Codex Usage Widget.app/Contents/MacOS/Codex Usage Widget" >/dev/null 2>&1 || true
 sleep 0.3
 
-rm -rf "$APP_DIR" "$HOME/Applications/Codex Usage Widget.app" "$INSTALL_DIR/UsageWidget.app"
+rm -rf "$APP_DIR" "$HOME/Applications/Quota Bubble.app" "$HOME/Applications/Codex Usage Widget.app" "$INSTALL_DIR/UsageWidget.app"
 mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources" "$INSTALL_DIR" "$SCRIPTS_DIR" "$HOME/Library/LaunchAgents"
 
 cp "$PLUGIN_DIR/scripts/codex-usage-snapshot.mjs" "$SCRIPTS_DIR/codex-usage-snapshot.mjs"

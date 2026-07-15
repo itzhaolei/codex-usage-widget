@@ -69,7 +69,7 @@ bash scripts/install.sh
 
 The installer builds:
 
-- `~/Applications/Quota Bubble.app`
+- `/Applications/Quota Bubble.app`
 - `~/Library/LaunchAgents/com.codex.usage-widget.autostart.plist`
 
 ### Windows

@@ -9,7 +9,7 @@ This plugin provides a local macOS floating widget for Codex quota visibility.
 
 ## What It Installs
 
-- `~/Applications/Quota Bubble.app`: the single SwiftUI macOS app that owns the HUD, Dock icon, and menus.
+- `/Applications/Quota Bubble.app`: the single SwiftUI macOS app that owns the HUD, Dock icon, and menus.
 - `~/.codex/scripts/codex-usage-snapshot.mjs`: reads Codex session usage and reset-credit information.
 - `~/.codex/usage-widget/ensure-usage-widget.sh`: opens the single app when explicitly invoked.
 - `~/Library/LaunchAgents/com.codex.usage-widget.autostart.plist`: opens the app once at user login.

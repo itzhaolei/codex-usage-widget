@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
-APP="$HOME/Applications/Quota Bubble.app"
+APP="/Applications/Quota Bubble.app"
+[ -d "$APP" ] || APP="$HOME/Applications/Quota Bubble.app"
 EXE="$APP/Contents/MacOS/Quota Bubble"
 LABEL="com.codex.usage-widget.autostart"
 STATUS=0
