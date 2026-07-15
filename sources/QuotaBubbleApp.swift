@@ -124,6 +124,9 @@ private struct QuotaBubbleView: View {
 
     private var primary: Color { store.isLightMode ? .black : .white }
     private var secondary: Color { primary.opacity(0.68) }
+    private var glassTint: Color {
+        store.isLightMode ? Color.white.opacity(0.28) : Color.black.opacity(0.38)
+    }
     private var barColor: Color {
         guard let value = store.remainingPercentage else { return .red }
         return value <= 20 ? .red : Color(red: 0, green: 0.94, blue: 0.08)
@@ -132,7 +135,7 @@ private struct QuotaBubbleView: View {
     var body: some View {
         ZStack {
             VisualEffectView(material: .hudWindow, appearance: store.isLightMode ? .vibrantLight : .vibrantDark)
-            (store.isLightMode ? Color.white.opacity(0.78) : Color.black.opacity(0.78))
+            glassTint
 
             VStack(alignment: .leading, spacing: 0) {
                 header
@@ -399,12 +402,15 @@ private struct VisualEffectView: NSViewRepresentable {
         view.material = material
         view.blendingMode = .behindWindow
         view.state = .active
+        view.appearance = NSAppearance(named: appearance)
+        view.isEmphasized = true
         return view
     }
 
     func updateNSView(_ view: NSVisualEffectView, context: Context) {
         view.material = material
         view.appearance = NSAppearance(named: appearance)
+        view.isEmphasized = true
     }
 }
 
