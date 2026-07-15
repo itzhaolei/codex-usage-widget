@@ -41,5 +41,14 @@ Uninstall:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\\windows\\uninstall.ps1
 TXT
 
-(cd "$BUILD_DIR" && zip -qr "$ZIP_PATH" "QuotaBubble-$VERSION")
+if command -v zip >/dev/null 2>&1; then
+    (cd "$BUILD_DIR" && zip -qr "$ZIP_PATH" "QuotaBubble-$VERSION")
+elif command -v powershell.exe >/dev/null 2>&1 && command -v cygpath >/dev/null 2>&1; then
+    BUILD_DIR_WINDOWS="$(cygpath -w "$BUILD_DIR/QuotaBubble-$VERSION")"
+    ZIP_PATH_WINDOWS="$(cygpath -w "$ZIP_PATH")"
+    powershell.exe -NoProfile -Command "Compress-Archive -Path '$BUILD_DIR_WINDOWS' -DestinationPath '$ZIP_PATH_WINDOWS' -Force"
+else
+    echo "A zip creator is required (zip or Windows PowerShell)." >&2
+    exit 1
+fi
 echo "$ZIP_PATH"
