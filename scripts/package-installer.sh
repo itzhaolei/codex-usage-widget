@@ -43,8 +43,10 @@ cat > "$QUOTA_APP/Contents/Info.plist" <<PLIST
 <key>CFBundleName</key><string>Quota Bubble</string>
 <key>CFBundleDisplayName</key><string>Quota Bubble</string>
 <key>CFBundleIconFile</key><string>AppIcon</string>
+<key>CFBundleIconName</key><string>AppIcon</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>$VERSION</string>
+<key>CFBundleVersion</key><string>$VERSION</string>
 <key>NSHighResolutionCapable</key><true/>
 <key>LSMultipleInstancesProhibited</key><true/>
 </dict></plist>
@@ -58,8 +60,10 @@ cat > "$INSTALLER_APP/Contents/Info.plist" <<PLIST
 <key>CFBundleIdentifier</key><string>local.codex.quota-bubble.installer</string>
 <key>CFBundleName</key><string>$APP_NAME</string>
 <key>CFBundleIconFile</key><string>AppIcon</string>
+<key>CFBundleIconName</key><string>AppIcon</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>$VERSION</string>
+<key>CFBundleVersion</key><string>$VERSION</string>
 <key>NSHighResolutionCapable</key><true/>
 </dict></plist>
 PLIST
@@ -103,6 +107,8 @@ cp "$PAYLOAD/scripts/codex-usage-snapshot.mjs" "$CODEX_HOME/scripts/"
 for script in ensure-usage-widget.sh start-usage-widget.sh restart.sh status.sh uninstall.sh; do cp "$PAYLOAD/scripts/$script" "$INSTALL_DIR/$script"; chmod +x "$INSTALL_DIR/$script"; done
 chmod +x "$CODEX_HOME/scripts/codex-usage-snapshot.mjs"
 xattr -dr com.apple.quarantine "$APP" >/dev/null 2>&1 || true
+touch "$APP"
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP"
 
 cat > "$LAUNCH_AGENT" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>

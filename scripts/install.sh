@@ -99,8 +99,10 @@ cat > "$APP_DIR/Contents/Info.plist" <<PLIST
 <key>CFBundleName</key><string>Quota Bubble</string>
 <key>CFBundleDisplayName</key><string>Quota Bubble</string>
 <key>CFBundleIconFile</key><string>AppIcon</string>
+<key>CFBundleIconName</key><string>AppIcon</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>$VERSION</string>
+<key>CFBundleVersion</key><string>$VERSION</string>
 <key>NSHighResolutionCapable</key><true/>
 <key>LSMultipleInstancesProhibited</key><true/>
 </dict></plist>
@@ -119,6 +121,8 @@ cat > "$LAUNCH_AGENT" <<PLIST
 PLIST
 
 xattr -dr com.apple.quarantine "$APP_DIR" >/dev/null 2>&1 || true
+touch "$APP_DIR"
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP_DIR"
 launchctl bootstrap "gui/$(id -u)" "$LAUNCH_AGENT"
 dedupe_dock_app
 if [ "${QUOTA_BUBBLE_SKIP_LAUNCH:-0}" != "1" ]; then open -g "$APP_DIR"; fi
