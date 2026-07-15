@@ -73,9 +73,7 @@ final class QuotaStore: ObservableObject {
         readLocalState()
         refreshSnapshot(force: true)
         checkVersion(force: true)
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.tick() }
-        }
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerDidFire), userInfo: nil, repeats: true)
         RunLoop.main.add(timer!, forMode: .common)
     }
 
@@ -91,6 +89,8 @@ final class QuotaStore: ObservableObject {
         refreshSnapshot()
         checkVersion()
     }
+
+    @objc private func timerDidFire() { tick() }
 
     func selectLanguage(_ code: String?) {
         writeLanguageOverride(code)
@@ -174,7 +174,12 @@ final class QuotaStore: ObservableObject {
         refreshInFlight = true
         let script = snapshotScriptPath
         let output = snapshotPath
-        DispatchQueue.global(qos: .utility).async { [weak self] in
+        let completion: @MainActor @Sendable () -> Void = { [weak self] in
+            guard let self else { return }
+            self.refreshInFlight = false
+            self.readLocalState()
+        }
+        DispatchQueue.global(qos: .utility).async {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
             process.arguments = ["node", script, output]
@@ -196,11 +201,7 @@ final class QuotaStore: ObservableObject {
                 try? fallback.run()
                 fallback.waitUntilExit()
             }
-            Task { @MainActor in
-                guard let self else { return }
-                self.refreshInFlight = false
-                self.readLocalState()
-            }
+            Task { @MainActor in completion() }
         }
     }
 
@@ -311,7 +312,13 @@ final class QuotaStore: ObservableObject {
     private func installCodexCLI() {
         installInFlight = true
         tickSetupIssue()
-        DispatchQueue.global(qos: .utility).async { [weak self] in
+        let completion: @MainActor @Sendable (Bool) -> Void = { [weak self] succeeded in
+            guard let self else { return }
+            self.installInFlight = false
+            if succeeded { self.refreshSnapshot(force: true); self.tickSetupIssue() }
+            else { self.setupIssue = .installFailed }
+        }
+        DispatchQueue.global(qos: .utility).async {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: "/bin/zsh")
             process.arguments = ["-lc", "curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh"]
@@ -323,12 +330,8 @@ final class QuotaStore: ObservableObject {
                 process.waitUntilExit()
                 success = process.terminationStatus == 0
             } catch {}
-            Task { @MainActor in
-                guard let self else { return }
-                self.installInFlight = false
-                if success { self.refreshSnapshot(force: true); self.tickSetupIssue() }
-                else { self.setupIssue = .installFailed }
-            }
+            let result = success
+            Task { @MainActor in completion(result) }
         }
     }
 
@@ -347,13 +350,15 @@ final class QuotaStore: ObservableObject {
     private func checkVersion(force: Bool = false) {
         guard force || Date().timeIntervalSince(lastVersionCheck) >= 1_800 else { return }
         lastVersionCheck = Date()
-        DispatchQueue.global(qos: .utility).async { [weak self] in
+        let completion: @MainActor @Sendable (Bool) -> Void = { [weak self] hasUpdate in self?.hasUpdate = hasUpdate }
+        DispatchQueue.global(qos: .utility).async {
             guard let url = URL(string: "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases/latest"),
                   let data = try? Data(contentsOf: url),
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let latest = normalizedVersion(json["tag_name"] as? String),
                   let current = normalizedVersion(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) else { return }
-            Task { @MainActor in self?.hasUpdate = compareVersions(current, latest) == .orderedAscending }
+            let result = compareVersions(current, latest) == .orderedAscending
+            Task { @MainActor in completion(result) }
         }
     }
 

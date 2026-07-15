@@ -4,6 +4,26 @@ import SwiftUI
 
 private let widgetWidth: CGFloat = 330
 
+private enum UpdateLookupResult: Sendable {
+    case failed
+    case current(tag: String)
+    case available(tag: String, assetURL: String)
+}
+
+private func lookupLatestRelease(currentVersion: String?) -> UpdateLookupResult {
+    guard let url = URL(string: "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases/latest"),
+          let data = try? Data(contentsOf: url),
+          let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+          let tag = json["tag_name"] as? String,
+          let latest = normalizedVersion(tag),
+          let current = normalizedVersion(currentVersion) else { return .failed }
+    guard compareVersions(current, latest) == .orderedAscending else { return .current(tag: tag) }
+    let assets = json["assets"] as? [[String: Any]] ?? []
+    guard let asset = assets.first(where: { ($0["name"] as? String)?.hasSuffix("macOS-Installer.zip") == true }),
+          let assetURL = asset["browser_download_url"] as? String else { return .failed }
+    return .available(tag: tag, assetURL: assetURL)
+}
+
 @main
 struct QuotaBubbleApp: App {
     @StateObject private var store = QuotaStore()
@@ -501,45 +521,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func checkForUpdates() {
         let dialogs = localizedDialogCopy(store?.languageCode ?? "en")
         showUpdateStatus(title: store?.copy.update ?? "Update", message: dialogs.checking, final: false)
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            guard let self,
-                  let url = URL(string: "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases/latest"),
-                  let data = try? Data(contentsOf: url),
-                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let tag = json["tag_name"] as? String,
-                  let latest = normalizedVersion(tag),
-                  let current = normalizedVersion(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) else {
-                Task { @MainActor in self?.showUpdateStatus(title: dialogs.updateFailed, message: "", final: true) }
-                return
+        let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        let completion: @MainActor @Sendable (UpdateLookupResult) -> Void = { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .failed:
+                self.showUpdateStatus(title: dialogs.updateFailed, message: "", final: true)
+            case let .current(tag):
+                self.showUpdateStatus(title: dialogs.upToDate, message: tag, final: true)
+            case let .available(tag, assetURL):
+                self.showUpdateStatus(title: dialogs.downloading, message: tag, final: false)
+                self.installUpdate(assetURL: assetURL, tag: tag)
             }
-            guard compareVersions(current, latest) == .orderedAscending else {
-                Task { @MainActor in self.showUpdateStatus(title: dialogs.upToDate, message: tag, final: true) }
-                return
-            }
-            let assets = json["assets"] as? [[String: Any]] ?? []
-            guard let asset = assets.first(where: { ($0["name"] as? String)?.hasSuffix("macOS-Installer.zip") == true }),
-                  let assetURL = asset["browser_download_url"] as? String else {
-                Task { @MainActor in self.showUpdateStatus(title: dialogs.updateFailed, message: "Installer not found", final: true) }
-                return
-            }
-            Task { @MainActor in self.showUpdateStatus(title: dialogs.downloading, message: tag, final: false) }
-            self.installUpdate(assetURL: assetURL, tag: tag)
+        }
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = lookupLatestRelease(currentVersion: currentVersion)
+            Task { @MainActor in completion(result) }
         }
     }
 
-    nonisolated private func installUpdate(assetURL: String, tag: String) {
+    private func installUpdate(assetURL: String, tag: String) {
         let command = "set -e; d=$(mktemp -d); curl -L -o \"$d/installer.zip\" \(shellQuote(assetURL)); unzip -q \"$d/installer.zip\" -d \"$d\"; QUOTA_BUBBLE_KEEP_RUNNING=1 QUOTA_BUBBLE_SKIP_LAUNCH=1 /bin/bash \"$d/Install Quota Bubble.app/Contents/Resources/install-packaged.sh\""
+        let completion: @MainActor @Sendable (Int32) -> Void = { [weak self] status in
+            guard let self else { return }
+            if status == 0 { self.store?.markUpdateInstalled() }
+            let dialogs = localizedDialogCopy(self.store?.languageCode ?? "en")
+            self.showUpdateStatus(title: status == 0 ? dialogs.updateComplete : dialogs.updateFailed, message: tag, final: true)
+        }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
         process.arguments = ["-lc", command]
         process.standardOutput = Pipe()
         process.standardError = Pipe()
-        process.terminationHandler = { [weak self] process in
-            Task { @MainActor in
-                if process.terminationStatus == 0 { self?.store?.markUpdateInstalled() }
-                let dialogs = localizedDialogCopy(self?.store?.languageCode ?? "en")
-                self?.showUpdateStatus(title: process.terminationStatus == 0 ? dialogs.updateComplete : dialogs.updateFailed, message: tag, final: true)
-            }
+        process.terminationHandler = { process in
+            let status = process.terminationStatus
+            Task { @MainActor in completion(status) }
         }
         try? process.run()
     }
