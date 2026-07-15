@@ -207,7 +207,7 @@ private struct QuotaBubbleView: View {
             }
             HStack(spacing: 12) {
                 QuotaProgressBar(percentage: store.remainingPercentage, color: barColor)
-                    .frame(width: 186, height: 20)
+                    .frame(width: 186, height: 35)
                 Text(store.remainingPercentage.map { "\($0)%" } ?? "—")
                     .font(.system(size: 11, weight: .regular, design: .monospaced))
                     .foregroundStyle(primary)
