@@ -112,7 +112,9 @@ private struct QuotaBubbleRoot: View {
     let appDelegate: AppDelegate
 
     var body: some View {
-        QuotaBubbleView(store: store)
+        QuotaBubbleView(store: store) { isPinned in
+            appDelegate.applyPinnedState(isPinned)
+        }
             .background(WindowAccessor { window in
                 appDelegate.attach(window: window, store: store)
             })
@@ -121,6 +123,7 @@ private struct QuotaBubbleRoot: View {
 
 private struct QuotaBubbleView: View {
     @ObservedObject var store: QuotaStore
+    let onPinnedChange: (Bool) -> Void
 
     private var primary: Color { store.isLightMode ? .black : .white }
     private var secondary: Color { primary.opacity(0.68) }
@@ -233,6 +236,7 @@ private struct QuotaBubbleView: View {
                 isActive: store.isPinned
             ) {
                 store.togglePinned()
+                onPinnedChange(store.isPinned)
             }
             divider
             capsuleButton("xmark", help: store.copy.close) { NSApp.terminate(nil) }
@@ -496,17 +500,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         store.$resetRows.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeWindow() }.store(in: &cancellables)
         store.$languageCode.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeWindow() }.store(in: &cancellables)
         store.$isPinned.removeDuplicates().receive(on: RunLoop.main).sink { [weak self] isPinned in
-            self?.window?.level = isPinned ? .statusBar : .normal
+            self?.applyPinnedState(isPinned)
         }.store(in: &cancellables)
         window.makeKeyAndOrderFront(nil)
-        DispatchQueue.main.async { [weak self] in self?.resizeWindow(force: true) }
+        DispatchQueue.main.async { [weak self] in
+            self?.resizeWindow(force: true)
+            self?.applyPinnedState()
+        }
     }
 
     private var cancellables = Set<AnyCancellable>()
 
-    func applyPinnedState() {
-        window?.level = store?.isPinned == true ? .statusBar : .normal
+    func applyPinnedState(_ isPinned: Bool? = nil) {
+        let pinned = isPinned ?? (store?.isPinned == true)
+        window?.level = pinned ? .statusBar : .normal
     }
+
+    func windowDidBecomeKey(_ notification: Notification) { applyPinnedState() }
+    func windowDidBecomeMain(_ notification: Notification) { applyPinnedState() }
 
     private func resizeWindow(force: Bool = false) {
         guard let window, let store else { return }
