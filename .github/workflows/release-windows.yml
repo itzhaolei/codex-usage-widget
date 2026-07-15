@@ -50,12 +50,45 @@ jobs:
           node tests/SnapshotFallbackTests.mjs
           node --check scripts/codex-usage-snapshot.mjs
 
+      - name: Smoke launch Windows widget
+        shell: pwsh
+        run: |
+          $smokeHome = Join-Path $env:RUNNER_TEMP "quota-bubble-smoke"
+          New-Item -ItemType Directory -Path $smokeHome -Force | Out-Null
+          $env:CODEX_HOME = $smokeHome
+          $stdout = Join-Path $smokeHome "stdout.log"
+          $stderr = Join-Path $smokeHome "stderr.log"
+          $process = Start-Process powershell.exe -ArgumentList @(
+            "-NoProfile", "-ExecutionPolicy", "Bypass", "-STA",
+            "-File", (Resolve-Path "windows/QuotaBubble.ps1"), "-NoSingleInstance"
+          ) -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+          Start-Sleep -Seconds 5
+          if ($process.HasExited) {
+            $details = (Get-Content $stderr -Raw -ErrorAction SilentlyContinue)
+            throw "Quota Bubble exited during smoke launch. $details"
+          }
+          Stop-Process -Id $process.Id -Force
+
       - name: Build Windows package
         shell: bash
         run: |
           VERSION="${{ inputs.version }}"
           if [ -z "$VERSION" ]; then VERSION="${GITHUB_REF_NAME#v}"; fi
           bash scripts/package-windows.sh "$VERSION"
+
+      - name: Verify packaged Windows payload
+        shell: pwsh
+        run: |
+          $version = "${{ inputs.version }}"
+          if (-not $version) { $version = $env:GITHUB_REF_NAME.TrimStart('v') }
+          $archive = "dist/QuotaBubble-$version-Windows.zip"
+          $output = Join-Path $env:RUNNER_TEMP "quota-bubble-package"
+          Expand-Archive -Path $archive -DestinationPath $output -Force
+          $root = Join-Path $output "QuotaBubble-$version"
+          if ((Get-Content (Join-Path $root "VERSION") -Raw).Trim() -ne $version) { throw "Packaged version mismatch" }
+          foreach ($relative in @("windows/QuotaBubble.ps1", "windows/install.ps1", "windows/uninstall.ps1", "scripts/codex-usage-snapshot.mjs")) {
+            if (-not (Test-Path (Join-Path $root $relative))) { throw "Missing packaged file: $relative" }
+          }
 
       - name: Upload package to GitHub Release
         shell: pwsh
