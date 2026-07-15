@@ -37,6 +37,17 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Run shared and Windows static tests
+        shell: bash
+        run: |
+          node tests/WindowsStaticTests.mjs
+          node tests/SnapshotFallbackTests.mjs
+          node --check scripts/codex-usage-snapshot.mjs
+
+      - name: Build native Windows application
+        shell: pwsh
+        run: dotnet build windows/QuotaBubble/QuotaBubble.csproj --configuration Release -p:Version=$env:VERSION
+
       - name: Install packaging tools
         shell: pwsh
         run: |
@@ -50,17 +61,6 @@ jobs:
       - name: Generate Windows application icon
         shell: pwsh
         run: magick assets/icon.png -define icon:auto-resize=256,128,64,48,32,16 windows/QuotaBubble.ico
-
-      - name: Run shared and Windows static tests
-        shell: bash
-        run: |
-          node tests/WindowsStaticTests.mjs
-          node tests/SnapshotFallbackTests.mjs
-          node --check scripts/codex-usage-snapshot.mjs
-
-      - name: Build native Windows application
-        shell: pwsh
-        run: dotnet build windows/QuotaBubble/QuotaBubble.csproj --configuration Release -p:Version=$env:VERSION
 
       - name: Publish self-contained Windows application
         shell: pwsh
