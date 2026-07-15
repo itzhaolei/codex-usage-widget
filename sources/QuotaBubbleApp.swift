@@ -210,7 +210,6 @@ private struct QuotaBubbleView: View {
             divider
             capsuleButton("pin.fill", help: store.isPinned ? store.copy.unpin : store.copy.pin) {
                 store.togglePinned()
-                AppDelegate.shared?.applyPinnedState()
             }
             divider
             capsuleButton("xmark", help: store.copy.close) { NSApp.terminate(nil) }
@@ -416,7 +415,6 @@ private struct WindowAccessor: NSViewRepresentable {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
-    static weak var shared: AppDelegate?
     private weak var window: NSWindow?
     private weak var store: QuotaStore?
     private var configuredWindow = false
@@ -424,7 +422,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private let bundleIdentifier = "local.codex.quota-bubble"
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        Self.shared = self
         let currentPID = ProcessInfo.processInfo.processIdentifier
         if let existing = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier).first(where: { $0.processIdentifier != currentPID }) {
             existing.activate(options: [.activateAllWindows])
@@ -470,6 +467,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         applyPinnedState()
         store.$resetRows.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeWindow() }.store(in: &cancellables)
         store.$languageCode.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeWindow() }.store(in: &cancellables)
+        store.$isPinned.removeDuplicates().receive(on: RunLoop.main).sink { [weak self] isPinned in
+            self?.window?.level = isPinned ? .statusBar : .normal
+        }.store(in: &cancellables)
         window.makeKeyAndOrderFront(nil)
         DispatchQueue.main.async { [weak self] in self?.resizeWindow(force: true) }
     }
