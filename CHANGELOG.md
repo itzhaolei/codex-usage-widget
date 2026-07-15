@@ -17,7 +17,7 @@ All notable changes to Quota Bubble are documented here.
 - Restored the Quota Bubble icon in Finder after installation by registering the `/Applications` bundle with Launch Services and providing complete bundle icon/version metadata.
 - Kept both metric-card backgrounds equal in height, allowed titles to wrap to two lines, and expanded the window when either localized title needs the second line.
 - Restored pin/unpin behavior by binding the window level directly to persisted `isPinned` state instead of relying on a global delegate callback from the button.
-- Prevented restarts from leaving a running App process without a window by using one explicit SwiftUI `Window` scene, waiting for the previous process to exit, and relying on macOS `LSMultipleInstancesProhibited` instead of a stale-process-prone manual duplicate check.
+- Prevented restarts from leaving a running App process without a window by using one explicit SwiftUI `Window` scene, quitting through the native app lifecycle before reopening, and relying on macOS `LSMultipleInstancesProhibited` instead of a stale-process-prone manual duplicate check.
 
 ## 3.0.0 - 2026-07-15
 
