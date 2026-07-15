@@ -419,15 +419,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private weak var store: QuotaStore?
     private var configuredWindow = false
     private var updateWindow: NSWindow?
-    private let bundleIdentifier = "local.codex.quota-bubble"
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let currentPID = ProcessInfo.processInfo.processIdentifier
-        if let existing = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier).first(where: { $0.processIdentifier != currentPID }) {
-            existing.activate(options: [.activateAllWindows])
-            NSApp.terminate(nil)
-            return
-        }
         NSApp.setActivationPolicy(.regular)
     }
 
