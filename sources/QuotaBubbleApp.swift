@@ -227,7 +227,11 @@ private struct QuotaBubbleView: View {
                 store.toggleTheme()
             }
             divider
-            capsuleButton("pin.fill", help: store.isPinned ? store.copy.unpin : store.copy.pin) {
+            capsuleButton(
+                store.isPinned ? "pin.fill" : "pin.slash.fill",
+                help: store.isPinned ? store.copy.unpin : store.copy.pin,
+                isActive: store.isPinned
+            ) {
                 store.togglePinned()
             }
             divider
@@ -243,16 +247,18 @@ private struct QuotaBubbleView: View {
         Rectangle().fill(primary.opacity(0.16)).frame(width: 1, height: 16)
     }
 
-    private func capsuleButton(_ symbol: String, help: String, action: @escaping () -> Void) -> some View {
+    private func capsuleButton(_ symbol: String, help: String, isActive: Bool = false, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: symbol)
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(primary.opacity(0.76))
+                .foregroundStyle(isActive ? Color.green : primary.opacity(0.76))
                 .frame(width: 36, height: 28)
+                .background(isActive ? Color.green.opacity(0.10) : Color.clear)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .help(help)
+        .animation(.easeOut(duration: 0.16), value: isActive)
     }
 
     private var quota: some View {
