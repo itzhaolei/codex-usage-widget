@@ -22,6 +22,7 @@ All notable changes to Quota Bubble are documented here.
 - Top-aligned both metric-card descriptions within a shared title area so one-line and two-line localized labels remain visually aligned.
 - Replaced the nearly opaque macOS window tint with adaptive translucent glass: dark mode now uses deep glass and light mode uses bright glass while preserving the system blur behind the window.
 - Added native interactive Liquid Glass on macOS 26 with theme-aware tinting, while retaining the adaptive `NSVisualEffectView` fallback for macOS 13 through 15.
+- Kept release builds compatible with older Xcode SDKs by compiling the native Liquid Glass path only when that API is available to the compiler.
 - Added immediate visual feedback to the pin control: pinned state uses a green filled pin and unpinned state uses a muted slashed pin, matching the already-applied window level.
 - Reapplied the persisted pin level after SwiftUI/Liquid Glass finishes configuring the main window, and made pin-button changes update the main `NSWindow` directly so rendering helper surfaces cannot mask the real state.
 - Kept both pinned and unpinned windows in their current macOS Space; pinned mode stays above windows there without following users into other desktops or full-screen apps.

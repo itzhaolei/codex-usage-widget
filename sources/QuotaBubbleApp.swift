@@ -199,6 +199,7 @@ private struct QuotaBubbleView: View {
 
     @ViewBuilder
     private var windowBackground: some View {
+#if compiler(>=6.2)
         if #available(macOS 26.0, *) {
             Color.clear
                 .glassEffect(
@@ -209,6 +210,10 @@ private struct QuotaBubbleView: View {
             VisualEffectView(material: .hudWindow, appearance: store.isLightMode ? .vibrantLight : .vibrantDark)
             glassTint
         }
+#else
+        VisualEffectView(material: .hudWindow, appearance: store.isLightMode ? .vibrantLight : .vibrantDark)
+        glassTint
+#endif
     }
 
     private var header: some View {
