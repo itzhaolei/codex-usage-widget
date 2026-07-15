@@ -74,7 +74,7 @@ The installer builds:
 
 ### Windows
 
-The current macOS release is v3.0.1. Windows remains on v2.1.3; open the Windows v2.1.3 release page to download its package:
+The current macOS release is v3.0.2. Windows remains on v2.1.3; open the Windows v2.1.3 release page to download its package:
 
 [Open the Windows v2.1.3 release](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v2.1.3)
 
