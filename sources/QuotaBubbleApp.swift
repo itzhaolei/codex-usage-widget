@@ -538,9 +538,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applyPinnedState(_ isPinned: Bool? = nil) {
         let pinned = isPinned ?? (store?.isPinned == true)
         window?.level = pinned ? .statusBar : .normal
-        window?.collectionBehavior = pinned
-            ? [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
-            : [.managed]
+        window?.collectionBehavior = [.managed]
     }
 
     func windowDidBecomeKey(_ notification: Notification) { applyPinnedState() }
