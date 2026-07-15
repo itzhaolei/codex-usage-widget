@@ -492,7 +492,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         window.backgroundColor = .clear
         window.hasShadow = true
         window.isMovableByWindowBackground = true
-        window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
         window.contentMinSize = NSSize(width: widgetWidth, height: 234)
         window.contentMaxSize = NSSize(width: widgetWidth, height: 1_000)
         restoreWindowFrame()
@@ -514,6 +513,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applyPinnedState(_ isPinned: Bool? = nil) {
         let pinned = isPinned ?? (store?.isPinned == true)
         window?.level = pinned ? .statusBar : .normal
+        window?.collectionBehavior = pinned
+            ? [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
+            : [.managed]
     }
 
     func windowDidBecomeKey(_ notification: Notification) { applyPinnedState() }

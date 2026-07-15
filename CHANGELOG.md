@@ -22,6 +22,7 @@ All notable changes to Quota Bubble are documented here.
 - Added native interactive Liquid Glass on macOS 26 with theme-aware tinting, while retaining the adaptive `NSVisualEffectView` fallback for macOS 13 through 15.
 - Added immediate visual feedback to the pin control: pinned state uses a green filled pin and unpinned state uses a muted slashed pin, matching the already-applied window level.
 - Reapplied the persisted pin level after SwiftUI/Liquid Glass finishes configuring the main window, and made pin-button changes update the main `NSWindow` directly so rendering helper surfaces cannot mask the real state.
+- Limited cross-Space and full-screen visibility to pinned mode; unpinned windows now use normal managed-Space behavior instead of following every macOS desktop.
 - Prevented restarts from leaving a running App process without a window by using one explicit SwiftUI `Window` scene, quitting through the native app lifecycle before reopening, and relying on macOS `LSMultipleInstancesProhibited` instead of a stale-process-prone manual duplicate check.
 
 ## 3.0.0 - 2026-07-15
