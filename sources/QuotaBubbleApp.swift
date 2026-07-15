@@ -28,17 +28,42 @@ private enum UpdateLookupResult: Sendable {
     case available(tag: String, assetURL: String)
 }
 
-private func lookupLatestRelease(currentVersion: String?) -> UpdateLookupResult {
-    guard let url = URL(string: "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases/latest"),
-          let data = try? Data(contentsOf: url),
-          let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-          let tag = json["tag_name"] as? String,
-          let latest = normalizedVersion(tag),
-          let current = normalizedVersion(currentVersion) else { return .failed }
+private func lookupLatestRelease(currentVersion: String?) async -> UpdateLookupResult {
+    guard let current = normalizedVersion(currentVersion) else { return .failed }
+    var tag: String?
+    var assetURL: String?
+
+    if let apiURL = URL(string: "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases/latest") {
+        var request = URLRequest(url: apiURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
+        request.setValue("Quota-Bubble-Updater", forHTTPHeaderField: "User-Agent")
+        request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+        if let (data, response) = try? await URLSession.shared.data(for: request),
+           (response as? HTTPURLResponse)?.statusCode == 200,
+           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            tag = json["tag_name"] as? String
+            let assets = json["assets"] as? [[String: Any]] ?? []
+            assetURL = assets.first(where: { ($0["name"] as? String)?.hasSuffix("macOS-Installer.zip") == true })?["browser_download_url"] as? String
+        }
+    }
+
+    if tag == nil, let latestURL = URL(string: "https://github.com/itzhaolei/codex-usage-widget/releases/latest") {
+        var request = URLRequest(url: latestURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
+        request.httpMethod = "HEAD"
+        request.setValue("Quota-Bubble-Updater", forHTTPHeaderField: "User-Agent")
+        if let (_, response) = try? await URLSession.shared.data(for: request),
+           let finalURL = response.url,
+           let rawTag = finalURL.pathComponents.last?.removingPercentEncoding,
+           finalURL.path.contains("/releases/tag/") {
+            tag = rawTag
+        }
+    }
+
+    guard let tag, let latest = normalizedVersion(tag) else { return .failed }
     guard compareVersions(current, latest) == .orderedAscending else { return .current(tag: tag) }
-    let assets = json["assets"] as? [[String: Any]] ?? []
-    guard let asset = assets.first(where: { ($0["name"] as? String)?.hasSuffix("macOS-Installer.zip") == true }),
-          let assetURL = asset["browser_download_url"] as? String else { return .failed }
+    if assetURL == nil {
+        assetURL = "https://github.com/itzhaolei/codex-usage-widget/releases/download/\(tag)/QuotaBubble-\(latest)-macOS-Installer.zip"
+    }
+    guard let assetURL else { return .failed }
     return .available(tag: tag, assetURL: assetURL)
 }
 
@@ -554,7 +579,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let dialogs = localizedDialogCopy(store?.languageCode ?? "en")
         showUpdateStatus(title: store?.copy.update ?? "Update", message: dialogs.checking, final: false)
         let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-        let completion: @MainActor @Sendable (UpdateLookupResult) -> Void = { [weak self] result in
+        Task { [weak self] in
+            let result = await lookupLatestRelease(currentVersion: currentVersion)
             guard let self else { return }
             switch result {
             case .failed:
@@ -566,30 +592,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 self.installUpdate(assetURL: assetURL, tag: tag)
             }
         }
-        DispatchQueue.global(qos: .userInitiated).async {
-            let result = lookupLatestRelease(currentVersion: currentVersion)
-            Task { @MainActor in completion(result) }
-        }
     }
 
     private func installUpdate(assetURL: String, tag: String) {
-        let command = "set -e; d=$(mktemp -d); curl -L -o \"$d/installer.zip\" \(shellQuote(assetURL)); unzip -q \"$d/installer.zip\" -d \"$d\"; QUOTA_BUBBLE_KEEP_RUNNING=1 QUOTA_BUBBLE_SKIP_LAUNCH=1 /bin/bash \"$d/Install Quota Bubble.app/Contents/Resources/install-packaged.sh\""
-        let completion: @MainActor @Sendable (Int32) -> Void = { [weak self] status in
+        let command = "set -euo pipefail; d=$(/usr/bin/mktemp -d \"${TMPDIR:-/tmp}/quota-bubble-update.XXXXXX\"); trap '/bin/rm -rf \"$d\"' EXIT; /usr/bin/curl -fsSL --retry 3 --retry-delay 1 --connect-timeout 15 -o \"$d/installer.zip\" \(shellQuote(assetURL)); /usr/bin/ditto -x -k \"$d/installer.zip\" \"$d\"; installer=\"$d/Install Quota Bubble.app/Contents/Resources/install-packaged.sh\"; test -f \"$installer\"; /usr/bin/env QUOTA_BUBBLE_KEEP_RUNNING=1 QUOTA_BUBBLE_SKIP_LAUNCH=1 QUOTA_BUBBLE_SKIP_DOCK=1 /bin/bash \"$installer\""
+        let completion: @MainActor @Sendable (Int32, String) -> Void = { [weak self] status, detail in
             guard let self else { return }
             if status == 0 { self.store?.markUpdateInstalled() }
             let dialogs = localizedDialogCopy(self.store?.languageCode ?? "en")
-            self.showUpdateStatus(title: status == 0 ? dialogs.updateComplete : dialogs.updateFailed, message: tag, final: true)
+            let message = status == 0 || detail.isEmpty ? tag : detail
+            self.showUpdateStatus(title: status == 0 ? dialogs.updateComplete : dialogs.updateFailed, message: message, final: true)
         }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
         process.arguments = ["-lc", command]
-        process.standardOutput = Pipe()
-        process.standardError = Pipe()
+        process.standardOutput = FileHandle.nullDevice
+        let errorPipe = Pipe()
+        process.standardError = errorPipe
         process.terminationHandler = { process in
             let status = process.terminationStatus
-            Task { @MainActor in completion(status) }
+            let data = errorPipe.fileHandleForReading.readDataToEndOfFile()
+            let raw = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            let detail = String(raw.suffix(240))
+            Task { @MainActor in completion(status, detail) }
         }
-        try? process.run()
+        do {
+            try process.run()
+        } catch {
+            Task { @MainActor in completion(-1, error.localizedDescription) }
+        }
     }
 
     private func showUpdateStatus(title: String, message: String, final: Bool) {
@@ -607,7 +638,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         content.addSubview(titleLabel)
         let info = NSTextField(labelWithString: message)
         info.textColor = .secondaryLabelColor
-        info.frame = NSRect(x: 22, y: 47, width: 316, height: 20)
+        info.lineBreakMode = .byWordWrapping
+        info.maximumNumberOfLines = 2
+        info.frame = NSRect(x: 22, y: 38, width: 316, height: 36)
         content.addSubview(info)
         if final {
             let button = NSButton(title: "OK", target: updateWindow, action: #selector(NSWindow.orderOut(_:)))
