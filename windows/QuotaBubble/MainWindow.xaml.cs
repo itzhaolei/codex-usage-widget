@@ -13,7 +13,7 @@ using Forms = System.Windows.Forms;
 
 namespace QuotaBubble;
 
-public sealed record ResetRow(string Text, Brush Brush, Brush Foreground);
+public sealed record ResetRow(string Text, System.Windows.Media.Brush Brush, System.Windows.Media.Brush Foreground);
 
 public partial class MainWindow : Window
 {
@@ -209,7 +209,7 @@ public partial class MainWindow : Window
 
     private ResetCredits? _lastRenderedCredits;
 
-    private Brush SecondaryBrush() => new SolidColorBrush(_settings.Light ? Color.FromRgb(89, 99, 107) : Color.FromRgb(174, 185, 191));
+    private System.Windows.Media.Brush SecondaryBrush() => new SolidColorBrush(_settings.Light ? Color.FromRgb(89, 99, 107) : Color.FromRgb(174, 185, 191));
 
     private void SelectLanguage(string code)
     {
