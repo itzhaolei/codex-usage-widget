@@ -20,6 +20,6 @@
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Resource Include="..\..\..\assets\icon.png" Link="Assets\icon.png" />
+    <Resource Include="..\..\assets\icon.png" Link="Assets\icon.png" />
   </ItemGroup>
 </Project>
