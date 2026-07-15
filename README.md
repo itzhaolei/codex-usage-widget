@@ -51,9 +51,7 @@ Unzip it, then double-click `Install Quota Bubble.app`. The installer copies the
 
 The README always links to the latest release page. To install an older version, open [all releases](https://github.com/itzhaolei/codex-usage-widget/releases) and download the installer from that version's page.
 
-Quota Bubble reads local Codex quota data from the current user account. If the local Codex CLI data is not available yet, the widget shows a setup overlay that can install Codex CLI and guide the user to log in.
-
-If Node.js is missing on macOS, the widget now shows the same setup overlay. The install button tries `brew install node` when Homebrew is available, and falls back to the Node.js download page otherwise.
+Quota Bubble reads local Codex quota data from the current user account and opens directly without prerequisite prompts.
 
 #### Method 2: One-Line Install
 

@@ -32,7 +32,7 @@
 
 README 始终指向最新版本发布页。如果需要安装旧版本，请打开[所有版本页面](https://github.com/itzhaolei/codex-usage-widget/releases)，进入对应版本页面下载该版本的安装器。
 
-工具会读取当前用户本机的 Codex 配额数据。如果本机还没有可用的 Codex CLI 本地数据，工具会显示初始化遮罩，引导用户安装 Codex CLI 并完成登录。
+工具会读取当前用户本机的 Codex 配额数据，并直接打开，不显示环境检查或安装引导遮罩。
 
 Windows 暂时保持在 v2.1.3，请从 [Windows v2.1.3 发布页](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v2.1.3) 下载 `QuotaBubble-*-Windows.zip`，解压后运行 `windows/install.ps1`。
 

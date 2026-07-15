@@ -4,6 +4,10 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+### Changed
+
+- Removed the macOS prerequisite overlay and its Node.js/Codex CLI detection, installation, and login handoff actions. The widget now opens directly and keeps local quota synchronization independent of setup prompts.
+
 ## 3.0.0 - 2026-07-15
 
 ### Changed

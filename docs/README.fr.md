@@ -28,7 +28,7 @@ Si vous ne souhaitez pas utiliser Terminal, ouvrez la dernière page de release 
 
 [Ouvrir la dernière page de release](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
-Décompressez-le, puis double-cliquez sur `Install Quota Bubble.app`. Quota Bubble lit les données locales de quota Codex du compte utilisateur actuel. Si les données locales de Codex CLI ne sont pas encore disponibles, le widget affiche un écran de configuration pour installer Codex CLI et se connecter.
+Décompressez-le, puis double-cliquez sur `Install Quota Bubble.app`. Quota Bubble lit les données locales de quota Codex du compte utilisateur actuel et s'ouvre directement, sans écran de configuration.
 
 Windows reste pour le moment en v2.1.3. Téléchargez `QuotaBubble-*-Windows.zip` depuis la [release Windows v2.1.3](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v2.1.3), décompressez-le, puis lancez `windows/install.ps1`.
 

@@ -107,7 +107,6 @@ private struct QuotaBubbleView: View {
             .padding(.bottom, 9)
 
             version
-            if store.setupIssue != .ready { setupOverlay }
         }
         .frame(width: widgetWidth, height: store.desiredHeight)
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -260,71 +259,6 @@ private struct QuotaBubbleView: View {
         .position(x: widgetWidth - 29, y: store.desiredHeight - 15)
     }
 
-    private var setupOverlay: some View {
-        ZStack {
-            Color.black.opacity(0.64)
-            VStack(alignment: .leading, spacing: 10) {
-                Text(setupCopy.title)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(Color.white)
-                Text(setupCopy.message)
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color.white.opacity(0.72))
-                    .lineLimit(2)
-                HStack(spacing: 16) {
-                    setupStep("安装 CLI", index: 0)
-                    setupStep("完成登录", index: 1)
-                    setupStep("同步配额", index: 2)
-                }
-                HStack {
-                    Spacer()
-                    Button(setupCopy.button) { store.performSetupAction() }
-                        .buttonStyle(.plain)
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(Color(red: 0.25, green: 1, blue: 0.34))
-                        .padding(.horizontal, 18)
-                        .frame(height: 28)
-                        .background(Color(red: 0.05, green: 0.42, blue: 0.14).opacity(0.72))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.green.opacity(0.62)))
-                        .disabled(store.setupIssue == .installing)
-                }
-            }
-            .padding(18)
-            .frame(width: widgetWidth - 36, height: 158)
-            .background(Color(red: 0.06, green: 0.09, blue: 0.11).opacity(0.96))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.14)))
-            .shadow(color: .black.opacity(0.28), radius: 18, y: 8)
-        }
-    }
-
-    private var setupCopy: (title: String, message: String, button: String) {
-        let zh = store.languageCode == "zh"
-        switch store.setupIssue {
-        case .missingNode: return zh ? ("需要安装 Node.js", "Quota Bubble 需要 Node.js 运行本地同步脚本，安装后会自动检测。", "安装") : ("Node.js required", "Node.js runs the local quota sync. It will be detected automatically after installation.", "Install")
-        case .missingCli: return zh ? ("需要安装 Codex CLI", "安装后将自动创建本地数据并继续同步配额。", "安装") : ("Codex CLI required", "Install the CLI to create local data and start quota sync.", "Install")
-        case .missingLogin: return zh ? ("需要登录 Codex CLI", "完成 codex login 后，工具会自动恢复显示。", "打开登录") : ("Codex CLI login required", "Complete codex login and the widget will recover automatically.", "Log in")
-        case .waitingForSnapshot: return zh ? ("正在同步配额", "本地快照尚未生成，工具会持续重试。", "重试") : ("Syncing quota", "The local snapshot is not ready. Quota Bubble will keep retrying.", "Retry")
-        case .installing: return zh ? ("正在安装 Codex CLI", "安装完成后会自动检测并同步配额。", "安装中") : ("Installing Codex CLI", "Quota Bubble will detect it and sync automatically.", "Installing")
-        case .installFailed: return zh ? ("安装未完成", "请检查网络后重试。", "重试") : ("Installation incomplete", "Check the network and retry.", "Retry")
-        case .ready: return ("", "", "")
-        }
-    }
-
-    private func setupStep(_ title: String, index: Int) -> some View {
-        let active: Int = {
-            switch store.setupIssue {
-            case .missingNode, .missingCli, .installing, .installFailed: return 0
-            case .missingLogin: return 1
-            case .waitingForSnapshot, .ready: return 2
-            }
-        }()
-        return HStack(spacing: 5) {
-            Circle().fill(index <= active ? Color.green : Color.white.opacity(0.22)).frame(width: 7, height: 7)
-            Text(title).font(.system(size: 9, weight: .semibold)).foregroundStyle(Color.white.opacity(index <= active ? 0.86 : 0.44))
-        }
-    }
 }
 
 private struct MetricCard: View {
