@@ -12,6 +12,7 @@ using Drawing = System.Drawing;
 using Forms = System.Windows.Forms;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
+using MessageBox = System.Windows.MessageBox;
 
 namespace QuotaBubble;
 
