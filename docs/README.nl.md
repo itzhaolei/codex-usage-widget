@@ -30,7 +30,7 @@ Als je Terminal niet wilt gebruiken, open dan de nieuwste releasepagina en downl
 
 Pak het bestand uit en dubbelklik op `Install Quota Bubble.app`. Quota Bubble leest lokale Codex-quotagegevens van het huidige gebruikersaccount en opent direct, zonder installatiescherm.
 
-Windows blijft voorlopig op v2.1.3. Download `QuotaBubble-*-Windows.zip` via de [Windows v2.1.3-release](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v2.1.3), pak het uit en voer `windows/install.ps1` uit.
+Windows is nu gelijkgetrokken met macOS op v3.0.2. Download `QuotaBubble-*-Windows.zip` via de [v3.0.2-release](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v3.0.2), pak het uit en voer `windows/install.ps1` uit.
 
 De README verwijst altijd naar de nieuwste releasepagina. Voor een oudere versie open je [alle releases](https://github.com/itzhaolei/codex-usage-widget/releases) en download je de installer vanaf de pagina van die versie.
 

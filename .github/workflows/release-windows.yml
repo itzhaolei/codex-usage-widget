@@ -1,0 +1,74 @@
+name: Release Windows package
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version without the v prefix
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Parse PowerShell and WPF XAML
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path "windows/QuotaBubble.ps1"),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | Format-List | Out-String | Write-Error
+            exit 1
+          }
+          Add-Type -AssemblyName PresentationFramework
+          $source = Get-Content "windows/QuotaBubble.ps1" -Raw
+          $match = [regex]::Match($source, '(?s)\$xaml = @"\r?\n(.*?)\r?\n"@')
+          if (-not $match.Success) { throw "WPF XAML block not found" }
+          $reader = [System.Xml.XmlNodeReader]::new([xml]$match.Groups[1].Value)
+          $window = [Windows.Markup.XamlReader]::Load($reader)
+          if ($window.Width -ne 330) { throw "Unexpected window width" }
+          $window.Close()
+
+      - name: Run shared tests
+        shell: bash
+        run: |
+          node tests/WindowsStaticTests.mjs
+          node tests/SnapshotFallbackTests.mjs
+          node --check scripts/codex-usage-snapshot.mjs
+
+      - name: Build Windows package
+        shell: bash
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [ -z "$VERSION" ]; then VERSION="${GITHUB_REF_NAME#v}"; fi
+          bash scripts/package-windows.sh "$VERSION"
+
+      - name: Upload package to GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = "${{ inputs.version }}"
+          if (-not $version) { $version = $env:GITHUB_REF_NAME.TrimStart('v') }
+          $tag = "v$version"
+          $asset = "dist/QuotaBubble-$version-Windows.zip"
+          for ($attempt = 0; $attempt -lt 30; $attempt++) {
+            gh release view $tag *> $null
+            if ($LASTEXITCODE -eq 0) { break }
+            Start-Sleep -Seconds 2
+          }
+          gh release upload $tag $asset --clobber

@@ -74,9 +74,9 @@ The installer builds:
 
 ### Windows
 
-The current macOS release is v3.0.2. Windows remains on v2.1.3; open the Windows v2.1.3 release page to download its package:
+The current macOS and Windows release is v3.0.2. Open the release page to download the Windows package:
 
-[Open the Windows v2.1.3 release](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v2.1.3)
+[Open the v3.0.2 release](https://github.com/itzhaolei/codex-usage-widget/releases/tag/v3.0.2)
 
 Unzip `QuotaBubble-*-Windows.zip`, then run:
 

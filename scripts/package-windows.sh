@@ -21,6 +21,7 @@ cp "$PLUGIN_DIR/windows/install.ps1" "$BUILD_DIR/QuotaBubble-$VERSION/windows/in
 cp "$PLUGIN_DIR/windows/uninstall.ps1" "$BUILD_DIR/QuotaBubble-$VERSION/windows/uninstall.ps1"
 cp "$PLUGIN_DIR/scripts/codex-usage-snapshot.mjs" "$BUILD_DIR/QuotaBubble-$VERSION/scripts/codex-usage-snapshot.mjs"
 cp "$PLUGIN_DIR/assets/icon.png" "$BUILD_DIR/QuotaBubble-$VERSION/assets/icon.png"
+printf '%s\n' "$VERSION" > "$BUILD_DIR/QuotaBubble-$VERSION/VERSION"
 
 cat > "$BUILD_DIR/QuotaBubble-$VERSION/INSTALL-WINDOWS.txt" <<TXT
 Quota Bubble $VERSION for Windows

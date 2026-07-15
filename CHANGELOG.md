@@ -6,6 +6,17 @@ All notable changes to Quota Bubble are documented here.
 
 ## 3.0.2 - 2026-07-16
 
+### Added
+
+- Added a Windows v3.0.2 package aligned with the current macOS data model: weekly quota, reset-credit expiration rows, balance, available resets, account, subscription expiration, plan badges, and update status.
+- Added ten-language Windows UI and tray language selection, dynamic window height, persisted theme/pin/position/language state, and in-app Windows updates.
+- Added Windows PowerShell AST and WPF XAML validation on `windows-latest`, plus automated Release asset packaging.
+
+### Changed
+
+- Rebuilt the Windows WPF layout to match the current fixed-width Quota Bubble HUD and removed the obsolete Codex CLI setup overlay.
+- Made the Windows version dynamic through packaged `VERSION` metadata and updated installation to replace old instances cleanly.
+
 ### Fixed
 
 - Prevented unaffiliated session-log rate limits from replacing the current authenticated account's live quota when the usage endpoint briefly fails, eliminating cross-account jumps such as 100% to 22% and back.

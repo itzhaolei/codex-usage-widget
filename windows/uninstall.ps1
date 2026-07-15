@@ -11,5 +11,6 @@ Get-Process powershell, pwsh -ErrorAction SilentlyContinue |
 
 Remove-Item -Force $shortcutPath
 Remove-Item -Force (Join-Path $installDir "QuotaBubble.ps1")
+Remove-Item -Force (Join-Path $installDir "VERSION")
 Remove-Item -Force (Join-Path $installDir "windows-state.json")
 Write-Host "Quota Bubble Windows files removed."
