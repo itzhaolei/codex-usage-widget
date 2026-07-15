@@ -10,6 +10,7 @@ All notable changes to Quota Bubble are documented here.
 
 - Added a compiled Windows desktop application built with .NET 8 and WPF, distributed as a self-contained graphical `Setup.exe`.
 - Added a per-user Inno Setup installer with Start menu and optional desktop shortcuts, launch-at-sign-in, graphical uninstall, and in-app installer updates.
+- Added a release-only compatibility bridge so existing v3.0.2 installations can automatically migrate from the old ZIP updater to the graphical installer without user command-line interaction.
 - Added Windows CI coverage that compiles the application, launches the published executable, installs the graphical package, launches the installed application, and uninstalls it on a real Windows runner.
 
 ### Changed

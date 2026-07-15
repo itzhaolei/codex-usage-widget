@@ -11,6 +11,7 @@ const quota = read("windows/QuotaBubble/Services/QuotaService.cs");
 const auth = read("windows/QuotaBubble/Services/AuthService.cs");
 const updater = read("windows/QuotaBubble/Services/UpdateService.cs");
 const installer = read("windows/installer.iss");
+const compatibilityInstaller = read("windows/compat/install.ps1");
 const workflow = read(".github/workflows/release-windows.yml");
 
 assert.match(project, /<OutputType>WinExe<\/OutputType>/, "Windows client is a compiled GUI app");
@@ -25,6 +26,8 @@ assert.match(window, /Forms\.NotifyIcon/, "native tray integration is present");
 assert.match(updater, /Windows-Setup\.exe/, "updater downloads the graphical installer");
 assert.match(installer, /PrivilegesRequired=lowest/, "installer supports non-admin per-user installation");
 assert.match(installer, /\[UninstallRun\]/, "installer provides graphical uninstall support");
+assert.match(compatibilityInstaller, /Windows-Setup\.exe/, "legacy updater bridge launches the graphical installer");
+assert.match(workflow, /Windows\.zip/, "release retains an automatic migration path for the previous updater");
 assert.match(workflow, /dotnet publish/, "Windows CI compiles the application");
 assert.match(workflow, /Smoke launch installed application/, "Windows CI launches the installed app");
 for (const code of ["en", "zh", "ja", "ko", "de", "fr", "es", "pt", "it", "nl"]) {

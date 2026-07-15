@@ -92,6 +92,16 @@ jobs:
           $installer = "dist/QuotaBubble-$env:VERSION-Windows-Setup.exe"
           if (-not (Test-Path $installer)) { throw "Graphical installer was not created" }
 
+      - name: Build legacy updater bridge
+        shell: pwsh
+        run: |
+          $bridge = Join-Path $env:RUNNER_TEMP "QuotaBubble-$env:VERSION"
+          New-Item -ItemType Directory -Path $bridge -Force | Out-Null
+          Copy-Item windows/compat/install.ps1 (Join-Path $bridge "install.ps1")
+          Copy-Item "dist/QuotaBubble-$env:VERSION-Windows-Setup.exe" $bridge
+          Compress-Archive -Path $bridge -DestinationPath "dist/QuotaBubble-$env:VERSION-Windows.zip" -Force
+          if (-not (Test-Path "dist/QuotaBubble-$env:VERSION-Windows.zip")) { throw "Legacy updater bridge was not created" }
+
       - name: Install graphical package silently
         shell: pwsh
         run: |
@@ -122,9 +132,10 @@ jobs:
         run: |
           $tag = "v$env:VERSION"
           $asset = "dist/QuotaBubble-$env:VERSION-Windows-Setup.exe"
+          $bridge = "dist/QuotaBubble-$env:VERSION-Windows.zip"
           for ($attempt = 0; $attempt -lt 60; $attempt++) {
             gh release view $tag *> $null
             if ($LASTEXITCODE -eq 0) { break }
             Start-Sleep -Seconds 2
           }
-          gh release upload $tag $asset --clobber
+          gh release upload $tag $asset $bridge --clobber
