@@ -9,6 +9,7 @@ mkdir -p "$CLANG_MODULE_CACHE_PATH" "$SWIFT_MODULECACHE_PATH"
 
 bash -n "$ROOT"/scripts/{install,package-installer,restart,ensure-usage-widget,start-usage-widget,status,uninstall}.sh
 node --check "$ROOT/scripts/codex-usage-snapshot.mjs"
+node "$ROOT/tests/SnapshotFallbackTests.mjs"
 
 swiftc -parse-as-library -o "$BUILD_DIR/QuotaModelsTests" \
     "$ROOT/sources/QuotaModels.swift" "$ROOT/tests/QuotaModelsTests.swift"

@@ -387,6 +387,7 @@ function readAnyResetCreditsCache() {
 }
 
 async function fetchResetCredits() {
+  if (process.env.QUOTA_BUBBLE_DISABLE_NETWORK === "1") return null;
   const fresh = readFreshResetCreditsCache();
   if (fresh) return fresh;
 
@@ -429,6 +430,7 @@ async function fetchResetCredits() {
 }
 
 async function fetchUsage() {
+  if (process.env.QUOTA_BUBBLE_DISABLE_NETWORK === "1") return null;
   const accessToken = currentAccessToken;
   if (typeof accessToken !== "string" || accessToken.length === 0) return null;
 
@@ -523,8 +525,13 @@ if (usage?.five_hour || usage?.seven_day) {
 }
 
 const selectedLimits = latestLimits;
+// Session rate-limit events do not carry an account identifier. Once an
+// authenticated account is known, using them as a fallback can leak the
+// previous account's quota after a switch. Authenticated accounts therefore
+// keep their last matching live snapshot until the usage endpoint recovers.
+const canUseSessionFallback = currentAccountFingerprint == null && !accountState.accountChanged;
 
-if (selectedLimits) {
+if (selectedLimits && canUseSessionFallback) {
   const fiveHour = mergeWindow(existingSnapshot?.five_hour, toWindow(selectedLimits.primary), existingSameAccount);
   const sevenDay = mergeWindow(existingSnapshot?.seven_day, toWindow(selectedLimits.secondary), existingSameAccount);
   const snapshot = {

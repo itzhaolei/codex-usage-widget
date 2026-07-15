@@ -4,6 +4,10 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+### Fixed
+
+- Prevented unaffiliated session-log rate limits from replacing the current authenticated account's live quota when the usage endpoint briefly fails, eliminating cross-account jumps such as 100% to 22% and back.
+
 ## 3.0.1 - 2026-07-15
 
 ### Changed
