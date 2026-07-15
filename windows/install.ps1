@@ -25,7 +25,10 @@ Start-Sleep -Milliseconds 500
 
 New-Item -ItemType Directory -Force -Path $installDir, $scriptsDir | Out-Null
 Copy-Item -Force (Join-Path $repoRoot "scripts\codex-usage-snapshot.mjs") (Join-Path $scriptsDir "codex-usage-snapshot.mjs")
-Copy-Item -Force (Join-Path $repoRoot "windows\QuotaBubble.ps1") (Join-Path $installDir "QuotaBubble.ps1")
+$widgetSource = Join-Path $repoRoot "windows\QuotaBubble.ps1"
+$widgetDestination = Join-Path $installDir "QuotaBubble.ps1"
+$widgetContent = Get-Content $widgetSource -Raw -Encoding UTF8
+[System.IO.File]::WriteAllText($widgetDestination, $widgetContent, (New-Object System.Text.UTF8Encoding($true)))
 Copy-Item -Force (Join-Path $repoRoot "assets\icon.png") (Join-Path $installDir "icon.png")
 Set-Content -Path (Join-Path $installDir "VERSION") -Value $version -Encoding ASCII
 

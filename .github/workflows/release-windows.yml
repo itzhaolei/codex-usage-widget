@@ -58,9 +58,12 @@ jobs:
           $env:CODEX_HOME = $smokeHome
           $stdout = Join-Path $smokeHome "stdout.log"
           $stderr = Join-Path $smokeHome "stderr.log"
+          $smokeScript = Join-Path $smokeHome "QuotaBubble.ps1"
+          $widgetContent = Get-Content "windows/QuotaBubble.ps1" -Raw -Encoding UTF8
+          [System.IO.File]::WriteAllText($smokeScript, $widgetContent, [System.Text.UTF8Encoding]::new($true))
           $process = Start-Process powershell.exe -ArgumentList @(
             "-NoProfile", "-ExecutionPolicy", "Bypass", "-STA",
-            "-File", (Resolve-Path "windows/QuotaBubble.ps1"), "-NoSingleInstance"
+            "-File", $smokeScript, "-NoSingleInstance"
           ) -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
           Start-Sleep -Seconds 5
           if ($process.HasExited) {
@@ -88,6 +91,10 @@ jobs:
           if ((Get-Content (Join-Path $root "VERSION") -Raw).Trim() -ne $version) { throw "Packaged version mismatch" }
           foreach ($relative in @("windows/QuotaBubble.ps1", "windows/install.ps1", "windows/uninstall.ps1", "scripts/codex-usage-snapshot.mjs")) {
             if (-not (Test-Path (Join-Path $root $relative))) { throw "Missing packaged file: $relative" }
+          }
+          $widgetBytes = [System.IO.File]::ReadAllBytes((Join-Path $root "windows/QuotaBubble.ps1"))
+          if ($widgetBytes.Length -lt 3 -or $widgetBytes[0] -ne 0xEF -or $widgetBytes[1] -ne 0xBB -or $widgetBytes[2] -ne 0xBF) {
+            throw "Packaged Windows widget is missing its UTF-8 BOM"
           }
 
       - name: Upload package to GitHub Release

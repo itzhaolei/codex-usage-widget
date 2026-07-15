@@ -23,6 +23,13 @@ cp "$PLUGIN_DIR/scripts/codex-usage-snapshot.mjs" "$BUILD_DIR/QuotaBubble-$VERSI
 cp "$PLUGIN_DIR/assets/icon.png" "$BUILD_DIR/QuotaBubble-$VERSION/assets/icon.png"
 printf '%s\n' "$VERSION" > "$BUILD_DIR/QuotaBubble-$VERSION/VERSION"
 
+# Windows PowerShell 5 treats UTF-8 without a BOM as the system code page.
+WIDGET_PATH="$BUILD_DIR/QuotaBubble-$VERSION/windows/QuotaBubble.ps1"
+WIDGET_WITH_BOM="$WIDGET_PATH.bom"
+printf '\357\273\277' > "$WIDGET_WITH_BOM"
+cat "$WIDGET_PATH" >> "$WIDGET_WITH_BOM"
+mv "$WIDGET_WITH_BOM" "$WIDGET_PATH"
+
 cat > "$BUILD_DIR/QuotaBubble-$VERSION/INSTALL-WINDOWS.txt" <<TXT
 Quota Bubble $VERSION for Windows
 
