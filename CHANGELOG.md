@@ -4,6 +4,10 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+### Added
+
+- Added three 1080 x 1920 short-video campaign posters highlighting live quota visibility, local account isolation, and native Liquid Glass installation and updates.
+
 ## 3.0.7 - 2026-07-16
 
 ### Fixed

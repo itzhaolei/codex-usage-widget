@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quota Bubble Social Posters</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 1080px; height: 1920px; margin: 0; overflow: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    .poster {
+      display: none;
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background-position: center;
+      background-size: cover;
+      color: #f7fbf8;
+    }
+    .poster.active { display: block; }
+    .poster::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .live { background-image: url("background-live.png"); }
+    .live::before { background: linear-gradient(180deg, rgba(0,8,7,.45) 0%, rgba(0,8,7,.06) 48%, rgba(0,8,7,.74) 100%); }
+    .private { background-image: url("background-private.png"); }
+    .private::before { background: linear-gradient(180deg, rgba(0,8,10,.24) 0%, rgba(0,8,10,.02) 62%, rgba(0,8,10,.70) 100%); }
+    .native { background-image: url("background-native.png"); color: #071420; }
+    .native::before { background: linear-gradient(180deg, rgba(225,243,255,.10), rgba(2,21,36,.06) 62%, rgba(1,19,34,.34)); }
+    .content { position: relative; z-index: 1; height: 100%; padding: 70px 64px 56px; }
+    .brand { display: flex; align-items: center; gap: 22px; }
+    .brand img { width: 82px; height: 82px; border-radius: 20px; box-shadow: 0 18px 46px rgba(0,0,0,.28); }
+    .brand-name { font-size: 34px; line-height: 1; font-weight: 800; letter-spacing: 0; }
+    .brand-meta { margin-top: 10px; color: rgba(234,246,241,.58); font: 600 18px/1.1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .native .brand-meta { color: rgba(7,20,32,.55); }
+    .status {
+      margin-left: auto;
+      padding: 11px 18px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      background: rgba(7,20,18,.32);
+      backdrop-filter: blur(20px);
+      color: #62ff84;
+      font: 700 18px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .native .status { background: rgba(255,255,255,.38); border-color: rgba(255,255,255,.66); color: #087d31; }
+    .eyebrow { margin-top: 76px; color: #33f064; font: 800 22px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    h1 { margin: 24px 0 0; max-width: 930px; font-size: 76px; line-height: 1.08; font-weight: 900; letter-spacing: 0; }
+    .native h1 { color: #061521; text-shadow: 0 2px 16px rgba(255,255,255,.35); }
+    .lead { margin-top: 28px; max-width: 880px; color: rgba(237,246,243,.70); font-size: 28px; line-height: 1.55; font-weight: 500; }
+    .native .lead { color: rgba(4,22,35,.68); font-weight: 600; }
+    .product-stage {
+      position: absolute;
+      left: 58px;
+      top: 620px;
+      width: 964px;
+      height: 862px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 46px;
+      background: rgba(3,14,13,.32);
+      box-shadow: 0 44px 120px rgba(0,0,0,.40), inset 0 1px rgba(255,255,255,.18);
+      backdrop-filter: blur(26px) saturate(135%);
+    }
+    .private .product-stage { top: 606px; background: rgba(2,18,20,.52); border-color: rgba(178,243,255,.35); }
+    .native .product-stage { top: 614px; background: rgba(255,255,255,.24); border-color: rgba(255,255,255,.72); box-shadow: 0 38px 110px rgba(1,33,58,.24), inset 0 1px rgba(255,255,255,.70); }
+    .widget { position: relative; width: 910px; }
+    .native .widget { overflow: hidden; border-radius: 32px; background: rgba(3,16,22,.72); box-shadow: 0 26px 70px rgba(0,24,42,.30); }
+    .widget img { display: block; width: 100%; height: auto; filter: drop-shadow(0 28px 42px rgba(0,0,0,.44)); }
+    .version-fix {
+      position: absolute;
+      right: 24px;
+      bottom: 24px;
+      min-width: 104px;
+      padding: 6px 9px;
+      border-radius: 6px;
+      background: rgba(4,15,13,.94);
+      color: rgba(255,255,255,.74);
+      text-align: center;
+      font: 500 22px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .feature-row { position: absolute; left: 64px; right: 64px; bottom: 150px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .feature {
+      min-height: 142px;
+      padding: 24px 22px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 24px;
+      background: rgba(7,19,17,.48);
+      backdrop-filter: blur(20px);
+    }
+    .native .feature { background: rgba(243,250,255,.38); border-color: rgba(255,255,255,.66); }
+    .feature strong { display: block; color: #43f56c; font-size: 25px; line-height: 1.15; font-weight: 800; }
+    .native .feature strong { color: #087f36; }
+    .feature span { display: block; margin-top: 13px; color: rgba(240,248,245,.64); font-size: 19px; line-height: 1.35; }
+    .native .feature span { color: rgba(4,22,35,.62); font-weight: 600; }
+    .footer { position: absolute; left: 64px; right: 64px; bottom: 68px; display: flex; align-items: center; justify-content: space-between; }
+    .footer-copy { color: rgba(241,248,245,.72); font-size: 22px; font-weight: 600; }
+    .native .footer-copy { color: rgba(4,22,35,.66); }
+    .cta { display: flex; align-items: center; gap: 12px; color: #fff; font-size: 22px; font-weight: 800; }
+    .native .cta { color: #062033; }
+    .cta-dot { width: 12px; height: 12px; border-radius: 50%; background: #00ef32; box-shadow: 0 0 18px #00ef32; }
+  </style>
+</head>
+<body>
+  <article class="poster live" data-poster="1">
+    <div class="content">
+      <div class="brand">
+        <img src="../app-icon.png" alt="">
+        <div><div class="brand-name">Quota Bubble</div><div class="brand-meta">CODEX QUOTA / LIVE</div></div>
+        <div class="status">1s LIVE</div>
+      </div>
+      <div class="eyebrow">配额常驻 · 专注不中断</div>
+      <h1>配额变化，<br>不用再去设置里找</h1>
+      <p class="lead">每秒同步 Codex 配额、重置时间、余额与套餐。<br>关键变化始终在视线里。</p>
+      <div class="product-stage">
+        <div class="widget"><img src="../preview-v3.png" alt="Quota Bubble"><span class="version-fix">v3.0.7</span></div>
+      </div>
+      <div class="feature-row">
+        <div class="feature"><strong>每秒刷新</strong><span>额度变化实时可见</span></div>
+        <div class="feature"><strong>窗口置顶</strong><span>工作时随时掌握</span></div>
+        <div class="feature"><strong>重置提醒</strong><span>到期日期清晰排列</span></div>
+      </div>
+      <div class="footer"><span class="footer-copy">专注工作，配额交给 Quota Bubble</span><span class="cta"><i class="cta-dot"></i> macOS · Windows</span></div>
+    </div>
+  </article>
+
+  <article class="poster private" data-poster="2">
+    <div class="content">
+      <div class="brand">
+        <img src="../app-icon.png" alt="">
+        <div><div class="brand-name">Quota Bubble</div><div class="brand-meta">LOCAL DATA / PRIVATE</div></div>
+        <div class="status">LOCAL</div>
+      </div>
+      <div class="eyebrow">本地读取 · 账号隔离</div>
+      <h1>数据留在本机，<br>切换账号也不串数据</h1>
+      <p class="lead">识别当前 Codex 账号，隔离旧账号配额。<br>不上传凭据，不在产品中保存 Token。</p>
+      <div class="product-stage">
+        <div class="widget"><img src="../preview-v3.png" alt="Quota Bubble"><span class="version-fix">v3.0.7</span></div>
+      </div>
+      <div class="feature-row">
+        <div class="feature"><strong>账号识别</strong><span>切换后立即重新同步</span></div>
+        <div class="feature"><strong>旧值隔离</strong><span>避免配额来回闪跳</span></div>
+        <div class="feature"><strong>本地优先</strong><span>敏感凭据不离开电脑</span></div>
+      </div>
+      <div class="footer"><span class="footer-copy">你的配额，只在你的电脑上</span><span class="cta"><i class="cta-dot"></i> PRIVACY FIRST</span></div>
+    </div>
+  </article>
+
+  <article class="poster native" data-poster="3">
+    <div class="content">
+      <div class="brand">
+        <img src="../app-icon.png" alt="">
+        <div><div class="brand-name">Quota Bubble</div><div class="brand-meta">NATIVE APP / LIQUID GLASS</div></div>
+        <div class="status">v3.0.7</div>
+      </div>
+      <div class="eyebrow">原生应用 · 图形安装</div>
+      <h1>原生 Liquid Glass，<br>下载后直接使用</h1>
+      <p class="lead">一个 App 管理窗口与 Dock 生命周期。<br>支持应用内更新、下载进度与自动重启。</p>
+      <div class="product-stage">
+        <div class="widget"><img src="../preview-v3.png" alt="Quota Bubble"><span class="version-fix">v3.0.7</span></div>
+      </div>
+      <div class="feature-row">
+        <div class="feature"><strong>原生 SwiftUI</strong><span>轻量、稳定、响应迅速</span></div>
+        <div class="feature"><strong>图形安装器</strong><span>无需终端命令</span></div>
+        <div class="feature"><strong>自动更新</strong><span>安装完成自动重启</span></div>
+      </div>
+      <div class="footer"><span class="footer-copy">打开官网，自动下载对应系统版本</span><span class="cta"><i class="cta-dot"></i> 一键安装</span></div>
+    </div>
+  </article>
+  <script>
+    const index = new URLSearchParams(location.search).get("poster") || "1";
+    document.querySelector(`[data-poster="${index}"]`)?.classList.add("active");
+  </script>
+</body>
+</html>
