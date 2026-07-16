@@ -131,7 +131,7 @@ function normalizePlanType(planType) {
   if (compact === "plus") return "plus";
   if (compact.includes("20x") || compact.includes("pro20")) return "pro20x";
   if (compact.includes("5x") || compact.includes("pro5")) return "pro5x";
-  if (compact === "pro") return "pro";
+  if (compact === "pro") return "pro20x";
   return null;
 }
 

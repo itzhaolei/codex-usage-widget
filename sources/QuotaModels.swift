@@ -134,14 +134,14 @@ func normalizedPlanType(_ rawValue: String?) -> String? {
     let value = raw.replacingOccurrences(of: #"[\s_-]+"#, with: "", options: .regularExpression)
     if value.contains("20x") || value.contains("pro20") { return "pro20x" }
     if value.contains("5x") || value.contains("pro5") { return "pro5x" }
-    return ["free", "plus", "pro"].contains(value) ? value : nil
+    if value == "pro" { return "pro20x" }
+    return ["free", "plus"].contains(value) ? value : nil
 }
 
 func planBadgeText(_ raw: String?) -> String {
     switch normalizedPlanType(raw) {
     case "free": return "Free"
     case "plus": return "Plus"
-    case "pro": return "Pro"
     case "pro5x": return "Pro5x"
     case "pro20x": return "Pro20x"
     default: return ""

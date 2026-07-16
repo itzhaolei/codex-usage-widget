@@ -175,7 +175,8 @@ public sealed class QuotaService : IDisposable
         var value = new string(raw.ToLowerInvariant().Where(char.IsLetterOrDigit).ToArray());
         if (value.Contains("20x") || value.Contains("pro20")) return "pro20x";
         if (value.Contains("5x") || value.Contains("pro5")) return "pro5x";
-        return value is "free" or "plus" or "pro" ? value : null;
+        if (value == "pro") return "pro20x";
+        return value is "free" or "plus" ? value : null;
     }
 
     private static string? Balance(JsonElement root)

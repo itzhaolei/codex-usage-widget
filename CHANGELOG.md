@@ -11,6 +11,7 @@ All notable changes to Quota Bubble are documented here.
 ### Fixed
 
 - Automatically restarts the macOS application after an update installs successfully, using a detached helper that waits for the old process to exit before launching the new bundle.
+- Displays the generic Codex `pro` plan as `Pro20x`, while preserving explicitly reported `Pro5x` plans.
 
 ## 3.0.3 - 2026-07-16
 

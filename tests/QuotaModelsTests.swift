@@ -4,6 +4,7 @@ import Foundation
 enum QuotaModelsTests {
     static func main() throws {
         expect(normalizedPlanType("pro_20x") == "pro20x", "Pro20x normalization")
+        expect(planBadgeText("pro") == "Pro20x", "generic Pro badge")
         expect(planBadgeText("chatgpt_pro_5x") == "Pro5x", "Pro5x badge")
         expect(planBadgeText("free") == "Free", "Free badge")
         expect(remainingPercent(fromUsedPercent: 0) == 100, "unused quota")
