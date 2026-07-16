@@ -33,6 +33,7 @@
 README 始终指向最新版本发布页。如果需要安装旧版本，请打开[所有版本页面](https://github.com/itzhaolei/codex-usage-widget/releases)，进入对应版本页面下载该版本的安装器。
 
 工具会读取当前用户本机的 Codex 配额数据，并直接打开，不显示环境检查或安装引导遮罩。
+macOS 应用使用 Swift 原生获取配额。普通用户不需要 Node.js、npm、单独安装的 Codex CLI、Xcode 或命令行工具；只需 macOS 13 或更高版本、已登录且已经生成 `~/.codex/auth.json` 的 Codex，以及能够访问 Codex 的网络。
 
 Windows 已与 macOS 对齐到 v3.0.3。请从[最新版本发布页](https://github.com/itzhaolei/codex-usage-widget/releases/latest)下载 `QuotaBubble-*-Windows-Setup.exe`，双击后按照图形安装向导操作。用户不需要 PowerShell、Node.js、命令行或额外安装 .NET 运行时；更新和卸载也通过图形界面完成。
 
@@ -66,4 +67,4 @@ bash scripts/git-sync.sh "描述这次改动"
 
 ## 隐私
 
-插件只在本机运行。它会读取用户本机的 Codex 会话元数据和 `~/.codex/auth.json` 中的当前 Codex token，用于向 Codex 后端请求该用户自己的可用重置次数。仓库中不包含个人凭据或账号数据。
+插件只在本机运行。macOS 应用只会在内存中读取 `~/.codex/auth.json` 的当前 Codex token，用于向 Codex 后端请求该账号的配额、余额、套餐和重置次数。Token 不会写入配额快照，仓库中也不包含个人凭据或账号数据。

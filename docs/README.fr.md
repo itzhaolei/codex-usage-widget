@@ -11,7 +11,7 @@ Une fenêtre flottante pour macOS et Windows afin d’afficher l’usage Codex s
 - Affiche l’usage Codex sur 5 heures, l’usage hebdomadaire et les réinitialisations disponibles.
 - Affiche sous macOS la date d’expiration de chaque réinitialisation, avec un point rouge à moins de trois jours et vert au-delà.
 - Affiche localement sous macOS le compte actuel et l’expiration de l’abonnement sans enregistrer les identifiants dans l’instantané de quota.
-- Stabilise les valeurs lors du basculement entre l’usage en direct et le journal de session local.
+- Stabilise les quotas en direct et empêche l’affichage des données du compte précédent après un changement de compte.
 - Fonctionne indépendamment et lit les données locales de quota Codex.
 - Mémorise la position, le thème et l’état épinglé.
 - Une seule app SwiftUI gère le HUD, l’icône du Dock, les menus et le cycle de vie.
@@ -29,6 +29,7 @@ Si vous ne souhaitez pas utiliser Terminal, ouvrez la dernière page de release 
 [Ouvrir la dernière page de release](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Décompressez-le, puis double-cliquez sur `Install Quota Bubble.app`. Quota Bubble lit les données locales de quota Codex du compte utilisateur actuel et s'ouvre directement, sans écran de configuration.
+L’application macOS récupère les quotas nativement en Swift. Elle ne nécessite ni Node.js, ni npm, ni installation séparée de Codex CLI, ni Xcode, ni outils en ligne de commande, seulement macOS 13 ou version ultérieure, une installation Codex connectée avec `~/.codex/auth.json` et un accès réseau à Codex.
 
 Windows est aligné sur macOS en v3.0.3. Téléchargez `QuotaBubble-*-Windows-Setup.exe` depuis la [dernière version](https://github.com/itzhaolei/codex-usage-widget/releases/latest), puis double-cliquez sur l’installeur graphique. PowerShell, Node.js, le terminal et une installation .NET séparée ne sont pas nécessaires.
 
@@ -54,4 +55,4 @@ bash scripts/uninstall.sh
 
 ## Confidentialité
 
-Ce plugin s’exécute localement. Il lit les métadonnées de session Codex locales et le token Codex actuel dans `~/.codex/auth.json` uniquement pour demander au backend Codex le nombre de réinitialisations disponibles de l’utilisateur. Aucun identifiant personnel ni donnée de compte n’est inclus dans ce dépôt.
+Ce plugin s’exécute localement. L’application macOS lit uniquement en mémoire le token Codex actuel dans `~/.codex/auth.json` afin de demander au backend le quota, le solde, l’offre et les réinitialisations de ce compte. Le token n’est jamais écrit dans l’instantané et aucun identifiant personnel ni donnée de compte n’est inclus dans ce dépôt.

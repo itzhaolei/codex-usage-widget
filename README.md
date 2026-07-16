@@ -27,7 +27,7 @@ Website source lives in `public/` and is ready for Cloudflare Pages. Recommended
 - Shows 5-hour usage, weekly usage, USD balance, and available reset credits.
 - Lists reset-credit expiration dates with red and green urgency indicators on macOS.
 - Shows the current account and subscription expiration locally on macOS without copying credentials into the quota snapshot.
-- Stabilizes quota values when switching between live usage and local session-log fallback data.
+- Stabilizes live quota values and prevents data from a previous account appearing after an account switch.
 - Runs independently while reading local Codex quota data.
 - Remembers position, theme, and pinned state.
 - Runs as one native SwiftUI macOS app: the HUD, Dock icon, menus, and lifecycle share one process.
@@ -52,6 +52,7 @@ Unzip it, then double-click `Install Quota Bubble.app`. The installer copies the
 The README always links to the latest release page. To install an older version, open [all releases](https://github.com/itzhaolei/codex-usage-widget/releases) and download the installer from that version's page.
 
 Quota Bubble reads local Codex quota data from the current user account and opens directly without prerequisite prompts.
+The macOS app fetches quota data natively in Swift. End users do not need Node.js, npm, a separately installed Codex CLI, Xcode, or command-line tools; they only need macOS 13 or later, a signed-in Codex installation that has created `~/.codex/auth.json`, and network access to Codex.
 
 #### Method 2: One-Line Install
 
@@ -105,4 +106,4 @@ The script stages changed files, creates a commit, and pushes to `origin`.
 
 ## Privacy
 
-This plugin runs locally. It reads Codex local session metadata and the current Codex auth token from `~/.codex/auth.json` only on the user's machine to request that user's reset-credit count from the Codex backend. No personal credentials or account data are included in this repository.
+This plugin runs locally. The macOS app reads the current Codex auth token from `~/.codex/auth.json` into memory only to request that account's quota, balance, plan, and reset-credit data from the Codex backend. Tokens are never written to the quota snapshot, and no personal credentials or account data are included in this repository.

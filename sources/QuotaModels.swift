@@ -201,3 +201,7 @@ func compareVersions(_ lhs: [Int], _ rhs: [Int]) -> ComparisonResult {
     }
     return .orderedSame
 }
+
+func shellQuote(_ value: String) -> String {
+    "'\(value.replacingOccurrences(of: "'", with: "'\\''"))'"
+}

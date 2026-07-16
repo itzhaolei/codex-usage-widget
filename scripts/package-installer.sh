@@ -20,7 +20,7 @@ UNIVERSAL="${QUOTA_BUBBLE_UNIVERSAL:-0}"
 rm -rf "$BUILD_DIR" "$ZIP_PATH"
 mkdir -p "$INSTALLER_APP/Contents/MacOS" "$PAYLOAD/scripts" "$QUOTA_APP/Contents/MacOS" "$QUOTA_APP/Contents/Resources" "$DIST_DIR"
 
-SOURCES=("$PLUGIN_DIR/sources/QuotaModels.swift" "$PLUGIN_DIR/sources/QuotaStore.swift" "$PLUGIN_DIR/sources/QuotaBubbleApp.swift")
+SOURCES=("$PLUGIN_DIR/sources/QuotaModels.swift" "$PLUGIN_DIR/sources/QuotaSnapshotService.swift" "$PLUGIN_DIR/sources/QuotaStore.swift" "$PLUGIN_DIR/sources/QuotaBubbleApp.swift")
 if [ "$UNIVERSAL" = "1" ]; then
   swiftc -parse-as-library -target arm64-apple-macosx13.0 -o "$BUILD_DIR/QuotaBubble-arm64" "${SOURCES[@]}" -framework Cocoa -framework SwiftUI -framework Combine
   swiftc -parse-as-library -target x86_64-apple-macosx13.0 -o "$BUILD_DIR/QuotaBubble-x86_64" "${SOURCES[@]}" -framework Cocoa -framework SwiftUI -framework Combine
@@ -68,7 +68,6 @@ cat > "$INSTALLER_APP/Contents/Info.plist" <<PLIST
 </dict></plist>
 PLIST
 
-cp "$PLUGIN_DIR/scripts/codex-usage-snapshot.mjs" "$PAYLOAD/scripts/"
 for script in ensure-usage-widget.sh start-usage-widget.sh restart.sh status.sh uninstall.sh; do cp "$PLUGIN_DIR/scripts/$script" "$PAYLOAD/scripts/$script"; done
 
 cat > "$INSTALLER_APP/Contents/Resources/install-packaged.sh" <<'SCRIPT'
@@ -90,7 +89,7 @@ pkill -f "UsageWidget.app/Contents/MacOS/UsageWidget" >/dev/null 2>&1 || true
 pkill -f "Codex Usage Widget.app/Contents/MacOS/Codex Usage Widget" >/dev/null 2>&1 || true
 sleep 0.3
 rm -rf "$LEGACY_USER_APP" "$HOME/Applications/Codex Usage Widget.app" "$INSTALL_DIR/UsageWidget.app"
-mkdir -p "$INSTALL_DIR" "$CODEX_HOME/scripts" "$HOME/Library/LaunchAgents"
+mkdir -p "$INSTALL_DIR" "$HOME/Library/LaunchAgents"
 if [ -w /Applications ] && { [ ! -e "$APP" ] || [ -w "$APP" ]; }; then
     rm -rf "$APP"
     cp -R "$PAYLOAD/Quota Bubble.app" "$APP"
@@ -103,9 +102,8 @@ on run argv
 end run
 APPLESCRIPT
 fi
-cp "$PAYLOAD/scripts/codex-usage-snapshot.mjs" "$CODEX_HOME/scripts/"
 for script in ensure-usage-widget.sh start-usage-widget.sh restart.sh status.sh uninstall.sh; do cp "$PAYLOAD/scripts/$script" "$INSTALL_DIR/$script"; chmod +x "$INSTALL_DIR/$script"; done
-chmod +x "$CODEX_HOME/scripts/codex-usage-snapshot.mjs"
+rm -f "$CODEX_HOME/scripts/codex-usage-snapshot.mjs"
 xattr -dr com.apple.quarantine "$APP" >/dev/null 2>&1 || true
 touch "$APP"
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP"

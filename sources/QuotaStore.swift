@@ -21,17 +21,19 @@ final class QuotaStore: ObservableObject {
     static let savedFrameKey = "CodexUsageWidget.savedFrame"
 
     private let codexHome: String
+    private let snapshotService: QuotaSnapshotService?
     private lazy var snapshotPath = "\(codexHome)/codex-usage-snapshot.json"
-    private lazy var snapshotScriptPath = "\(codexHome)/scripts/codex-usage-snapshot.mjs"
     private lazy var authPath = "\(codexHome)/auth.json"
     private var timer: Timer?
     private var refreshInFlight = false
     private var lastVersionCheck = Date.distantPast
     private var authReadFailureSince: Date?
 
-    init(codexHome: String? = nil) {
-        self.codexHome = codexHome ?? ProcessInfo.processInfo.environment["CODEX_HOME"]
+    init(codexHome: String? = nil, refreshesRemotely: Bool = true) {
+        let resolvedHome = codexHome ?? ProcessInfo.processInfo.environment["CODEX_HOME"]
             ?? NSString(string: "~/.codex").expandingTildeInPath
+        self.codexHome = resolvedHome
+        snapshotService = refreshesRemotely ? QuotaSnapshotService(codexHome: resolvedHome) : nil
         Self.migrateLegacyPreferences()
         isLightMode = UserDefaults.standard.bool(forKey: Self.lightModeKey)
         isPinned = UserDefaults.standard.object(forKey: Self.pinnedKey) as? Bool ?? true
@@ -124,38 +126,14 @@ final class QuotaStore: ObservableObject {
     }
 
     private func refreshSnapshot(force: Bool = false) {
-        guard !refreshInFlight, FileManager.default.fileExists(atPath: snapshotScriptPath) else { return }
+        guard !refreshInFlight, let snapshotService else { return }
         refreshInFlight = true
-        let script = snapshotScriptPath
-        let output = snapshotPath
-        let completion: @MainActor @Sendable () -> Void = { [weak self] in
+        let existing = snapshot
+        Task { [weak self] in
             guard let self else { return }
+            _ = await snapshotService.refresh(existing: existing)
             self.refreshInFlight = false
             self.readLocalState()
-        }
-        DispatchQueue.global(qos: .utility).async {
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-            process.arguments = ["node", script, output]
-            process.environment = ["PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/sbin:/usr/sbin"]
-            process.standardOutput = Pipe()
-            process.standardError = Pipe()
-            var succeeded = false
-            do {
-                try process.run()
-                process.waitUntilExit()
-                succeeded = process.terminationStatus == 0
-            } catch {}
-            if !succeeded {
-                let fallback = Process()
-                fallback.executableURL = URL(fileURLWithPath: "/bin/zsh")
-                fallback.arguments = ["-lc", "node \(shellQuote(script)) \(shellQuote(output))"]
-                fallback.standardOutput = Pipe()
-                fallback.standardError = Pipe()
-                try? fallback.run()
-                fallback.waitUntilExit()
-            }
-            Task { @MainActor in completion() }
         }
     }
 
@@ -241,10 +219,6 @@ final class QuotaStore: ObservableObject {
             if let value = legacy.object(forKey: key) { current.set(value, forKey: key) }
         }
     }
-}
-
-func shellQuote(_ value: String) -> String {
-    "'\(value.replacingOccurrences(of: "'", with: "'\\''"))'"
 }
 
 private func accountFingerprint(kind: String, value: String) -> String {

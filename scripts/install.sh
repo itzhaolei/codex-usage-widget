@@ -4,7 +4,6 @@ set -euo pipefail
 PLUGIN_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 INSTALL_DIR="$CODEX_HOME/usage-widget"
-SCRIPTS_DIR="$CODEX_HOME/scripts"
 APP_DIR="/Applications/Quota Bubble.app"
 APP_EXE="$APP_DIR/Contents/MacOS/Quota Bubble"
 APP_PATTERN="Quota Bubble.app/Contents/MacOS/Quota Bubble"
@@ -61,17 +60,17 @@ pkill -f "Codex Usage Widget.app/Contents/MacOS/Codex Usage Widget" >/dev/null 2
 sleep 0.3
 
 rm -rf "$APP_DIR" "$HOME/Applications/Quota Bubble.app" "$HOME/Applications/Codex Usage Widget.app" "$INSTALL_DIR/UsageWidget.app"
-mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources" "$INSTALL_DIR" "$SCRIPTS_DIR" "$HOME/Library/LaunchAgents"
+mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources" "$INSTALL_DIR" "$HOME/Library/LaunchAgents"
 
-cp "$PLUGIN_DIR/scripts/codex-usage-snapshot.mjs" "$SCRIPTS_DIR/codex-usage-snapshot.mjs"
 for script in ensure-usage-widget.sh start-usage-widget.sh restart.sh status.sh uninstall.sh; do
     cp "$PLUGIN_DIR/scripts/$script" "$INSTALL_DIR/$script"
     chmod +x "$INSTALL_DIR/$script"
 done
-chmod +x "$SCRIPTS_DIR/codex-usage-snapshot.mjs"
+rm -f "$CODEX_HOME/scripts/codex-usage-snapshot.mjs"
 
 swiftc -parse-as-library -o "$APP_EXE" \
     "$PLUGIN_DIR/sources/QuotaModels.swift" \
+    "$PLUGIN_DIR/sources/QuotaSnapshotService.swift" \
     "$PLUGIN_DIR/sources/QuotaStore.swift" \
     "$PLUGIN_DIR/sources/QuotaBubbleApp.swift" \
     -framework Cocoa -framework SwiftUI -framework Combine

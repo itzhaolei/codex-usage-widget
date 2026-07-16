@@ -12,7 +12,7 @@ enum QuotaStoreTests {
         try writeAuth(accountID: "account-a", email: "a@example.test", root: root)
         try writeSnapshot(accountID: "account-a", used: 20, root: root)
 
-        let store = QuotaStore(codexHome: root.path)
+        let store = QuotaStore(codexHome: root.path, refreshesRemotely: false)
         store.tick()
         expect(store.snapshot?.five_hour?.used_percentage == 20, "same-account snapshot loads")
         expect(store.accountText == "a@example.test", "account A loads")

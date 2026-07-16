@@ -37,12 +37,10 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Run shared and Windows static tests
+      - name: Run Windows static tests
         shell: bash
         run: |
           node tests/WindowsStaticTests.mjs
-          node tests/SnapshotFallbackTests.mjs
-          node --check scripts/codex-usage-snapshot.mjs
 
       - name: Build native Windows application
         shell: pwsh

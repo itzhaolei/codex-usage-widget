@@ -7,11 +7,13 @@ All notable changes to Quota Bubble are documented here.
 ### Added
 
 - Added a determinate progress bar and percentage to the macOS update window while the installer is downloading.
+- Added a native Swift quota service for macOS that fetches usage, balance, plan, and reset-credit data inside the application.
 
 ### Fixed
 
 - Automatically restarts the macOS application after an update installs successfully, using a detached helper that waits for the old process to exit before launching the new bundle.
 - Displays the generic Codex `pro` plan as `Pro20x`, while preserving explicitly reported `Pro5x` plans.
+- Removed the macOS runtime dependency on Node.js, npm, Codex CLI, and the external snapshot process while preserving account isolation and quota stabilization.
 
 ## 3.0.3 - 2026-07-16
 

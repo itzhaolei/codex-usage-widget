@@ -29,6 +29,7 @@ Se você não quiser usar o Terminal, abra a página da versão mais recente e b
 [Abrir a página da versão mais recente](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Descompacte e dê dois cliques em `Install Quota Bubble.app`. O Quota Bubble lê os dados locais de cota do Codex da conta do usuário atual e abre diretamente, sem tela de configuração.
+O app para macOS obtém a cota nativamente em Swift. Não exige Node.js, npm, uma instalação separada do Codex CLI, Xcode ou ferramentas de linha de comando; basta macOS 13 ou posterior, Codex conectado com `~/.codex/auth.json` e acesso de rede ao Codex.
 
 O Windows está alinhado com o macOS na v3.0.3. Baixe `QuotaBubble-*-Windows-Setup.exe` na [versão mais recente](https://github.com/itzhaolei/codex-usage-widget/releases/latest) e abra o instalador gráfico com um duplo clique. Não é necessário PowerShell, Node.js, terminal ou runtime .NET separado.
 
@@ -54,4 +55,4 @@ bash scripts/uninstall.sh
 
 ## Privacidade
 
-Este plugin roda localmente. Ele lê metadados locais de sessão do Codex e o token atual do Codex em `~/.codex/auth.json` apenas para solicitar ao backend do Codex as redefinições disponíveis do usuário. Este repositório não contém credenciais pessoais nem dados de conta.
+Este plugin roda localmente. O app para macOS lê o token atual do Codex em `~/.codex/auth.json` apenas na memória para solicitar ao backend a cota, o saldo, o plano e as redefinições dessa conta. O token nunca é gravado no snapshot e o repositório não contém credenciais pessoais nem dados da conta.

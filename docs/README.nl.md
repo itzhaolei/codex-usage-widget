@@ -29,6 +29,7 @@ Als je Terminal niet wilt gebruiken, open dan de nieuwste releasepagina en downl
 [Open de nieuwste releasepagina](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 
 Pak het bestand uit en dubbelklik op `Install Quota Bubble.app`. Quota Bubble leest lokale Codex-quotagegevens van het huidige gebruikersaccount en opent direct, zonder installatiescherm.
+De macOS-app haalt quota native op met Swift. Gebruikers hebben geen Node.js, npm, afzonderlijk geïnstalleerde Codex CLI, Xcode of opdrachtregeltools nodig, alleen macOS 13 of nieuwer, een aangemelde Codex-installatie met `~/.codex/auth.json` en netwerktoegang tot Codex.
 
 Windows is gelijkgetrokken met macOS op v3.0.3. Download `QuotaBubble-*-Windows-Setup.exe` via de [nieuwste release](https://github.com/itzhaolei/codex-usage-widget/releases/latest) en dubbelklik op het grafische installatieprogramma. PowerShell, Node.js, een terminal en een afzonderlijke .NET-runtime zijn niet nodig.
 
@@ -54,4 +55,4 @@ bash scripts/uninstall.sh
 
 ## Privacy
 
-Deze plugin draait lokaal. Hij leest lokale Codex-sessiemetadata en de huidige Codex token in `~/.codex/auth.json` alleen om de beschikbare resets van de gebruiker op te vragen bij de Codex-backend. Deze repository bevat geen persoonlijke inloggegevens of accountgegevens.
+Deze plugin draait lokaal. De macOS-app leest de huidige Codex-token uit `~/.codex/auth.json` alleen in het geheugen om quota, saldo, abonnement en resets voor dat account op te vragen. De token wordt nooit naar de snapshot geschreven en deze repository bevat geen persoonlijke inloggegevens of accountgegevens.
