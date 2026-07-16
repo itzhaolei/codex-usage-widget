@@ -4,13 +4,20 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version without the v prefix
+        required: true
 
 permissions:
   contents: write
 
 jobs:
   release:
-    runs-on: macos-26-arm64
+    runs-on: macos-26
+    env:
+      VERSION: ${{ inputs.version || github.ref_name }}
     steps:
       - name: Check out tagged source
         uses: actions/checkout@v4
@@ -26,7 +33,7 @@ jobs:
           QUOTA_BUBBLE_UNIVERSAL: "1"
           QUOTA_BUBBLE_REQUIRE_LIQUID_GLASS: "1"
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${VERSION#v}"
           bash scripts/package-installer.sh "$VERSION"
           file "dist/QuotaBubble-$VERSION-macOS-Installer.zip"
           shasum -a 256 "dist/QuotaBubble-$VERSION-macOS-Installer.zip"
@@ -35,13 +42,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${VERSION#v}"
+          TAG="v$VERSION"
           ASSET="dist/QuotaBubble-$VERSION-macOS-Installer.zip"
           NOTES="docs/releases/$VERSION.md"
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" "$ASSET" --clobber
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ASSET" --clobber
           elif [ -f "$NOTES" ]; then
-            gh release create "$GITHUB_REF_NAME" "$ASSET" --title "Quota Bubble $GITHUB_REF_NAME" --notes-file "$NOTES" --verify-tag
+            gh release create "$TAG" "$ASSET" --title "Quota Bubble $TAG" --notes-file "$NOTES" --verify-tag
           else
-            gh release create "$GITHUB_REF_NAME" "$ASSET" --title "Quota Bubble $GITHUB_REF_NAME" --generate-notes --verify-tag
+            gh release create "$TAG" "$ASSET" --title "Quota Bubble $TAG" --generate-notes --verify-tag
           fi
