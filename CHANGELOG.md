@@ -17,6 +17,7 @@ All notable changes to Quota Bubble are documented here.
 - Redesigned the website around the current SwiftUI window, with a compact technical visual system and a real app-rendered preview.
 - Replaced command-line installation guidance in the website and all ten README languages with a graphical website-first installation flow.
 - Removed the horizontal green scan line from the website preview stage so it no longer cuts through the app window.
+- Switched the macOS 26 light theme and metric cards to native clear Liquid Glass, with a translucent highlight edge and a low-opacity fallback for older systems.
 
 ## 3.0.5 - 2026-07-16
 

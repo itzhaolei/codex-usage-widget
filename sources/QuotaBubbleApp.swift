@@ -215,11 +215,12 @@ private struct QuotaBubbleView: View {
     private var primary: Color { store.isLightMode ? .black : .white }
     private var secondary: Color { primary.opacity(0.68) }
     private var glassTint: Color {
-        store.isLightMode ? Color.white.opacity(0.28) : Color.black.opacity(0.38)
+        store.isLightMode ? Color.white.opacity(0.12) : Color.black.opacity(0.38)
     }
     private var liquidGlassTint: Color {
-        store.isLightMode ? Color.white.opacity(0.18) : Color.black.opacity(0.30)
+        store.isLightMode ? Color.white.opacity(0.05) : Color.black.opacity(0.30)
     }
+    private var windowStroke: Color { store.isLightMode ? Color.white.opacity(0.56) : primary.opacity(0.14) }
     private var barColor: Color {
         guard let value = store.remainingPercentage else { return .red }
         return value <= 20 ? .red : Color(red: 0, green: 0.94, blue: 0.08)
@@ -253,7 +254,7 @@ private struct QuotaBubbleView: View {
         }
         .frame(width: widgetWidth, height: widgetHeight(for: store))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(primary.opacity(0.14), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(windowStroke, lineWidth: 1))
         .environment(\.colorScheme, store.isLightMode ? .light : .dark)
         .onAppear { store.start() }
         .onDisappear { store.stop() }
@@ -263,11 +264,19 @@ private struct QuotaBubbleView: View {
     private var windowBackground: some View {
 #if compiler(>=6.2)
         if #available(macOS 26.0, *) {
-            Color.clear
-                .glassEffect(
-                    .regular.tint(liquidGlassTint).interactive(),
-                    in: RoundedRectangle(cornerRadius: 12, style: .continuous)
-                )
+            if store.isLightMode {
+                Color.clear
+                    .glassEffect(
+                        .clear.tint(liquidGlassTint).interactive(),
+                        in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    )
+            } else {
+                Color.clear
+                    .glassEffect(
+                        .regular.tint(liquidGlassTint).interactive(),
+                        in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    )
+            }
         } else {
             VisualEffectView(material: .hudWindow, appearance: store.isLightMode ? .vibrantLight : .vibrantDark)
             glassTint
@@ -457,10 +466,21 @@ private struct MetricCard: View {
         .padding(.top, 7)
         .padding(.bottom, 5)
         .frame(width: metricCardWidth, height: height)
-        .background(lightMode ? Color.white.opacity(0.42) : Color.white.opacity(0.07))
+        .background {
+#if compiler(>=6.2)
+            if #available(macOS 26.0, *), lightMode {
+                Color.clear
+                    .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+            } else {
+                lightMode ? Color.white.opacity(0.12) : Color.white.opacity(0.07)
+            }
+#else
+            lightMode ? Color.white.opacity(0.12) : Color.white.opacity(0.07)
+#endif
+        }
         .clipShape(RoundedRectangle(cornerRadius: 9))
-        .overlay(RoundedRectangle(cornerRadius: 9).stroke(Color.white.opacity(lightMode ? 0.46 : 0.12)))
-        .shadow(color: .black.opacity(lightMode ? 0.10 : 0.22), radius: 10, x: 3, y: 3)
+        .overlay(RoundedRectangle(cornerRadius: 9).stroke(Color.white.opacity(lightMode ? 0.34 : 0.12)))
+        .shadow(color: .black.opacity(lightMode ? 0.07 : 0.22), radius: 10, x: 3, y: 3)
     }
 }
 
