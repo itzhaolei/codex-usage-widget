@@ -4,6 +4,14 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+### Added
+
+- Added a determinate progress bar and percentage to the macOS update window while the installer is downloading.
+
+### Fixed
+
+- Automatically restarts the macOS application after an update installs successfully, using a detached helper that waits for the old process to exit before launching the new bundle.
+
 ## 3.0.3 - 2026-07-16
 
 ### Added

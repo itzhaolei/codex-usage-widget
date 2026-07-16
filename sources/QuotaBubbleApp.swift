@@ -28,6 +28,66 @@ private enum UpdateLookupResult: Sendable {
     case available(tag: String, assetURL: String)
 }
 
+private final class UpdateDownload: NSObject, URLSessionDownloadDelegate {
+    private let destination: URL
+    private let progressHandler: (Double) -> Void
+    private let completionHandler: (Result<URL, Error>) -> Void
+    private var session: URLSession?
+    private var completed = false
+
+    init(destination: URL, progress: @escaping (Double) -> Void, completion: @escaping (Result<URL, Error>) -> Void) {
+        self.destination = destination
+        progressHandler = progress
+        completionHandler = completion
+    }
+
+    func start(url: URL) {
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.timeoutIntervalForRequest = 30
+        configuration.timeoutIntervalForResource = 300
+        let session = URLSession(configuration: configuration, delegate: self, delegateQueue: queue)
+        self.session = session
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
+        request.setValue("Quota-Bubble-Updater", forHTTPHeaderField: "User-Agent")
+        session.downloadTask(with: request).resume()
+    }
+
+    func urlSession(
+        _ session: URLSession,
+        downloadTask: URLSessionDownloadTask,
+        didWriteData bytesWritten: Int64,
+        totalBytesWritten: Int64,
+        totalBytesExpectedToWrite: Int64
+    ) {
+        guard totalBytesExpectedToWrite > 0 else { return }
+        progressHandler(min(1, max(0, Double(totalBytesWritten) / Double(totalBytesExpectedToWrite))))
+    }
+
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        do {
+            try? FileManager.default.removeItem(at: destination)
+            try FileManager.default.moveItem(at: location, to: destination)
+            finish(.success(destination))
+        } catch {
+            finish(.failure(error))
+        }
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        if let error { finish(.failure(error)) }
+    }
+
+    private func finish(_ result: Result<URL, Error>) {
+        guard !completed else { return }
+        completed = true
+        session?.finishTasksAndInvalidate()
+        session = nil
+        completionHandler(result)
+    }
+}
+
 private func lookupLatestRelease(currentVersion: String?) async -> UpdateLookupResult {
     guard let current = normalizedVersion(currentVersion) else { return .failed }
     var tag: String?
@@ -488,6 +548,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private weak var store: QuotaStore?
     private var configuredWindow = false
     private var updateWindow: NSWindow?
+    private var updateDownload: UpdateDownload?
+    private weak var updateProgressIndicator: NSProgressIndicator?
+    private weak var updateProgressLabel: NSTextField?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
@@ -591,20 +654,55 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             case let .current(tag):
                 self.showUpdateStatus(title: dialogs.upToDate, message: tag, final: true)
             case let .available(tag, assetURL):
-                self.showUpdateStatus(title: dialogs.downloading, message: tag, final: false)
+                self.showUpdateStatus(title: dialogs.downloading, message: tag, final: false, progress: 0)
                 self.installUpdate(assetURL: assetURL, tag: tag)
             }
         }
     }
 
     private func installUpdate(assetURL: String, tag: String) {
-        let command = "set -euo pipefail; d=$(/usr/bin/mktemp -d \"${TMPDIR:-/tmp}/quota-bubble-update.XXXXXX\"); trap '/bin/rm -rf \"$d\"' EXIT; /usr/bin/curl -fsSL --retry 3 --retry-delay 1 --connect-timeout 15 -o \"$d/installer.zip\" \(shellQuote(assetURL)); /usr/bin/ditto -x -k \"$d/installer.zip\" \"$d\"; installer=\"$d/Install Quota Bubble.app/Contents/Resources/install-packaged.sh\"; test -f \"$installer\"; /usr/bin/env QUOTA_BUBBLE_KEEP_RUNNING=1 QUOTA_BUBBLE_SKIP_LAUNCH=1 QUOTA_BUBBLE_SKIP_DOCK=1 /bin/bash \"$installer\""
+        guard let url = URL(string: assetURL) else {
+            showUpdateStatus(title: localizedDialogCopy(store?.languageCode ?? "en").updateFailed, message: "", final: true)
+            return
+        }
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("quota-bubble-update-\(UUID().uuidString)", isDirectory: true)
+        do { try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true) } catch {
+            showUpdateStatus(title: localizedDialogCopy(store?.languageCode ?? "en").updateFailed, message: error.localizedDescription, final: true)
+            return
+        }
+        let archive = directory.appendingPathComponent("installer.zip")
+        let download = UpdateDownload(destination: archive, progress: { [weak self] value in
+            DispatchQueue.main.async { self?.updateDownloadProgress(value) }
+        }, completion: { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.updateDownload = nil
+                switch result {
+                case let .success(archive): self.installDownloadedUpdate(archive: archive, directory: directory, tag: tag)
+                case let .failure(error):
+                    try? FileManager.default.removeItem(at: directory)
+                    self.showUpdateStatus(title: localizedDialogCopy(self.store?.languageCode ?? "en").updateFailed, message: error.localizedDescription, final: true)
+                }
+            }
+        })
+        updateDownload = download
+        download.start(url: url)
+    }
+
+    private func installDownloadedUpdate(archive: URL, directory: URL, tag: String) {
+        let command = "set -euo pipefail; /usr/bin/ditto -x -k \(shellQuote(archive.path)) \(shellQuote(directory.path)); installer=\(shellQuote(directory.appendingPathComponent("Install Quota Bubble.app/Contents/Resources/install-packaged.sh").path)); test -f \"$installer\"; /usr/bin/env QUOTA_BUBBLE_KEEP_RUNNING=1 QUOTA_BUBBLE_SKIP_LAUNCH=1 QUOTA_BUBBLE_SKIP_DOCK=1 /bin/bash \"$installer\""
         let completion: @MainActor @Sendable (Int32, String) -> Void = { [weak self] status, detail in
             guard let self else { return }
-            if status == 0 { self.store?.markUpdateInstalled() }
+            try? FileManager.default.removeItem(at: directory)
             let dialogs = localizedDialogCopy(self.store?.languageCode ?? "en")
             let message = status == 0 || detail.isEmpty ? tag : detail
-            self.showUpdateStatus(title: status == 0 ? dialogs.updateComplete : dialogs.updateFailed, message: message, final: true)
+            if status == 0 {
+                self.store?.markUpdateInstalled()
+                self.showUpdateStatus(title: dialogs.updateComplete, message: message, final: false, progress: 1)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in self?.restartAfterUpdate() }
+            } else {
+                self.showUpdateStatus(title: dialogs.updateFailed, message: message, final: true)
+            }
         }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
@@ -626,7 +724,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
     }
 
-    private func showUpdateStatus(title: String, message: String, final: Bool) {
+    private func restartAfterUpdate() {
+        let currentPID = ProcessInfo.processInfo.processIdentifier
+        let installedApp = "/Applications/Quota Bubble.app"
+        let command = "while /bin/kill -0 \(currentPID) >/dev/null 2>&1; do /bin/sleep 0.1; done; /usr/bin/open -g \(shellQuote(installedApp))"
+        let helper = Process()
+        helper.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        helper.arguments = ["-lc", command]
+        helper.standardOutput = FileHandle.nullDevice
+        helper.standardError = FileHandle.nullDevice
+        do {
+            try helper.run()
+            NSApp.terminate(nil)
+        } catch {
+            let dialogs = localizedDialogCopy(store?.languageCode ?? "en")
+            showUpdateStatus(title: dialogs.updateFailed, message: error.localizedDescription, final: true)
+        }
+    }
+
+    private func showUpdateStatus(title: String, message: String, final: Bool, progress: Double? = nil) {
         if updateWindow == nil {
             let panel = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 360, height: 132), styleMask: [.titled, .closable], backing: .buffered, defer: false)
             panel.level = .floating
@@ -635,6 +751,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
         guard let content = updateWindow?.contentView else { return }
         content.subviews.forEach { $0.removeFromSuperview() }
+        updateProgressIndicator = nil
+        updateProgressLabel = nil
         let titleLabel = NSTextField(labelWithString: title)
         titleLabel.font = .boldSystemFont(ofSize: 15)
         titleLabel.frame = NSRect(x: 22, y: 75, width: 316, height: 22)
@@ -643,8 +761,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         info.textColor = .secondaryLabelColor
         info.lineBreakMode = .byWordWrapping
         info.maximumNumberOfLines = 2
-        info.frame = NSRect(x: 22, y: 38, width: 316, height: 36)
+        info.frame = NSRect(x: 22, y: progress == nil ? 38 : 48, width: 316, height: progress == nil ? 36 : 22)
         content.addSubview(info)
+        if let progress {
+            let indicator = NSProgressIndicator(frame: NSRect(x: 22, y: 27, width: 316, height: 10))
+            indicator.style = .bar
+            indicator.isIndeterminate = false
+            indicator.minValue = 0
+            indicator.maxValue = 1
+            indicator.doubleValue = progress
+            content.addSubview(indicator)
+            updateProgressIndicator = indicator
+
+            let percentage = NSTextField(labelWithString: "\(Int((progress * 100).rounded()))%")
+            percentage.alignment = .right
+            percentage.font = .monospacedDigitSystemFont(ofSize: 11, weight: .regular)
+            percentage.textColor = .secondaryLabelColor
+            percentage.frame = NSRect(x: 278, y: 8, width: 60, height: 16)
+            content.addSubview(percentage)
+            updateProgressLabel = percentage
+        }
         if final {
             let button = NSButton(title: "OK", target: updateWindow, action: #selector(NSWindow.orderOut(_:)))
             button.frame = NSRect(x: 268, y: 12, width: 70, height: 28)
@@ -652,6 +788,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
         updateWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func updateDownloadProgress(_ value: Double) {
+        let progress = min(1, max(0, value))
+        updateProgressIndicator?.doubleValue = progress
+        updateProgressLabel?.stringValue = "\(Int((progress * 100).rounded()))%"
     }
 
     func confirmUninstall() {
