@@ -4,6 +4,12 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.0.7 - 2026-07-16
+
+### Fixed
+
+- Built the macOS release with Xcode 26.6 and verified native SwiftUI Glass symbols before upload, so macOS 26 users receive the intended clear Liquid Glass appearance instead of the compatibility blur fallback.
+
 ## 3.0.6 - 2026-07-16
 
 ### Added

@@ -10,14 +10,21 @@ permissions:
 
 jobs:
   release:
-    runs-on: macos-14
+    runs-on: macos-26-arm64
     steps:
       - name: Check out tagged source
         uses: actions/checkout@v4
 
+      - name: Select Liquid Glass toolchain
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.6.app
+          xcodebuild -version
+          swiftc --version
+
       - name: Build universal installer
         env:
           QUOTA_BUBBLE_UNIVERSAL: "1"
+          QUOTA_BUBBLE_REQUIRE_LIQUID_GLASS: "1"
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           bash scripts/package-installer.sh "$VERSION"

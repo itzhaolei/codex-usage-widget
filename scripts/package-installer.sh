@@ -16,6 +16,7 @@ DIST_DIR="$PLUGIN_DIR/dist"
 ZIP_PATH="$DIST_DIR/QuotaBubble-$VERSION-macOS-Installer.zip"
 SWIFT_TARGET="${QUOTA_BUBBLE_SWIFT_TARGET:-}"
 UNIVERSAL="${QUOTA_BUBBLE_UNIVERSAL:-0}"
+REQUIRE_LIQUID_GLASS="${QUOTA_BUBBLE_REQUIRE_LIQUID_GLASS:-0}"
 
 rm -rf "$BUILD_DIR" "$ZIP_PATH"
 mkdir -p "$INSTALLER_APP/Contents/MacOS" "$PAYLOAD/scripts" "$QUOTA_APP/Contents/MacOS" "$QUOTA_APP/Contents/Resources" "$DIST_DIR"
@@ -31,6 +32,13 @@ else
   swiftc "${SWIFT_ARGS[@]}" -o "$QUOTA_APP/Contents/MacOS/Quota Bubble" "${SOURCES[@]}" -framework Cocoa -framework SwiftUI -framework Combine
 fi
 chmod +x "$QUOTA_APP/Contents/MacOS/Quota Bubble"
+if [ "$REQUIRE_LIQUID_GLASS" = "1" ]; then
+  nm -u "$QUOTA_APP/Contents/MacOS/Quota Bubble" > "$BUILD_DIR/QuotaBubble-symbols.txt"
+  if ! grep -q 'glassEffect' "$BUILD_DIR/QuotaBubble-symbols.txt"; then
+    echo "error: release binary does not contain native SwiftUI Liquid Glass support" >&2
+    exit 1
+  fi
+fi
 cp "$PLUGIN_DIR/assets/AppIcon.icns" "$QUOTA_APP/Contents/Resources/AppIcon.icns"
 cp "$PLUGIN_DIR/assets/AppIcon.icns" "$INSTALLER_APP/Contents/Resources/AppIcon.icns"
 
