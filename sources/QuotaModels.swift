@@ -202,6 +202,16 @@ func compareVersions(_ lhs: [Int], _ rhs: [Int]) -> ComparisonResult {
     return .orderedSame
 }
 
+func macOSInstallerDownloadURL(for tagValue: String) -> String? {
+    let tag = tagValue.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !tag.isEmpty,
+          tag.range(of: #"^v?[0-9]+(?:\.[0-9]+)*$"#, options: .regularExpression) != nil,
+          let version = normalizedVersion(tag) else { return nil }
+    let versionText = version.map(String.init).joined(separator: ".")
+    let normalizedTag = tag.hasPrefix("v") ? tag : "v\(versionText)"
+    return "https://github.com/itzhaolei/codex-usage-widget/releases/download/\(normalizedTag)/QuotaBubble-\(versionText)-macOS-Installer.zip"
+}
+
 func shellQuote(_ value: String) -> String {
     "'\(value.replacingOccurrences(of: "'", with: "'\\''"))'"
 }

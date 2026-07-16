@@ -75,7 +75,7 @@ The installer builds:
 
 ### Windows
 
-The current macOS and Windows release is v3.0.4. Open the release page to download the graphical Windows installer:
+The current macOS and Windows release is v3.0.5. Open the release page to download the graphical Windows installer:
 
 [Open the latest release](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
 

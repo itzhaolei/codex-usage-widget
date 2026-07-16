@@ -4,6 +4,12 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.0.5 - 2026-07-16
+
+### Fixed
+
+- Fixed the macOS updater fallback URL so GitHub API failures no longer produce a malformed array-style version and `bad range in URL` error.
+
 ## 3.0.4 - 2026-07-16
 
 ### Added

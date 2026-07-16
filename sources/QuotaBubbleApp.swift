@@ -121,7 +121,7 @@ private func lookupLatestRelease(currentVersion: String?) async -> UpdateLookupR
     guard let tag, let latest = normalizedVersion(tag) else { return .failed }
     guard compareVersions(current, latest) == .orderedAscending else { return .current(tag: tag) }
     if assetURL == nil {
-        assetURL = "https://github.com/itzhaolei/codex-usage-widget/releases/download/\(tag)/QuotaBubble-\(latest)-macOS-Installer.zip"
+        assetURL = macOSInstallerDownloadURL(for: tag)
     }
     guard let assetURL else { return .failed }
     return .available(tag: tag, assetURL: assetURL)

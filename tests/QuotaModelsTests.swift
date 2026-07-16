@@ -7,6 +7,12 @@ enum QuotaModelsTests {
         expect(planBadgeText("pro") == "Pro20x", "generic Pro badge")
         expect(planBadgeText("chatgpt_pro_5x") == "Pro5x", "Pro5x badge")
         expect(planBadgeText("free") == "Free", "Free badge")
+        expect(
+            macOSInstallerDownloadURL(for: "v3.0.4") == "https://github.com/itzhaolei/codex-usage-widget/releases/download/v3.0.4/QuotaBubble-3.0.4-macOS-Installer.zip",
+            "fallback installer URL"
+        )
+        expect(macOSInstallerDownloadURL(for: "3.0.5")?.contains("/v3.0.5/QuotaBubble-3.0.5-") == true, "fallback URL normalizes tag")
+        expect(macOSInstallerDownloadURL(for: "v[3, 0, 4]") == nil, "fallback URL rejects malformed tag")
         expect(remainingPercent(fromUsedPercent: 0) == 100, "unused quota")
         expect(remainingPercent(fromUsedPercent: 29) == 71, "remaining quota")
         expect(remainingPercent(fromUsedPercent: 100) == 0, "exhausted quota")
