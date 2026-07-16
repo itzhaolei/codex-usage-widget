@@ -7,6 +7,8 @@ enum QuotaModelsTests {
         expect(planBadgeText("pro") == "Pro20x", "generic Pro badge")
         expect(planBadgeText("chatgpt_pro_5x") == "Pro5x", "Pro5x badge")
         expect(planBadgeText("free") == "Free", "Free badge")
+        expect(localizedCopy("zh").website == "官网", "Chinese website menu")
+        expect(URL(string: officialWebsiteURLString)?.host == "htmlpreview.github.io", "official website URL")
         expect(
             macOSInstallerDownloadURL(for: "v3.0.4") == "https://github.com/itzhaolei/codex-usage-widget/releases/download/v3.0.4/QuotaBubble-3.0.4-macOS-Installer.zip",
             "fallback installer URL"

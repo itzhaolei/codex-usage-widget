@@ -4,6 +4,14 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+### Added
+
+- Added a localized Official Website item to the macOS application menu that opens the GitHub-hosted website preview.
+
+### Changed
+
+- Removed the active background tint from the pin button; pinned state is now indicated only by the green pin icon.
+
 ## 3.0.5 - 2026-07-16
 
 ### Fixed

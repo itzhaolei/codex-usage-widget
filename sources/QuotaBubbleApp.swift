@@ -184,6 +184,7 @@ struct QuotaBubbleApp: App {
                         }
                     }
                 }
+                Button(languageMenu.copy.website) { appDelegate.openWebsite() }
                 Button(languageMenu.copy.update) { appDelegate.checkForUpdates() }
                 Divider()
                 Button(role: .destructive) { appDelegate.confirmUninstall() } label: { Text(languageMenu.copy.uninstall) }
@@ -347,7 +348,6 @@ private struct QuotaBubbleView: View {
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(isActive ? Color.green : primary.opacity(0.76))
                 .frame(width: 36, height: 28)
-                .background(isActive ? Color.green.opacity(0.10) : Color.clear)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -566,6 +566,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     func selectLanguage(_ code: String?) {
         store?.selectLanguage(code)
+    }
+
+    func openWebsite() {
+        guard let url = URL(string: officialWebsiteURLString) else { return }
+        NSWorkspace.shared.open(url)
     }
 
     func attach(window: NSWindow, store: QuotaStore) {

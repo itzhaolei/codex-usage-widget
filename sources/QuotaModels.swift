@@ -41,6 +41,7 @@ struct AppCopy {
     let times: String
     let alreadyReset: String
     let language: String
+    let website: String
     let followSystem: String
     let update: String
     let uninstall: String
@@ -50,6 +51,8 @@ struct AppCopy {
     let unpin: String
     let close: String
 }
+
+let officialWebsiteURLString = "https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260621-1"
 
 struct DialogCopy {
     let checking: String
@@ -116,16 +119,16 @@ func effectiveLanguageCode() -> String { readLanguageOverride() ?? systemLanguag
 
 func localizedCopy(_ code: String = effectiveLanguageCode()) -> AppCopy {
     switch code {
-    case "zh": return AppCopy(title: "Codex 额度", week: "周", reset: "重置", availableReset: "可用重置", balance: "余额", times: "次", alreadyReset: "已重置", language: "语言", followSystem: "跟随系统", update: "版本更新", uninstall: "卸载", switchToDark: "切换到黑色模式", switchToLight: "切换到白色模式", pin: "置顶", unpin: "取消置顶", close: "关闭窗口")
-    case "ja": return AppCopy(title: "Codex 使用量", week: "週", reset: "リセット", availableReset: "利用可能なリセット", balance: "残高", times: "回", alreadyReset: "リセット済み", language: "言語", followSystem: "システムに従う", update: "アップデート", uninstall: "アンインストール", switchToDark: "ダークモード", switchToLight: "ライトモード", pin: "最前面に固定", unpin: "固定解除", close: "閉じる")
-    case "ko": return AppCopy(title: "Codex 사용량", week: "주", reset: "재설정", availableReset: "사용 가능 재설정", balance: "잔액", times: "회", alreadyReset: "재설정됨", language: "언어", followSystem: "시스템 따르기", update: "업데이트", uninstall: "제거", switchToDark: "다크 모드", switchToLight: "라이트 모드", pin: "항상 위", unpin: "고정 해제", close: "닫기")
-    case "de": return AppCopy(title: "Codex Limit", week: "Woche", reset: "Reset", availableReset: "Verfügbare Resets", balance: "Guthaben", times: "Mal", alreadyReset: "Zurückgesetzt", language: "Sprache", followSystem: "System folgen", update: "Update", uninstall: "Deinstallieren", switchToDark: "Dunkelmodus", switchToLight: "Hellmodus", pin: "Anheften", unpin: "Lösen", close: "Schließen")
-    case "fr": return AppCopy(title: "Quota Codex", week: "Semaine", reset: "Réinit.", availableReset: "Réinitialisations dispo.", balance: "Solde", times: "fois", alreadyReset: "Réinitialisé", language: "Langue", followSystem: "Suivre le système", update: "Mettre à jour", uninstall: "Désinstaller", switchToDark: "Mode sombre", switchToLight: "Mode clair", pin: "Épingler", unpin: "Détacher", close: "Fermer")
-    case "es": return AppCopy(title: "Cuota Codex", week: "Semana", reset: "Reinicio", availableReset: "Reinicios disponibles", balance: "Saldo", times: "veces", alreadyReset: "Reiniciado", language: "Idioma", followSystem: "Seguir sistema", update: "Actualizar", uninstall: "Desinstalar", switchToDark: "Modo oscuro", switchToLight: "Modo claro", pin: "Fijar", unpin: "Desfijar", close: "Cerrar")
-    case "pt": return AppCopy(title: "Cota Codex", week: "Semana", reset: "Redefinir", availableReset: "Redefinições disponíveis", balance: "Saldo", times: "vezes", alreadyReset: "Redefinido", language: "Idioma", followSystem: "Seguir sistema", update: "Atualizar", uninstall: "Desinstalar", switchToDark: "Modo escuro", switchToLight: "Modo claro", pin: "Fixar", unpin: "Desafixar", close: "Fechar")
-    case "it": return AppCopy(title: "Quota Codex", week: "Settimana", reset: "Ripristino", availableReset: "Ripristini disponibili", balance: "Saldo", times: "volte", alreadyReset: "Ripristinato", language: "Lingua", followSystem: "Segui sistema", update: "Aggiorna", uninstall: "Disinstalla", switchToDark: "Modalità scura", switchToLight: "Modalità chiara", pin: "Fissa", unpin: "Rimuovi fissaggio", close: "Chiudi")
-    case "nl": return AppCopy(title: "Codex-limiet", week: "Week", reset: "Reset", availableReset: "Beschikbare resets", balance: "Saldo", times: "keer", alreadyReset: "Gereset", language: "Taal", followSystem: "Systeem volgen", update: "Bijwerken", uninstall: "Verwijderen", switchToDark: "Donkere modus", switchToLight: "Lichte modus", pin: "Vastzetten", unpin: "Losmaken", close: "Sluiten")
-    default: return AppCopy(title: "Codex Quota", week: "Week", reset: "Reset", availableReset: "Available resets", balance: "Balance", times: "times", alreadyReset: "Reset", language: "Language", followSystem: "Follow System", update: "Check for Updates", uninstall: "Uninstall", switchToDark: "Switch to dark mode", switchToLight: "Switch to light mode", pin: "Pin", unpin: "Unpin", close: "Close")
+    case "zh": return AppCopy(title: "Codex 额度", week: "周", reset: "重置", availableReset: "可用重置", balance: "余额", times: "次", alreadyReset: "已重置", language: "语言", website: "官网", followSystem: "跟随系统", update: "版本更新", uninstall: "卸载", switchToDark: "切换到黑色模式", switchToLight: "切换到白色模式", pin: "置顶", unpin: "取消置顶", close: "关闭窗口")
+    case "ja": return AppCopy(title: "Codex 使用量", week: "週", reset: "リセット", availableReset: "利用可能なリセット", balance: "残高", times: "回", alreadyReset: "リセット済み", language: "言語", website: "公式サイト", followSystem: "システムに従う", update: "アップデート", uninstall: "アンインストール", switchToDark: "ダークモード", switchToLight: "ライトモード", pin: "最前面に固定", unpin: "固定解除", close: "閉じる")
+    case "ko": return AppCopy(title: "Codex 사용량", week: "주", reset: "재설정", availableReset: "사용 가능 재설정", balance: "잔액", times: "회", alreadyReset: "재설정됨", language: "언어", website: "공식 웹사이트", followSystem: "시스템 따르기", update: "업데이트", uninstall: "제거", switchToDark: "다크 모드", switchToLight: "라이트 모드", pin: "항상 위", unpin: "고정 해제", close: "닫기")
+    case "de": return AppCopy(title: "Codex Limit", week: "Woche", reset: "Reset", availableReset: "Verfügbare Resets", balance: "Guthaben", times: "Mal", alreadyReset: "Zurückgesetzt", language: "Sprache", website: "Website", followSystem: "System folgen", update: "Update", uninstall: "Deinstallieren", switchToDark: "Dunkelmodus", switchToLight: "Hellmodus", pin: "Anheften", unpin: "Lösen", close: "Schließen")
+    case "fr": return AppCopy(title: "Quota Codex", week: "Semaine", reset: "Réinit.", availableReset: "Réinitialisations dispo.", balance: "Solde", times: "fois", alreadyReset: "Réinitialisé", language: "Langue", website: "Site officiel", followSystem: "Suivre le système", update: "Mettre à jour", uninstall: "Désinstaller", switchToDark: "Mode sombre", switchToLight: "Mode clair", pin: "Épingler", unpin: "Détacher", close: "Fermer")
+    case "es": return AppCopy(title: "Cuota Codex", week: "Semana", reset: "Reinicio", availableReset: "Reinicios disponibles", balance: "Saldo", times: "veces", alreadyReset: "Reiniciado", language: "Idioma", website: "Sitio oficial", followSystem: "Seguir sistema", update: "Actualizar", uninstall: "Desinstalar", switchToDark: "Modo oscuro", switchToLight: "Modo claro", pin: "Fijar", unpin: "Desfijar", close: "Cerrar")
+    case "pt": return AppCopy(title: "Cota Codex", week: "Semana", reset: "Redefinir", availableReset: "Redefinições disponíveis", balance: "Saldo", times: "vezes", alreadyReset: "Redefinido", language: "Idioma", website: "Site oficial", followSystem: "Seguir sistema", update: "Atualizar", uninstall: "Desinstalar", switchToDark: "Modo escuro", switchToLight: "Modo claro", pin: "Fixar", unpin: "Desafixar", close: "Fechar")
+    case "it": return AppCopy(title: "Quota Codex", week: "Settimana", reset: "Ripristino", availableReset: "Ripristini disponibili", balance: "Saldo", times: "volte", alreadyReset: "Ripristinato", language: "Lingua", website: "Sito ufficiale", followSystem: "Segui sistema", update: "Aggiorna", uninstall: "Disinstalla", switchToDark: "Modalità scura", switchToLight: "Modalità chiara", pin: "Fissa", unpin: "Rimuovi fissaggio", close: "Chiudi")
+    case "nl": return AppCopy(title: "Codex-limiet", week: "Week", reset: "Reset", availableReset: "Beschikbare resets", balance: "Saldo", times: "keer", alreadyReset: "Gereset", language: "Taal", website: "Officiële website", followSystem: "Systeem volgen", update: "Bijwerken", uninstall: "Verwijderen", switchToDark: "Donkere modus", switchToLight: "Lichte modus", pin: "Vastzetten", unpin: "Losmaken", close: "Sluiten")
+    default: return AppCopy(title: "Codex Quota", week: "Week", reset: "Reset", availableReset: "Available resets", balance: "Balance", times: "times", alreadyReset: "Reset", language: "Language", website: "Official Website", followSystem: "Follow System", update: "Check for Updates", uninstall: "Uninstall", switchToDark: "Switch to dark mode", switchToLight: "Switch to light mode", pin: "Pin", unpin: "Unpin", close: "Close")
     }
 }
 
