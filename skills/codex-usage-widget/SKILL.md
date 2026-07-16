@@ -23,7 +23,7 @@ Install or update:
 bash scripts/install.sh
 ```
 
-One-line install for other users is documented in `ONE_LINE_INSTALL.md`. It uses `scripts/bootstrap-install.sh` after the plugin is published as a downloadable archive.
+End users install from the official website, which detects macOS or Windows and directly downloads the latest graphical installer. Do not instruct end users to run terminal commands.
 
 Install also adds `Quota Bubble.app` to the Dock and removes duplicate legacy entries.
 

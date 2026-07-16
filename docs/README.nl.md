@@ -2,13 +2,13 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Een zwevend venster voor macOS en Windows voor Codex-gebruik over 5 uur, weekgebruik en beschikbare resets.
+Een native venster voor macOS en Windows met Codex-weekquota, resettijd, saldo, plan, account en beschikbare resets.
 
-![Quota Bubble preview](../assets/preview-plus.png)
+![Quota Bubble preview](../assets/preview-v3.png)
 
 ## Functies
 
-- Toont Codex-gebruik over 5 uur, weekgebruik en beschikbare resets.
+- Toont Codex-weekquota, resettijd, saldo, plan en beschikbare resets.
 - Toont op macOS de vervaldatum van elke reset, met een rode stip binnen drie dagen en anders een groene stip.
 - Toont op macOS lokaal het huidige account en de vervaldatum van het abonnement zonder aanmeldgegevens in de quota-snapshot op te slaan.
 - Houdt quotawaarden stabiel bij het wisselen tussen live gebruik en het lokale sessielogboek.
@@ -22,36 +22,19 @@ Een zwevend venster voor macOS en Windows voor Codex-gebruik over 5 uur, weekgeb
 
 ## Installatie
 
-### Methode 1: app-installer
+Open de [officiële Quota Bubble-website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-1) en klik op de hoofdknop. De site detecteert macOS of Windows en downloadt de nieuwste grafische installer direct zonder de Release-pagina te openen.
 
-Als je Terminal niet wilt gebruiken, open dan de nieuwste releasepagina en download daar de installer:
+### macOS
 
-[Open de nieuwste releasepagina](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
+macOS 13 of nieuwer. Pak `macOS-Installer.zip` uit en open `Install Quota Bubble.app`. Node.js, npm, een aparte Codex CLI, Xcode en opdrachten zijn niet nodig. Codex moet zijn aangemeld en `~/.codex/auth.json` hebben gemaakt.
 
-Pak het bestand uit en dubbelklik op `Install Quota Bubble.app`. Quota Bubble leest lokale Codex-quotagegevens van het huidige gebruikersaccount en opent direct, zonder installatiescherm.
-De macOS-app haalt quota native op met Swift. Gebruikers hebben geen Node.js, npm, afzonderlijk geïnstalleerde Codex CLI, Xcode of opdrachtregeltools nodig, alleen macOS 13 of nieuwer, een aangemelde Codex-installatie met `~/.codex/auth.json` en netwerktoegang tot Codex.
+### Windows
 
-Windows is gelijkgetrokken met macOS op v3.0.5. Download `QuotaBubble-*-Windows-Setup.exe` via de [nieuwste release](https://github.com/itzhaolei/codex-usage-widget/releases/latest) en dubbelklik op het grafische installatieprogramma. PowerShell, Node.js, een terminal en een afzonderlijke .NET-runtime zijn niet nodig.
-
-De README verwijst altijd naar de nieuwste releasepagina. Voor een oudere versie open je [alle releases](https://github.com/itzhaolei/codex-usage-widget/releases) en download je de installer vanaf de pagina van die versie.
-
-### Methode 2: installatie met één opdracht
-
-```bash
-CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"
-```
-
-### Methode 3: lokale installatie
-
-```bash
-bash scripts/install.sh
-```
+Windows 10 of nieuwer. Open `Windows-Setup.exe` en volg de grafische wizard. PowerShell, Node.js, terminalopdrachten en een aparte .NET-runtime zijn niet nodig.
 
 ## Verwijderen
 
-```bash
-bash scripts/uninstall.sh
-```
+Gebruik op macOS **Quota Bubble > Verwijderen**. Gebruik op Windows **Instellingen > Apps > Geïnstalleerde apps**.
 
 ## Privacy
 

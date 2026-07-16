@@ -7,10 +7,13 @@ All notable changes to Quota Bubble are documented here.
 ### Added
 
 - Added a localized Official Website item to the macOS application menu that opens the GitHub-hosted website preview.
+- Added operating-system detection to the website so macOS and Windows users download the matching latest graphical installer directly.
 
 ### Changed
 
 - Removed the active background tint from the pin button; pinned state is now indicated only by the green pin icon.
+- Redesigned the website around the current SwiftUI window, with a compact technical visual system and a real app-rendered preview.
+- Replaced command-line installation guidance in the website and all ten README languages with a graphical website-first installation flow.
 
 ## 3.0.5 - 2026-07-16
 

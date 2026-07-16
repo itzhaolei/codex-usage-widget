@@ -2,13 +2,13 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Une fenêtre flottante pour macOS et Windows afin d’afficher l’usage Codex sur 5 heures, l’usage hebdomadaire et les réinitialisations disponibles.
+Une fenêtre native pour macOS et Windows affichant le quota hebdomadaire Codex, le reset, le solde, l’offre, le compte et les réinitialisations disponibles.
 
-![Quota Bubble preview](../assets/preview-plus.png)
+![Quota Bubble preview](../assets/preview-v3.png)
 
 ## Fonctionnalités
 
-- Affiche l’usage Codex sur 5 heures, l’usage hebdomadaire et les réinitialisations disponibles.
+- Affiche le quota hebdomadaire Codex, le reset, le solde, l’offre et les réinitialisations disponibles.
 - Affiche sous macOS la date d’expiration de chaque réinitialisation, avec un point rouge à moins de trois jours et vert au-delà.
 - Affiche localement sous macOS le compte actuel et l’expiration de l’abonnement sans enregistrer les identifiants dans l’instantané de quota.
 - Stabilise les quotas en direct et empêche l’affichage des données du compte précédent après un changement de compte.
@@ -22,36 +22,19 @@ Une fenêtre flottante pour macOS et Windows afin d’afficher l’usage Codex s
 
 ## Installation
 
-### Méthode 1 : installateur d’application
+Ouvrez le [site officiel Quota Bubble](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-1) et cliquez sur le bouton principal. Le site détecte macOS ou Windows et télécharge directement le dernier installateur graphique sans ouvrir la page Releases.
 
-Si vous ne souhaitez pas utiliser Terminal, ouvrez la dernière page de release et téléchargez-y l’installateur :
+### macOS
 
-[Ouvrir la dernière page de release](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
+macOS 13 ou ultérieur. Décompressez `macOS-Installer.zip`, puis ouvrez `Install Quota Bubble.app`. Node.js, npm, Codex CLI séparé, Xcode et commandes ne sont pas requis. Codex doit être connecté et avoir créé `~/.codex/auth.json`.
 
-Décompressez-le, puis double-cliquez sur `Install Quota Bubble.app`. Quota Bubble lit les données locales de quota Codex du compte utilisateur actuel et s'ouvre directement, sans écran de configuration.
-L’application macOS récupère les quotas nativement en Swift. Elle ne nécessite ni Node.js, ni npm, ni installation séparée de Codex CLI, ni Xcode, ni outils en ligne de commande, seulement macOS 13 ou version ultérieure, une installation Codex connectée avec `~/.codex/auth.json` et un accès réseau à Codex.
+### Windows
 
-Windows est aligné sur macOS en v3.0.5. Téléchargez `QuotaBubble-*-Windows-Setup.exe` depuis la [dernière version](https://github.com/itzhaolei/codex-usage-widget/releases/latest), puis double-cliquez sur l’installeur graphique. PowerShell, Node.js, le terminal et une installation .NET séparée ne sont pas nécessaires.
-
-Le README pointe toujours vers la dernière page de release. Pour installer une ancienne version, ouvrez [toutes les releases](https://github.com/itzhaolei/codex-usage-widget/releases) et téléchargez l’installateur depuis la page de cette version.
-
-### Méthode 2 : installation en une ligne
-
-```bash
-CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"
-```
-
-### Méthode 3 : installation locale
-
-```bash
-bash scripts/install.sh
-```
+Windows 10 ou ultérieur. Ouvrez `Windows-Setup.exe` et suivez l’assistant graphique. PowerShell, Node.js, terminal et runtime .NET séparé ne sont pas requis.
 
 ## Désinstallation
 
-```bash
-bash scripts/uninstall.sh
-```
+Sous macOS, utilisez **Quota Bubble > Désinstaller**. Sous Windows, utilisez **Paramètres > Applications > Applications installées**.
 
 ## Confidentialité
 

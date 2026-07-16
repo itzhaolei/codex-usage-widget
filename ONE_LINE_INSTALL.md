@@ -1,20 +1,10 @@
-# One-Line Install
+# Graphical Installation
 
-After publishing this plugin as a GitHub repository, users can install it with one command.
+Command-line installation is no longer part of the supported end-user flow.
 
-```bash
-CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"
-```
+Open the [Quota Bubble official website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-1). The main download button detects macOS or Windows and downloads the latest matching graphical installer directly.
 
-What the installer does:
+- macOS: unzip `QuotaBubble-*-macOS-Installer.zip`, then open `Install Quota Bubble.app`.
+- Windows: open `QuotaBubble-*-Windows-Setup.exe` and follow the setup wizard.
 
-- Downloads the plugin archive.
-- Installs it to `~/plugins/codex-usage-widget`.
-- Adds it to `~/.agents/plugins/marketplace.json`.
-- Builds and installs one native SwiftUI macOS app for both the Dock icon and floating HUD.
-
-For local testing from a checked-out plugin directory:
-
-```bash
-bash scripts/install.sh
-```
+No terminal commands are required.

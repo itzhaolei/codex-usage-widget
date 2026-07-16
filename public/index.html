@@ -4,300 +4,236 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Quota Bubble</title>
-  <meta name="description" content="Quota Bubble is a local desktop floating widget for Codex quota, balance, reset credits, and update status on macOS and Windows.">
-  <link rel="icon" href="assets/icon.png?v=20260621-1">
+  <meta name="description" content="Quota Bubble keeps Codex quota, reset credits, balance, and account status visible on macOS and Windows.">
+  <link rel="icon" href="assets/icon.png?v=20260716-1">
   <style>
     :root {
       color-scheme: dark;
-      --bg: #071015;
-      --panel: rgba(14, 32, 42, 0.72);
-      --panel-strong: rgba(17, 42, 54, 0.92);
-      --line: rgba(255, 255, 255, 0.12);
-      --text: #f6fbff;
-      --muted: rgba(246, 251, 255, 0.68);
-      --green: #10f02f;
-      --green-soft: rgba(16, 240, 47, 0.16);
+      --bg: #06090b;
+      --surface: rgba(15, 22, 25, 0.78);
+      --surface-strong: rgba(20, 29, 33, 0.94);
+      --line: rgba(255, 255, 255, 0.13);
+      --line-bright: rgba(112, 255, 136, 0.35);
+      --text: #f6faf7;
+      --muted: rgba(230, 239, 233, 0.66);
+      --green: #00ef26;
+      --green-dark: #06280d;
+      --blue: #63bce9;
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
       color: var(--text);
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
       background:
-        radial-gradient(circle at 74% 16%, rgba(16, 240, 47, 0.18), transparent 32rem),
-        radial-gradient(circle at 22% 62%, rgba(72, 160, 220, 0.16), transparent 30rem),
-        linear-gradient(145deg, #071015 0%, #0c1b24 52%, #05080c 100%);
+        radial-gradient(circle at 72% 20%, rgba(0, 239, 38, 0.12), transparent 28rem),
+        radial-gradient(circle at 18% 74%, rgba(99, 188, 233, 0.10), transparent 30rem);
     }
     a { color: inherit; }
+    button, select { font: inherit; }
     .page { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
     header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      min-height: 82px;
       gap: 20px;
-      padding: 28px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: 0.01em; }
-    .brand img { width: 38px; height: 38px; border-radius: 10px; box-shadow: 0 10px 32px rgba(16, 240, 47, 0.2); }
-    nav { display: flex; gap: 16px; color: var(--muted); font-size: 14px; }
-    .topbar { display: flex; align-items: center; gap: 18px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; }
+    .brand img { width: 36px; height: 36px; border-radius: 8px; }
+    .topbar { display: flex; align-items: center; gap: 12px; }
+    .text-link { color: var(--muted); font-size: 14px; text-decoration: none; }
+    .text-link:hover { color: var(--text); }
     .language-picker {
       position: relative;
       display: inline-flex;
-      align-items: center;
       border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--muted);
-      overflow: hidden;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
     }
     .language-picker::after {
       content: "⌄";
       position: absolute;
-      right: 11px;
+      right: 10px;
       top: 50%;
-      transform: translateY(-54%);
+      transform: translateY(-56%);
+      color: var(--muted);
       pointer-events: none;
-      color: rgba(255, 255, 255, 0.62);
-      font-size: 13px;
     }
     .language-select {
+      min-width: 148px;
+      padding: 8px 30px 8px 11px;
       appearance: none;
-      -webkit-appearance: none;
       border: 0;
-      background: transparent;
+      outline: 0;
       color: var(--text);
+      background: transparent;
       cursor: pointer;
-      font: inherit;
-      font-size: 13px;
-      min-width: 146px;
-      padding: 8px 31px 8px 12px;
     }
-    .language-select:focus { outline: 0; }
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
-      gap: 54px;
+      grid-template-columns: minmax(0, 1fr) minmax(430px, 0.92fr);
       align-items: center;
-      padding: 78px 0 72px;
+      gap: 70px;
+      min-height: 650px;
+      padding: 66px 0;
     }
     .eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 7px 11px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.06);
       color: var(--muted);
       font-size: 13px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     }
-    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 18px var(--green); }
-    h1 { margin: 20px 0 14px; font-size: clamp(44px, 7vw, 82px); line-height: 0.92; letter-spacing: -0.04em; }
-    .lead { margin: 0 0 28px; color: var(--muted); font-size: 19px; line-height: 1.65; max-width: 620px; }
-    .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 16px rgba(0, 239, 38, 0.72); }
+    h1 { margin: 16px 0 0; font-size: clamp(52px, 8vw, 88px); line-height: 0.98; letter-spacing: 0; }
+    .tagline { margin: 18px 0 0; font-size: clamp(22px, 3vw, 32px); line-height: 1.18; font-weight: 720; max-width: 620px; }
+    .lead { margin: 18px 0 28px; color: var(--muted); font-size: 17px; line-height: 1.7; max-width: 610px; }
+    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
     .button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       min-height: 46px;
       padding: 0 18px;
-      border-radius: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.055);
+      color: var(--text);
       text-decoration: none;
       font-weight: 760;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.07);
-    }
-    .button.primary { background: var(--green); color: #021107; border-color: transparent; box-shadow: 0 16px 44px rgba(16, 240, 47, 0.24); }
-    .share-note { color: var(--muted); font-size: 13px; min-height: 18px; margin-top: 10px; }
-    .command-row {
-      margin-top: 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .terminal {
-      position: relative;
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      padding: 13px 14px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(0, 0, 0, 0.32);
-      color: rgba(255, 255, 255, 0.86);
-      overflow: hidden;
-      font: 12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      white-space: nowrap;
-    }
-    .terminal code {
-      display: block;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .copy-command {
-      flex: 0 0 auto;
-      border: 1px solid rgba(16, 240, 47, 0.32);
-      border-radius: 14px;
-      background: linear-gradient(180deg, rgba(16, 240, 47, 0.18), rgba(16, 240, 47, 0.08));
-      color: var(--green);
       cursor: pointer;
-      font: 800 13px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      min-height: 46px;
-      padding: 0 18px;
-      box-shadow: 0 12px 34px rgba(16, 240, 47, 0.10);
     }
-    .preview {
+    .button:hover { border-color: rgba(255, 255, 255, 0.27); background: rgba(255, 255, 255, 0.09); }
+    .button.primary { color: #021006; background: var(--green); border-color: var(--green); box-shadow: 0 14px 38px rgba(0, 239, 38, 0.18); }
+    .button.primary:hover { background: #26f444; }
+    .share-note { min-height: 18px; margin-top: 9px; color: var(--muted); font-size: 12px; }
+    .signal-row { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 34px; }
+    .signal { display: flex; align-items: center; gap: 8px; color: var(--muted); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .signal::before { content: ""; width: 16px; height: 1px; background: var(--green); box-shadow: 0 0 9px rgba(0, 239, 38, 0.7); }
+    .product-stage {
       position: relative;
-      padding: clamp(18px, 4vw, 32px);
-      border: 1px solid var(--line);
-      border-radius: 28px;
-      background:
-        radial-gradient(circle at 72% 18%, rgba(16, 240, 47, 0.20), transparent 16rem),
-        radial-gradient(circle at 24% 82%, rgba(74, 168, 220, 0.18), transparent 15rem),
-        linear-gradient(155deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
-      box-shadow: 0 28px 90px rgba(0, 0, 0, 0.38);
-      backdrop-filter: blur(18px);
-    }
-    .preview::after {
-      content: "";
-      position: absolute;
-      inset: 12px;
-      border-radius: 22px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      pointer-events: none;
-    }
-    .preview img {
-      position: relative;
-      z-index: 1;
-      display: block;
-      width: 100%;
-      border-radius: 18px;
-      filter: drop-shadow(0 24px 38px rgba(0, 0, 0, 0.34));
-    }
-    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 0 0 30px; }
-    .card { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 20px; min-height: 146px; }
-    .card strong { display: block; margin-bottom: 10px; font-size: 16px; }
-    .card span { color: var(--muted); line-height: 1.55; font-size: 14px; }
-    .poster-grid {
+      min-height: 480px;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-      padding: 0 0 76px;
-    }
-    .poster {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 318px;
+      place-items: center;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.13);
-      border-radius: 24px;
-      padding: 24px;
-      background:
-        radial-gradient(circle at 78% 12%, rgba(16, 240, 47, 0.22), transparent 12rem),
-        linear-gradient(160deg, rgba(20, 47, 61, 0.92), rgba(6, 13, 18, 0.95));
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(12, 22, 27, 0.74);
+      box-shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
     }
-    .poster:nth-child(2) {
-      background:
-        radial-gradient(circle at 18% 16%, rgba(72, 160, 220, 0.22), transparent 12rem),
-        linear-gradient(160deg, rgba(18, 39, 52, 0.92), rgba(7, 12, 17, 0.95));
-    }
-    .poster:nth-child(3) {
-      background:
-        radial-gradient(circle at 74% 76%, rgba(255, 149, 36, 0.18), transparent 12rem),
-        linear-gradient(160deg, rgba(18, 38, 48, 0.92), rgba(6, 11, 16, 0.96));
-    }
-    .poster::before {
+    .product-stage::before,
+    .product-stage::after {
       content: "";
       position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), transparent 34%);
       pointer-events: none;
     }
-    .poster-copy,
-    .poster-visual { position: relative; z-index: 1; }
-    .poster-kicker {
-      display: inline-flex;
-      align-self: flex-start;
-      padding: 6px 9px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--green);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.02em;
+    .product-stage::before {
+      width: 380px;
+      height: 380px;
+      border: 1px solid rgba(0, 239, 38, 0.22);
+      border-radius: 50%;
+      box-shadow: inset 0 0 70px rgba(0, 239, 38, 0.06), 0 0 70px rgba(0, 239, 38, 0.07);
     }
-    .poster-title {
-      margin: 16px 0 9px;
-      max-width: 12ch;
-      font-size: 27px;
-      line-height: 1.04;
-      letter-spacing: -0.03em;
-      font-weight: 850;
+    .product-stage::after {
+      inset: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.055);
+      border-radius: 6px;
     }
-    .poster-text {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.55;
+    .scan-line { position: absolute; left: 0; right: 0; top: 28%; height: 1px; background: rgba(0, 239, 38, 0.22); box-shadow: 0 0 18px rgba(0, 239, 38, 0.4); }
+    .corner-label { position: absolute; color: rgba(225, 239, 229, 0.42); font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .corner-label.top { top: 24px; left: 26px; }
+    .corner-label.bottom { right: 26px; bottom: 23px; }
+    .widget-shot { position: relative; z-index: 2; display: block; width: 330px; height: 288px; object-fit: contain; filter: drop-shadow(0 24px 38px rgba(0, 0, 0, 0.55)); }
+    .section { padding: 86px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+    .section-heading { display: grid; grid-template-columns: 0.7fr 1.3fr; gap: 40px; align-items: end; margin-bottom: 34px; }
+    .section-index { color: var(--green); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    h2 { margin: 8px 0 0; font-size: clamp(31px, 5vw, 52px); line-height: 1.06; letter-spacing: 0; }
+    .section-lead { margin: 0; color: var(--muted); line-height: 1.7; max-width: 620px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .feature-card {
+      min-height: 174px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
     }
-    .poster-visual {
-      min-height: 142px;
-      margin-top: 22px;
+    .feature-number { color: var(--green); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .feature-card strong { display: block; margin: 32px 0 10px; font-size: 16px; }
+    .feature-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.58; }
+    .interface-grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 18px; }
+    .interface-panel {
+      min-height: 390px;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(13, 20, 23, 0.76);
     }
-    .poster-widget-image {
-      display: block;
-      width: 100%;
-      height: auto;
-      border-radius: 12px;
-      filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.22));
+    .interface-panel img { display: block; width: 330px; max-width: 100%; filter: drop-shadow(0 20px 34px rgba(0, 0, 0, 0.42)); }
+    .telemetry { align-content: center; place-items: stretch; gap: 0; }
+    .telemetry-row { display: grid; grid-template-columns: 110px 1fr; gap: 18px; padding: 20px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.09); }
+    .telemetry-row:last-child { border-bottom: 0; }
+    .telemetry-label { color: var(--green); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .telemetry-copy strong { display: block; margin-bottom: 6px; }
+    .telemetry-copy span { color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .download-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .download-card { padding: 25px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-strong); }
+    .platform { color: var(--muted); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .download-card h3 { margin: 15px 0 8px; font-size: 24px; }
+    .download-card p { margin: 0 0 22px; min-height: 48px; color: var(--muted); line-height: 1.55; }
+    .release-tag { margin-top: 12px; color: var(--muted); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    footer { display: flex; justify-content: space-between; gap: 20px; padding: 30px 0 44px; border-top: 1px solid rgba(255, 255, 255, 0.08); color: var(--muted); font-size: 13px; }
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; gap: 40px; }
+      .product-stage { min-height: 430px; }
+      .feature-grid { grid-template-columns: 1fr 1fr; }
+      .interface-grid { grid-template-columns: 1fr; }
+      .section-heading { grid-template-columns: 1fr; gap: 15px; }
     }
-    @media (max-width: 860px) {
-      .hero { grid-template-columns: 1fr; padding-top: 38px; gap: 30px; }
-      .grid { grid-template-columns: 1fr 1fr; }
-      .poster-grid { grid-template-columns: 1fr; }
-      .poster { min-height: 276px; }
-      .command-row { align-items: stretch; flex-direction: column; }
-      .copy-command { width: 100%; }
-      nav { display: none; }
-      header { align-items: flex-start; }
-      .topbar { flex-direction: column; align-items: flex-end; gap: 10px; }
-    }
-    @media (max-width: 560px) {
+    @media (max-width: 600px) {
       .page { width: min(100% - 28px, 1120px); }
-      .grid { grid-template-columns: 1fr; }
-      .poster-title { max-width: 100%; }
-      .hero { padding-bottom: 46px; }
-      header { flex-direction: column; }
-      .topbar { align-items: flex-start; }
+      header { align-items: flex-start; padding: 18px 0; }
+      .topbar { flex-direction: column-reverse; align-items: flex-end; }
+      h1 { font-size: 50px; }
+      .hero { padding: 48px 0; }
+      .product-stage { min-height: 360px; }
+      .widget-shot { width: min(330px, calc(100vw - 58px)); height: auto; }
+      .feature-grid, .download-grid { grid-template-columns: 1fr; }
+      .feature-card { min-height: 150px; }
+      .download-card p { min-height: 0; }
+      footer { flex-direction: column; }
     }
   </style>
 </head>
 <body>
   <div class="page">
     <header>
-      <div class="brand"><img src="assets/icon.png?v=20260621-1" alt="Quota Bubble icon"><span>Quota Bubble</span></div>
+      <div class="brand"><img src="assets/icon.png?v=20260716-1" alt="Quota Bubble app icon"><span>Quota Bubble</span></div>
       <div class="topbar">
-        <nav><a href="https://github.com/itzhaolei/codex-usage-widget">GitHub</a></nav>
-        <div class="language-picker" aria-label="Language selector">
-          <select class="language-select" id="languageSelect">
-            <option value="system">System</option>
-            <option value="en">English</option>
-            <option value="zh">中文</option>
-            <option value="ja">日本語</option>
-            <option value="ko">한국어</option>
-            <option value="de">Deutsch</option>
-            <option value="fr">Français</option>
-            <option value="es">Español</option>
-            <option value="pt">Português</option>
-            <option value="it">Italiano</option>
-            <option value="nl">Nederlands</option>
+        <a class="text-link" href="https://github.com/itzhaolei/codex-usage-widget">GitHub</a>
+        <div class="language-picker">
+          <select class="language-select" id="languageSelect" aria-label="Language selector">
+            <option value="system">System</option><option value="en">English</option><option value="zh">中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="pt">Português</option><option value="it">Italiano</option><option value="nl">Nederlands</option>
           </select>
         </div>
       </div>
@@ -306,284 +242,156 @@
     <main>
       <section class="hero">
         <div>
-          <div class="eyebrow"><span class="dot"></span><span data-i18n="eyebrow">Local desktop quota monitor for Codex</span></div>
-          <h1 data-i18n="headline">Your Codex quota, always visible.</h1>
-          <p class="lead" data-i18n="lead">Quota Bubble is a small floating desktop window for macOS and Windows that keeps Codex usage, weekly limits, balance, reset credits, and update status in sight without opening settings.</p>
-          <div id="install" class="actions">
-            <a class="button primary" href="https://github.com/itzhaolei/codex-usage-widget/releases/latest" data-i18n="download">Download installer</a>
+          <div class="eyebrow"><span class="live-dot"></span><span data-i18n="eyebrow">Native desktop quota telemetry</span></div>
+          <h1>Quota Bubble</h1>
+          <div class="tagline" data-i18n="tagline">Codex quota, visible without breaking focus.</div>
+          <p class="lead" data-i18n="lead">A compact native window for weekly quota, resets, balance, plan, account, and subscription status. Refreshed every second on macOS and Windows.</p>
+          <div class="actions">
+            <a class="button primary" id="smartDownload" href="#platformDownloads" data-i18n="preparing">Preparing download…</a>
             <a class="button" href="https://github.com/itzhaolei/codex-usage-widget" data-i18n="source">View source</a>
-            <button class="button" id="shareButton" type="button" data-i18n="share">Share</button>
+            <button class="button" type="button" id="shareButton" data-i18n="share">Share</button>
           </div>
           <div class="share-note" id="shareNote" aria-live="polite"></div>
-          <div class="command-row">
-            <div class="terminal">
-              <code id="installCommand">CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"</code>
-            </div>
-            <button class="copy-command" id="copyCommandButton" type="button" data-i18n="copyCommand">Copy</button>
+          <div class="signal-row">
+            <span class="signal" data-i18n="signal1">Native desktop app</span>
+            <span class="signal" data-i18n="signal2">1-second refresh</span>
+            <span class="signal" data-i18n="signal3">10 languages</span>
           </div>
         </div>
-        <div class="preview"><img src="assets/hero-widget.png?v=20260622-1" alt="Quota Bubble preview"></div>
+        <div class="product-stage" aria-label="Quota Bubble app preview">
+          <span class="scan-line"></span><span class="corner-label top">LIVE / CODEX</span><span class="corner-label bottom">330 × 288 / SWIFTUI</span>
+          <img class="widget-shot" src="assets/hero-widget-v3.png?v=20260716-1" alt="Current Quota Bubble window rendered by the macOS app">
+        </div>
       </section>
 
-      <section id="features" class="grid">
-        <div class="card"><strong data-i18n="card1Title">Always on top</strong><span data-i18n="card1Text">Pin the bubble where you work and keep Dock state synced with the window.</span></div>
-        <div class="card"><strong data-i18n="card2Title">Live quota</strong><span data-i18n="card2Text">Refreshes local Codex quota, reset time, balance, and reset credits every second.</span></div>
-        <div class="card"><strong data-i18n="card3Title">Private by design</strong><span data-i18n="card3Text">Runs locally and stores only redacted account fingerprints, never raw account IDs or tokens.</span></div>
-        <div class="card"><strong data-i18n="card4Title">Easy updates</strong><span data-i18n="card4Text">Use the app menu to check GitHub releases and update directly from the installer package.</span></div>
+      <section class="section">
+        <div class="section-heading">
+          <div><span class="section-index">01 / SYSTEM</span><h2 data-i18n="featureTitle">The data you need, held in one quiet surface.</h2></div>
+          <p class="section-lead" data-i18n="featureLead">The website now mirrors the actual application: one weekly quota bar, reset expiration rows, two aligned metric cards, account status, subscription date, and compact controls.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card"><span class="feature-number">01</span><strong data-i18n="card1Title">Always available</strong><p data-i18n="card1Text">Pin the window when needed while keeping Dock and app lifecycle in one process.</p></article>
+          <article class="feature-card"><span class="feature-number">02</span><strong data-i18n="card2Title">Live account data</strong><p data-i18n="card2Text">Refresh quota, reset time, balance, plan, and reset credits every second.</p></article>
+          <article class="feature-card"><span class="feature-number">03</span><strong data-i18n="card3Title">Local by design</strong><p data-i18n="card3Text">Read the signed-in Codex account locally and never ship credentials with the app.</p></article>
+          <article class="feature-card"><span class="feature-number">04</span><strong data-i18n="card4Title">Native updates</strong><p data-i18n="card4Text">Download progress, install, and automatic restart are handled inside the app.</p></article>
+        </div>
       </section>
 
-      <section class="poster-grid" aria-label="Quota Bubble highlights">
-        <article class="poster">
-          <div class="poster-copy">
-            <span class="poster-kicker" data-i18n="poster1Kicker">Focus</span>
-            <div class="poster-title" data-i18n="poster1Title">Quota without context switching.</div>
-            <p class="poster-text" data-i18n="poster1Text">Keep the numbers beside your work, not buried in settings.</p>
+      <section class="section">
+        <div class="section-heading">
+          <div><span class="section-index">02 / INTERFACE</span><h2 data-i18n="interfaceTitle">The real product, not a redrawn mockup.</h2></div>
+          <p class="section-lead" data-i18n="interfaceLead">This preview is exported from the same SwiftUI view users run. The glass, spacing, progress treatment, cards, typography, and controls stay true to the application.</p>
+        </div>
+        <div class="interface-grid">
+          <div class="interface-panel"><img src="assets/hero-widget-v3.png?v=20260716-1" alt="Quota Bubble real interface"></div>
+          <div class="interface-panel telemetry">
+            <div class="telemetry-row"><span class="telemetry-label">QUOTA</span><div class="telemetry-copy"><strong data-i18n="detail1Title">Stable quota display</strong><span data-i18n="detail1Text">Account-aware updates prevent values from a previous account flashing into the current session.</span></div></div>
+            <div class="telemetry-row"><span class="telemetry-label">GLASS</span><div class="telemetry-copy"><strong data-i18n="detail2Title">Adaptive glass</strong><span data-i18n="detail2Text">Dark and light modes control the glass treatment while preserving legibility.</span></div></div>
+            <div class="telemetry-row"><span class="telemetry-label">RESET</span><div class="telemetry-copy"><strong data-i18n="detail3Title">Expiration at a glance</strong><span data-i18n="detail3Text">Reset credits list their dates, with red indicators when expiration is within three days.</span></div></div>
           </div>
-          <div class="poster-visual" aria-hidden="true">
-            <img class="poster-widget-image" src="assets/poster-focus.png?v=20260622-1" alt="Quota Bubble focused quota state">
-          </div>
-        </article>
-        <article class="poster">
-          <div class="poster-copy">
-            <span class="poster-kicker" data-i18n="poster2Kicker">Private</span>
-            <div class="poster-title" data-i18n="poster2Title">Local first, account safe.</div>
-            <p class="poster-text" data-i18n="poster2Text">Quota Bubble watches local Codex data and keeps account details redacted.</p>
-          </div>
-          <div class="poster-visual" aria-hidden="true">
-            <img class="poster-widget-image" src="assets/poster-private.png?v=20260622-1" alt="Quota Bubble private local state">
-          </div>
-        </article>
-        <article class="poster">
-          <div class="poster-copy">
-            <span class="poster-kicker" data-i18n="poster3Kicker">Updates</span>
-            <div class="poster-title" data-i18n="poster3Title">Install once, stay current.</div>
-            <p class="poster-text" data-i18n="poster3Text">Download the installer or copy one command, then update from the app menu.</p>
-          </div>
-          <div class="poster-visual" aria-hidden="true">
-            <img class="poster-widget-image" src="assets/poster-updates.png?v=20260622-1" alt="Quota Bubble update-ready quota state">
-          </div>
-        </article>
+        </div>
+      </section>
+
+      <section class="section" id="platformDownloads">
+        <div class="section-heading">
+          <div><span class="section-index">03 / INSTALL</span><h2 data-i18n="installTitle">Click once. Install the right app.</h2></div>
+          <p class="section-lead" data-i18n="installLead">No terminal and no release-page detour. The main download button detects your operating system; these platform buttons always download the latest graphical installer directly.</p>
+        </div>
+        <div class="download-grid">
+          <article class="download-card"><span class="platform">macOS 13+</span><h3>Quota Bubble for macOS</h3><p data-i18n="macText">Universal SwiftUI app for Apple silicon and Intel. Unzip, then open the graphical installer.</p><a class="button primary platform-download" id="macDownload" href="#" data-i18n="downloadMac">Download for macOS</a><div class="release-tag" data-release-tag>Latest release</div></article>
+          <article class="download-card"><span class="platform">Windows 10+</span><h3>Quota Bubble for Windows</h3><p data-i18n="windowsText">Self-contained desktop app with a graphical Setup wizard. No PowerShell or separate runtime required.</p><a class="button primary platform-download" id="windowsDownload" href="#" data-i18n="downloadWindows">Download for Windows</a><div class="release-tag" data-release-tag>Latest release</div></article>
+        </div>
       </section>
     </main>
+
+    <footer><span data-i18n="footer">Independent local quota companion for Codex.</span><span>© 2026 Quota Bubble</span></footer>
   </div>
+
   <script>
     const translations = {
-      en: {
-        navInstall: "Install", navFeatures: "Features", system: "Follow system", eyebrow: "Local desktop quota monitor for Codex",
-        headline: "Your Codex quota, always visible.",
-        lead: "Quota Bubble is a small floating desktop window for macOS and Windows that keeps Codex usage, weekly limits, balance, reset credits, and update status in sight without opening settings.",
-        download: "Download macOS / Windows installer", source: "View source", share: "Share", copyCommand: "Copy", commandCopied: "Install command copied.", shared: "Share sheet opened.", copied: "Link copied.", copyFailed: "Could not copy the link.",
-        card1Title: "Always on top", card1Text: "Pin the bubble where you work and keep Dock state synced with the window.",
-        card2Title: "Live quota", card2Text: "Refreshes local Codex quota, reset time, balance, and reset credits every second.",
-        card3Title: "Private by design", card3Text: "Runs locally and stores only redacted account fingerprints, never raw account IDs or tokens.",
-        card4Title: "Easy updates", card4Text: "Use the app menu to check GitHub releases and update directly from the installer package.",
-        poster1Kicker: "Focus", poster1Title: "Quota without context switching.", poster1Text: "Keep the numbers beside your work, not buried in settings.",
-        poster2Kicker: "Private", poster2Title: "Local first, account safe.", poster2Text: "Quota Bubble watches local Codex data and keeps account details redacted.",
-        poster3Kicker: "Updates", poster3Title: "Install once, stay current.", poster3Text: "Download the installer or copy one command, then update from the app menu.",
-        footer: "Quota Bubble is an independent local tool for viewing Codex quota information."
-      },
-      zh: {
-        navInstall: "安装", navFeatures: "功能", system: "跟随系统", eyebrow: "Codex 本地桌面配额悬浮窗",
-        headline: "Codex 配额，一眼可见。",
-        lead: "Quota Bubble 是一个支持 macOS 和 Windows 的轻量桌面悬浮窗，可以直接显示 Codex 用量、每周限制、余额、可用重置和更新状态，不用再打开设置查看。",
-        download: "下载 macOS / Windows 安装器", source: "查看源码", share: "分享", copyCommand: "复制", commandCopied: "安装命令已复制。", shared: "已打开系统分享。", copied: "链接已复制。", copyFailed: "链接复制失败。",
-        card1Title: "始终可见", card1Text: "把悬浮窗固定在工作区，窗口和 Dock 启动状态保持同步。",
-        card2Title: "实时配额", card2Text: "每秒同步本机 Codex 配额、重置时间、余额和可用重置次数。",
-        card3Title: "隐私优先", card3Text: "只在本机运行，只保存脱敏账号指纹，不保存原始账号 ID 或 token。",
-        card4Title: "轻松更新", card4Text: "通过应用菜单检查 GitHub Release，并直接用安装器完成更新。",
-        poster1Kicker: "专注", poster1Title: "不用切换窗口，也能看见配额。", poster1Text: "把关键数字放在工作区旁边，不再藏在设置里。",
-        poster2Kicker: "隐私", poster2Title: "本地优先，账号安全。", poster2Text: "只观察本机 Codex 数据，并对账号信息做脱敏处理。",
-        poster3Kicker: "更新", poster3Title: "安装一次，持续跟进。", poster3Text: "可以下载安装器，也可以复制一行命令，并通过应用菜单更新。",
-        footer: "Quota Bubble 是一个独立的本地工具，用来查看 Codex 配额信息。"
-      },
-      ja: {
-        navInstall: "インストール", navFeatures: "機能", system: "システムに合わせる", eyebrow: "Codex 用のローカルデスクトップクォータモニター",
-        headline: "Codex のクォータを、いつでも見える場所に。",
-        lead: "Quota Bubble は、macOS と Windows で Codex の使用量、週間制限、残高、リセット回数、更新状態を設定画面なしで確認できる小さなフローティングウィンドウです。",
-        download: "インストーラーをダウンロード", source: "ソースを見る", share: "共有", copyCommand: "コピー", commandCopied: "インストールコマンドをコピーしました。", shared: "共有シートを開きました。", copied: "リンクをコピーしました。", copyFailed: "リンクをコピーできませんでした。",
-        card1Title: "常に手前", card1Text: "作業場所に固定し、ウィンドウと Dock の状態を同期します。",
-        card2Title: "ライブクォータ", card2Text: "Codex のクォータ、リセット時刻、残高、リセット回数を毎秒更新します。",
-        card3Title: "プライバシー重視", card3Text: "ローカルで動作し、匿名化されたアカウント指紋のみを保存します。",
-        card4Title: "簡単アップデート", card4Text: "アプリメニューから GitHub Release を確認し、インストーラーで直接更新できます。",
-        poster1Kicker: "集中", poster1Title: "切り替えなしでクォータ確認。", poster1Text: "必要な数字を作業のそばに置き、設定画面に埋もれさせません。",
-        poster2Kicker: "プライベート", poster2Title: "ローカル優先、アカウント安全。", poster2Text: "ローカルの Codex データを見守り、アカウント情報は匿名化します。",
-        poster3Kicker: "更新", poster3Title: "一度入れれば、常に最新へ。", poster3Text: "インストーラーか一行コマンドで導入し、アプリメニューから更新できます。",
-        footer: "Quota Bubble は Codex のクォータ情報を表示する独立したローカルツールです。"
-      },
-      ko: {
-        navInstall: "설치", navFeatures: "기능", system: "시스템 따르기", eyebrow: "Codex용 로컬 데스크톱 할당량 모니터",
-        headline: "Codex 할당량을 항상 한눈에.",
-        lead: "Quota Bubble은 macOS와 Windows에서 Codex 사용량, 주간 한도, 잔액, 재설정 횟수, 업데이트 상태를 설정을 열지 않고 보여 주는 작은 플로팅 창입니다.",
-        download: "설치 프로그램 다운로드", source: "소스 보기", share: "공유", copyCommand: "복사", commandCopied: "설치 명령이 복사되었습니다.", shared: "공유 창을 열었습니다.", copied: "링크가 복사되었습니다.", copyFailed: "링크를 복사하지 못했습니다.",
-        card1Title: "항상 위에", card1Text: "작업 위치에 고정하고 창과 Dock 상태를 동기화합니다.",
-        card2Title: "실시간 할당량", card2Text: "Codex 할당량, 재설정 시간, 잔액, 재설정 횟수를 매초 새로 고칩니다.",
-        card3Title: "개인정보 보호", card3Text: "로컬에서 실행되며 익명화된 계정 지문만 저장합니다.",
-        card4Title: "쉬운 업데이트", card4Text: "앱 메뉴에서 GitHub Release를 확인하고 설치 프로그램으로 바로 업데이트합니다.",
-        poster1Kicker: "집중", poster1Title: "전환 없이 할당량 확인.", poster1Text: "중요한 숫자를 작업 공간 옆에 두고 설정에 숨기지 않습니다.",
-        poster2Kicker: "비공개", poster2Title: "로컬 우선, 계정 안전.", poster2Text: "로컬 Codex 데이터를 확인하고 계정 정보는 익명화합니다.",
-        poster3Kicker: "업데이트", poster3Title: "한 번 설치하고 계속 최신으로.", poster3Text: "설치 프로그램이나 한 줄 명령으로 설치하고 앱 메뉴에서 업데이트합니다.",
-        footer: "Quota Bubble은 Codex 할당량 정보를 확인하는 독립 로컬 도구입니다."
-      },
-      de: {
-        navInstall: "Installieren", navFeatures: "Funktionen", system: "System folgen", eyebrow: "Lokaler Desktop-Quota-Monitor für Codex",
-        headline: "Dein Codex-Kontingent immer sichtbar.",
-        lead: "Quota Bubble ist ein kleines schwebendes Desktop-Fenster für macOS und Windows für Codex-Nutzung, Wochenlimits, Guthaben, Reset-Credits und Update-Status.",
-        download: "Installer laden", source: "Quellcode ansehen", share: "Teilen", copyCommand: "Kopieren", commandCopied: "Installationsbefehl kopiert.", shared: "Teilen-Dialog geöffnet.", copied: "Link kopiert.", copyFailed: "Link konnte nicht kopiert werden.",
-        card1Title: "Immer oben", card1Text: "Fixiere die Bubble dort, wo du arbeitest, und halte Dock und Fenster synchron.",
-        card2Title: "Live-Kontingent", card2Text: "Aktualisiert Codex-Kontingent, Reset-Zeit, Guthaben und Reset-Credits jede Sekunde.",
-        card3Title: "Privat by Design", card3Text: "Läuft lokal und speichert nur anonymisierte Konto-Fingerprints.",
-        card4Title: "Einfache Updates", card4Text: "Prüfe GitHub Releases im App-Menü und aktualisiere direkt per Installer.",
-        poster1Kicker: "Fokus", poster1Title: "Quota ohne Kontextwechsel.", poster1Text: "Behalte die Zahlen direkt neben deiner Arbeit statt in den Einstellungen.",
-        poster2Kicker: "Privat", poster2Title: "Lokal zuerst, Konto geschützt.", poster2Text: "Quota Bubble liest lokale Codex-Daten und anonymisiert Kontodetails.",
-        poster3Kicker: "Updates", poster3Title: "Einmal installieren, aktuell bleiben.", poster3Text: "Lade den Installer oder kopiere einen Befehl und aktualisiere im App-Menü.",
-        footer: "Quota Bubble ist ein unabhängiges lokales Tool zum Anzeigen von Codex-Kontingenten."
-      },
-      fr: {
-        navInstall: "Installer", navFeatures: "Fonctionnalités", system: "Suivre le système", eyebrow: "Moniteur de quota desktop local pour Codex",
-        headline: "Votre quota Codex, toujours visible.",
-        lead: "Quota Bubble est une petite fenêtre flottante pour macOS et Windows qui suit l’usage Codex, les limites hebdomadaires, le solde, les réinitialisations et l’état de mise à jour.",
-        download: "Télécharger l’installateur", source: "Voir le code", share: "Partager", copyCommand: "Copier", commandCopied: "Commande d’installation copiée.", shared: "Feuille de partage ouverte.", copied: "Lien copié.", copyFailed: "Impossible de copier le lien.",
-        card1Title: "Toujours au-dessus", card1Text: "Épinglez la bulle où vous travaillez et gardez le Dock synchronisé.",
-        card2Title: "Quota en direct", card2Text: "Actualise chaque seconde le quota Codex, le temps de réinitialisation, le solde et les crédits.",
-        card3Title: "Confidentialité d’abord", card3Text: "Fonctionne localement et ne stocke que des empreintes de compte anonymisées.",
-        card4Title: "Mises à jour simples", card4Text: "Vérifiez les releases GitHub depuis le menu et mettez à jour avec l’installateur.",
-        poster1Kicker: "Focus", poster1Title: "Le quota sans changer de contexte.", poster1Text: "Gardez les chiffres près de votre travail, pas enfouis dans les réglages.",
-        poster2Kicker: "Privé", poster2Title: "Local d’abord, compte protégé.", poster2Text: "Quota Bubble lit les données Codex locales et anonymise les détails du compte.",
-        poster3Kicker: "Mises à jour", poster3Title: "Installez une fois, restez à jour.", poster3Text: "Téléchargez l’installateur ou copiez une commande, puis mettez à jour depuis le menu.",
-        footer: "Quota Bubble est un outil local indépendant pour afficher les informations de quota Codex."
-      },
-      es: {
-        navInstall: "Instalar", navFeatures: "Funciones", system: "Seguir sistema", eyebrow: "Monitor local de cuota de escritorio para Codex",
-        headline: "Tu cuota de Codex, siempre visible.",
-        lead: "Quota Bubble es una pequeña ventana flotante para macOS y Windows que muestra uso de Codex, límites semanales, saldo, reinicios y estado de actualización.",
-        download: "Descargar instalador", source: "Ver código", share: "Compartir", copyCommand: "Copiar", commandCopied: "Comando de instalación copiado.", shared: "Panel de compartir abierto.", copied: "Enlace copiado.", copyFailed: "No se pudo copiar el enlace.",
-        card1Title: "Siempre visible", card1Text: "Fija la burbuja donde trabajas y mantén sincronizado el Dock.",
-        card2Title: "Cuota en vivo", card2Text: "Actualiza cada segundo la cuota de Codex, reinicio, saldo y créditos.",
-        card3Title: "Privacidad por diseño", card3Text: "Funciona localmente y solo guarda huellas de cuenta anonimizadas.",
-        card4Title: "Actualizaciones fáciles", card4Text: "Consulta GitHub Releases desde el menú y actualiza con el instalador.",
-        poster1Kicker: "Enfoque", poster1Title: "Cuota sin cambiar de contexto.", poster1Text: "Mantén los números junto a tu trabajo, no escondidos en ajustes.",
-        poster2Kicker: "Privado", poster2Title: "Local primero, cuenta segura.", poster2Text: "Quota Bubble observa datos locales de Codex y anonimiza la cuenta.",
-        poster3Kicker: "Updates", poster3Title: "Instala una vez y mantente al día.", poster3Text: "Descarga el instalador o copia un comando y actualiza desde el menú.",
-        footer: "Quota Bubble es una herramienta local independiente para ver la cuota de Codex."
-      },
-      pt: {
-        navInstall: "Instalar", navFeatures: "Recursos", system: "Seguir sistema", eyebrow: "Monitor local de cota de desktop para Codex",
-        headline: "Sua cota do Codex sempre visível.",
-        lead: "Quota Bubble é uma pequena janela flutuante para macOS e Windows que mostra uso do Codex, limites semanais, saldo, redefinições e estado de atualização.",
-        download: "Baixar instalador", source: "Ver código", share: "Compartilhar", copyCommand: "Copiar", commandCopied: "Comando de instalação copiado.", shared: "Painel de compartilhamento aberto.", copied: "Link copiado.", copyFailed: "Não foi possível copiar o link.",
-        card1Title: "Sempre visível", card1Text: "Fixe a bolha onde você trabalha e mantenha o Dock sincronizado.",
-        card2Title: "Cota ao vivo", card2Text: "Atualiza a cada segundo a cota do Codex, redefinição, saldo e créditos.",
-        card3Title: "Privacidade por design", card3Text: "Roda localmente e salva apenas impressões de conta anonimizadas.",
-        card4Title: "Atualizações fáceis", card4Text: "Confira releases do GitHub no menu e atualize pelo instalador.",
-        poster1Kicker: "Foco", poster1Title: "Cota sem trocar de contexto.", poster1Text: "Mantenha os números ao lado do trabalho, não escondidos nas configurações.",
-        poster2Kicker: "Privado", poster2Title: "Local primeiro, conta segura.", poster2Text: "Quota Bubble observa dados locais do Codex e anonimiza detalhes da conta.",
-        poster3Kicker: "Updates", poster3Title: "Instale uma vez e fique atualizado.", poster3Text: "Baixe o instalador ou copie um comando e atualize pelo menu do app.",
-        footer: "Quota Bubble é uma ferramenta local independente para ver cotas do Codex."
-      },
-      it: {
-        navInstall: "Installa", navFeatures: "Funzioni", system: "Segui sistema", eyebrow: "Monitor quota desktop locale per Codex",
-        headline: "La tua quota Codex sempre visibile.",
-        lead: "Quota Bubble è una piccola finestra flottante per macOS e Windows che mostra uso Codex, limiti settimanali, saldo, ripristini e stato aggiornamenti.",
-        download: "Scarica installer", source: "Vedi sorgente", share: "Condividi", copyCommand: "Copia", commandCopied: "Comando di installazione copiato.", shared: "Pannello di condivisione aperto.", copied: "Link copiato.", copyFailed: "Impossibile copiare il link.",
-        card1Title: "Sempre in primo piano", card1Text: "Fissa la bolla dove lavori e mantieni sincronizzato il Dock.",
-        card2Title: "Quota live", card2Text: "Aggiorna ogni secondo quota Codex, reset, saldo e crediti.",
-        card3Title: "Privacy by design", card3Text: "Funziona localmente e salva solo impronte account anonimizzate.",
-        card4Title: "Aggiornamenti semplici", card4Text: "Controlla le release GitHub dal menu e aggiorna con l’installer.",
-        poster1Kicker: "Focus", poster1Title: "Quota senza cambiare contesto.", poster1Text: "Tieni i numeri accanto al lavoro, non nascosti nelle impostazioni.",
-        poster2Kicker: "Privato", poster2Title: "Prima locale, account al sicuro.", poster2Text: "Quota Bubble osserva i dati Codex locali e anonimizza i dettagli account.",
-        poster3Kicker: "Update", poster3Title: "Installa una volta, resta aggiornato.", poster3Text: "Scarica l’installer o copia un comando e aggiorna dal menu dell’app.",
-        footer: "Quota Bubble è uno strumento locale indipendente per visualizzare le quote Codex."
-      },
-      nl: {
-        navInstall: "Installeren", navFeatures: "Functies", system: "Systeem volgen", eyebrow: "Lokale desktop-quotamonitor voor Codex",
-        headline: "Je Codex-quota altijd zichtbaar.",
-        lead: "Quota Bubble is een klein zwevend desktopvenster voor macOS en Windows voor Codex-gebruik, weeklimieten, saldo, resets en updatestatus.",
-        download: "Installer downloaden", source: "Bron bekijken", share: "Delen", copyCommand: "Kopiëren", commandCopied: "Installatieopdracht gekopieerd.", shared: "Deelvenster geopend.", copied: "Link gekopieerd.", copyFailed: "Link kon niet worden gekopieerd.",
-        card1Title: "Altijd bovenaan", card1Text: "Zet de bubble vast waar je werkt en houd Dock en venster synchroon.",
-        card2Title: "Live quota", card2Text: "Ververst Codex-quota, resettijd, saldo en resetcredits elke seconde.",
-        card3Title: "Privacygericht", card3Text: "Draait lokaal en bewaart alleen geanonimiseerde accountvingerafdrukken.",
-        card4Title: "Eenvoudige updates", card4Text: "Controleer GitHub Releases in het appmenu en update via de installer.",
-        poster1Kicker: "Focus", poster1Title: "Quota zonder contextwissel.", poster1Text: "Houd de cijfers naast je werk, niet verborgen in instellingen.",
-        poster2Kicker: "Privé", poster2Title: "Lokaal eerst, account veilig.", poster2Text: "Quota Bubble bekijkt lokale Codex-data en anonimiseert accountdetails.",
-        poster3Kicker: "Updates", poster3Title: "Eenmaal installeren, actueel blijven.", poster3Text: "Download de installer of kopieer een opdracht en update via het appmenu.",
-        footer: "Quota Bubble is een onafhankelijke lokale tool voor Codex-quota-informatie."
-      }
+      en: { system:"Follow system", eyebrow:"Native desktop quota telemetry", tagline:"Codex quota, visible without breaking focus.", lead:"A compact native window for weekly quota, resets, balance, plan, account, and subscription status. Refreshed every second on macOS and Windows.", preparing:"Preparing download…", downloadMac:"Download for macOS", downloadWindows:"Download for Windows", chooseDownload:"Choose your system", source:"View source", share:"Share", shared:"Share sheet opened.", copied:"Link copied.", copyFailed:"Could not copy the link.", signal1:"Native desktop app", signal2:"1-second refresh", signal3:"10 languages", featureTitle:"The data you need, held in one quiet surface.", featureLead:"The website now mirrors the actual application: one weekly quota bar, reset expiration rows, two aligned metric cards, account status, subscription date, and compact controls.", card1Title:"Always available", card1Text:"Pin the window when needed while keeping Dock and app lifecycle in one process.", card2Title:"Live account data", card2Text:"Refresh quota, reset time, balance, plan, and reset credits every second.", card3Title:"Local by design", card3Text:"Read the signed-in Codex account locally and never ship credentials with the app.", card4Title:"Native updates", card4Text:"Download progress, install, and automatic restart are handled inside the app.", interfaceTitle:"The real product, not a redrawn mockup.", interfaceLead:"This preview is exported from the same SwiftUI view users run. The glass, spacing, progress treatment, cards, typography, and controls stay true to the application.", detail1Title:"Stable quota display", detail1Text:"Account-aware updates prevent values from a previous account flashing into the current session.", detail2Title:"Adaptive glass", detail2Text:"Dark and light modes control the glass treatment while preserving legibility.", detail3Title:"Expiration at a glance", detail3Text:"Reset credits list their dates, with red indicators when expiration is within three days.", installTitle:"Click once. Install the right app.", installLead:"No terminal and no release-page detour. The main download button detects your operating system; these platform buttons always download the latest graphical installer directly.", macText:"Universal SwiftUI app for Apple silicon and Intel. Unzip, then open the graphical installer.", windowsText:"Self-contained desktop app with a graphical Setup wizard. No PowerShell or separate runtime required.", latest:"Latest release", footer:"Independent local quota companion for Codex." },
+      zh: { system:"跟随系统", eyebrow:"Codex 原生桌面配额遥测", tagline:"不打断专注，也能随时看见 Codex 配额。", lead:"用一个紧凑的原生窗口展示周配额、重置、余额、套餐、账号和订阅状态，在 macOS 与 Windows 上每秒刷新。", preparing:"正在准备下载…", downloadMac:"下载 macOS 版", downloadWindows:"下载 Windows 版", chooseDownload:"选择电脑系统", source:"查看源码", share:"分享", shared:"已打开系统分享。", copied:"链接已复制。", copyFailed:"链接复制失败。", signal1:"原生桌面应用", signal2:"每秒刷新", signal3:"支持 10 种语言", featureTitle:"需要的数据，安静地集中在一个窗口。", featureLead:"官网现在与真实程序一致：一条周配额进度、重置到期列表、两张等高指标卡、账号状态、订阅日期和紧凑控制胶囊。", card1Title:"随时可见", card1Text:"需要时置顶窗口，Dock、窗口与应用生命周期始终属于同一个进程。", card2Title:"实时账号数据", card2Text:"每秒刷新配额、重置时间、余额、套餐和可用重置次数。", card3Title:"本地优先", card3Text:"在本机读取已登录的 Codex 账号，不随应用分发任何凭据。", card4Title:"原生更新", card4Text:"下载进度、安装与自动重启都在应用内部完成。", interfaceTitle:"真实程序，不是重新绘制的近似图。", interfaceLead:"预览由用户实际运行的同一套 SwiftUI 界面导出，玻璃质感、间距、进度条、卡片、字体和控件都与程序保持一致。", detail1Title:"稳定的配额展示", detail1Text:"识别当前账号，避免切换账号后旧账号数值短暂闪回。", detail2Title:"自适应玻璃质感", detail2Text:"深色和浅色模式控制玻璃明暗，同时保持文字清晰。", detail3Title:"到期时间一眼可见", detail3Text:"逐条列出重置次数到期日期，三天内到期显示红点。", installTitle:"点击一次，下载正确的安装器。", installLead:"不需要终端，也不再跳转 Release 页面。主下载按钮自动识别系统，下方按钮始终直接下载最新图形安装器。", macText:"同时支持 Apple 芯片和 Intel 的 SwiftUI 应用。解压后打开图形安装器。", windowsText:"自包含桌面应用与图形 Setup 向导，不需要 PowerShell 或额外运行时。", latest:"最新版本", footer:"独立、本地运行的 Codex 配额伴侣。" },
+      ja: { system:"システムに合わせる", eyebrow:"Codex ネイティブデスクトップクォータ", tagline:"集中を切らさず、Codex クォータを確認。", lead:"週間クォータ、リセット、残高、プラン、アカウント、契約状態を小さなネイティブウィンドウで毎秒更新します。", preparing:"ダウンロードを準備中…", downloadMac:"macOS 版をダウンロード", downloadWindows:"Windows 版をダウンロード", chooseDownload:"OS を選択", source:"ソースを見る", share:"共有", shared:"共有シートを開きました。", copied:"リンクをコピーしました。", copyFailed:"リンクをコピーできませんでした。", signal1:"ネイティブアプリ", signal2:"1 秒ごとに更新", signal3:"10 言語対応", featureTitle:"必要な情報を、静かな一面に。", featureLead:"実際のアプリと同じ週間バー、期限一覧、指標カード、アカウント、契約日、コンパクトな操作部を表示します。", card1Title:"いつでも見える", card1Text:"必要な時だけ固定し、Dock とウィンドウを単一プロセスで管理します。", card2Title:"ライブデータ", card2Text:"クォータ、リセット、残高、プラン、クレジットを毎秒更新します。", card3Title:"ローカル設計", card3Text:"ログイン中の Codex アカウントをローカルで読み、認証情報を同梱しません。", card4Title:"ネイティブ更新", card4Text:"進捗、インストール、自動再起動をアプリ内で処理します。", interfaceTitle:"描き直しではなく、本物の製品。", interfaceLead:"同じ SwiftUI ビューから書き出した実画面で、ガラス、余白、バー、カード、文字、操作部もそのままです。", detail1Title:"安定した表示", detail1Text:"アカウント切替時に旧アカウントの値が一瞬戻ることを防ぎます。", detail2Title:"適応型ガラス", detail2Text:"ライトとダークで質感を調整し、可読性を保ちます。", detail3Title:"期限を一覧", detail3Text:"リセット期限を並べ、3 日以内は赤で示します。", installTitle:"1 クリックで正しいアプリを。", installLead:"ターミナルも Release ページも不要。OS を検出して最新の GUI インストーラーを直接ダウンロードします。", macText:"Apple silicon と Intel 対応。解凍して GUI インストーラーを開きます。", windowsText:"自己完結型アプリと GUI セットアップ。PowerShell や追加ランタイムは不要です。", latest:"最新リリース", footer:"Codex 用の独立したローカルクォータツール。" },
+      ko: { system:"시스템 따르기", eyebrow:"Codex 네이티브 데스크톱 할당량", tagline:"집중을 깨지 않고 Codex 할당량 확인.", lead:"주간 할당량, 재설정, 잔액, 플랜, 계정 및 구독 상태를 작은 네이티브 창에서 매초 갱신합니다.", preparing:"다운로드 준비 중…", downloadMac:"macOS용 다운로드", downloadWindows:"Windows용 다운로드", chooseDownload:"운영 체제 선택", source:"소스 보기", share:"공유", shared:"공유 창을 열었습니다.", copied:"링크를 복사했습니다.", copyFailed:"링크를 복사하지 못했습니다.", signal1:"네이티브 데스크톱 앱", signal2:"1초 새로 고침", signal3:"10개 언어", featureTitle:"필요한 데이터를 조용한 한 화면에.", featureLead:"실제 앱과 같은 주간 바, 만료 목록, 지표 카드, 계정, 구독 날짜와 컨트롤을 보여 줍니다.", card1Title:"항상 확인", card1Text:"필요할 때 고정하고 Dock과 창을 하나의 프로세스로 유지합니다.", card2Title:"실시간 계정 데이터", card2Text:"할당량, 재설정, 잔액, 플랜과 크레딧을 매초 갱신합니다.", card3Title:"로컬 우선", card3Text:"로그인한 Codex 계정을 로컬에서 읽고 자격 증명을 배포하지 않습니다.", card4Title:"네이티브 업데이트", card4Text:"진행률, 설치와 자동 재시작을 앱 안에서 처리합니다.", interfaceTitle:"다시 그린 목업이 아닌 실제 제품.", interfaceLead:"사용자와 같은 SwiftUI 화면에서 내보내 유리, 간격, 진행 막대, 카드와 컨트롤이 동일합니다.", detail1Title:"안정적인 표시", detail1Text:"계정 전환 시 이전 계정 값이 잠깐 나타나는 것을 막습니다.", detail2Title:"적응형 유리", detail2Text:"라이트와 다크 모드에 맞춰 질감을 조정합니다.", detail3Title:"만료일 한눈에", detail3Text:"재설정 만료일을 나열하고 3일 이내는 빨간색으로 표시합니다.", installTitle:"한 번 클릭해 맞는 앱 설치.", installLead:"터미널과 Release 페이지 이동 없이 OS를 감지해 최신 GUI 설치 프로그램을 직접 받습니다.", macText:"Apple silicon과 Intel을 지원합니다. 압축을 풀고 GUI 설치 프로그램을 여세요.", windowsText:"자체 포함 앱과 GUI Setup. PowerShell이나 별도 런타임이 필요 없습니다.", latest:"최신 릴리스", footer:"Codex용 독립 로컬 할당량 도구." },
+      de: { system:"System folgen", eyebrow:"Native Desktop-Kontingentdaten", tagline:"Codex-Kontingent sichtbar, ohne den Fokus zu verlieren.", lead:"Ein kompaktes natives Fenster für Wochenkontingent, Resets, Guthaben, Tarif, Konto und Abo-Status, jede Sekunde aktualisiert.", preparing:"Download wird vorbereitet…", downloadMac:"Für macOS laden", downloadWindows:"Für Windows laden", chooseDownload:"System auswählen", source:"Quellcode", share:"Teilen", shared:"Teilen geöffnet.", copied:"Link kopiert.", copyFailed:"Link konnte nicht kopiert werden.", signal1:"Native Desktop-App", signal2:"Aktualisierung jede Sekunde", signal3:"10 Sprachen", featureTitle:"Alle wichtigen Daten auf einer ruhigen Fläche.", featureLead:"Die Website entspricht der echten App: Wochenleiste, Ablaufdaten, Karten, Konto, Abo-Datum und kompakte Steuerung.", card1Title:"Immer verfügbar", card1Text:"Bei Bedarf anheften; Dock, Fenster und Lebenszyklus bleiben ein Prozess.", card2Title:"Live-Kontodaten", card2Text:"Kontingent, Reset, Guthaben, Tarif und Credits jede Sekunde aktualisieren.", card3Title:"Lokal entwickelt", card3Text:"Das angemeldete Codex-Konto lokal lesen, ohne Zugangsdaten auszuliefern.", card4Title:"Native Updates", card4Text:"Fortschritt, Installation und Neustart laufen direkt in der App.", interfaceTitle:"Das echte Produkt, kein nachgebautes Mockup.", interfaceLead:"Die Vorschau stammt aus derselben SwiftUI-Ansicht und bewahrt Glas, Abstände, Balken, Karten und Bedienung.", detail1Title:"Stabile Anzeige", detail1Text:"Kontobewusste Updates verhindern kurzzeitige Werte des vorherigen Kontos.", detail2Title:"Adaptives Glas", detail2Text:"Hell und Dunkel steuern den Glaseindruck bei guter Lesbarkeit.", detail3Title:"Ablauf auf einen Blick", detail3Text:"Reset-Termine werden gelistet; innerhalb von drei Tagen rot.", installTitle:"Ein Klick. Die richtige App.", installLead:"Kein Terminal und keine Release-Seite. Das System wird erkannt und der aktuelle grafische Installer direkt geladen.", macText:"Universelle SwiftUI-App für Apple silicon und Intel. Entpacken und Installer öffnen.", windowsText:"Eigenständige App mit grafischem Setup, ohne PowerShell oder extra Laufzeit.", latest:"Neueste Version", footer:"Unabhängiger lokaler Codex-Kontingentbegleiter." },
+      fr: { system:"Suivre le système", eyebrow:"Télémétrie native du quota Codex", tagline:"Le quota Codex visible sans perdre le fil.", lead:"Une fenêtre native compacte pour le quota hebdomadaire, les resets, le solde, l’offre, le compte et l’abonnement, actualisée chaque seconde.", preparing:"Préparation du téléchargement…", downloadMac:"Télécharger pour macOS", downloadWindows:"Télécharger pour Windows", chooseDownload:"Choisir le système", source:"Voir le code", share:"Partager", shared:"Partage ouvert.", copied:"Lien copié.", copyFailed:"Impossible de copier le lien.", signal1:"Application native", signal2:"Actualisation chaque seconde", signal3:"10 langues", featureTitle:"Les données utiles sur une surface discrète.", featureLead:"Le site reflète l’application réelle : barre hebdomadaire, dates d’expiration, cartes, compte, abonnement et commandes compactes.", card1Title:"Toujours disponible", card1Text:"Épinglez la fenêtre au besoin, avec Dock et cycle de vie dans un seul processus.", card2Title:"Données en direct", card2Text:"Actualise quota, reset, solde, offre et crédits chaque seconde.", card3Title:"Conçu en local", card3Text:"Lit localement le compte Codex connecté sans distribuer d’identifiants.", card4Title:"Mises à jour natives", card4Text:"Progression, installation et redémarrage sont gérés dans l’application.", interfaceTitle:"Le vrai produit, pas une maquette redessinée.", interfaceLead:"L’aperçu vient de la même vue SwiftUI et conserve verre, espacements, barre, cartes et commandes.", detail1Title:"Affichage stable", detail1Text:"Les mises à jour liées au compte évitent le retour furtif des anciennes valeurs.", detail2Title:"Verre adaptatif", detail2Text:"Les modes clair et sombre ajustent le verre tout en restant lisibles.", detail3Title:"Expiration visible", detail3Text:"Les dates sont listées et passent au rouge à moins de trois jours.", installTitle:"Un clic. La bonne application.", installLead:"Sans terminal ni détour par les Releases : le système est détecté et l’installateur graphique est téléchargé directement.", macText:"Application SwiftUI universelle Apple silicon et Intel. Décompressez puis ouvrez l’installateur.", windowsText:"Application autonome avec Setup graphique, sans PowerShell ni runtime séparé.", latest:"Dernière version", footer:"Compagnon local indépendant pour le quota Codex." },
+      es: { system:"Seguir sistema", eyebrow:"Telemetría nativa de cuota Codex", tagline:"La cuota de Codex visible sin romper tu concentración.", lead:"Una ventana nativa compacta para cuota semanal, reinicios, saldo, plan, cuenta y suscripción, actualizada cada segundo.", preparing:"Preparando descarga…", downloadMac:"Descargar para macOS", downloadWindows:"Descargar para Windows", chooseDownload:"Elegir sistema", source:"Ver código", share:"Compartir", shared:"Panel de compartir abierto.", copied:"Enlace copiado.", copyFailed:"No se pudo copiar el enlace.", signal1:"Aplicación nativa", signal2:"Actualización cada segundo", signal3:"10 idiomas", featureTitle:"Los datos necesarios en una superficie tranquila.", featureLead:"La web refleja la app real: barra semanal, caducidades, tarjetas, cuenta, fecha de suscripción y controles compactos.", card1Title:"Siempre disponible", card1Text:"Fija la ventana cuando haga falta y mantén Dock y ciclo de vida en un proceso.", card2Title:"Datos en vivo", card2Text:"Actualiza cuota, reinicio, saldo, plan y créditos cada segundo.", card3Title:"Diseño local", card3Text:"Lee localmente la cuenta Codex iniciada sin distribuir credenciales.", card4Title:"Actualización nativa", card4Text:"Progreso, instalación y reinicio automático dentro de la app.", interfaceTitle:"El producto real, no un mockup redibujado.", interfaceLead:"La vista sale del mismo SwiftUI y conserva cristal, espacios, barra, tarjetas y controles.", detail1Title:"Visualización estable", detail1Text:"La detección de cuenta evita mostrar brevemente datos de la cuenta anterior.", detail2Title:"Cristal adaptable", detail2Text:"Los modos claro y oscuro ajustan el cristal manteniendo la legibilidad.", detail3Title:"Caducidad visible", detail3Text:"Lista las fechas y marca en rojo las que vencen en tres días.", installTitle:"Un clic. La aplicación correcta.", installLead:"Sin terminal ni página de Releases. Detecta el sistema y descarga directamente el instalador gráfico más reciente.", macText:"App SwiftUI universal para Apple silicon e Intel. Descomprime y abre el instalador.", windowsText:"App autónoma con Setup gráfico, sin PowerShell ni runtime adicional.", latest:"Última versión", footer:"Compañero local independiente para la cuota de Codex." },
+      pt: { system:"Seguir sistema", eyebrow:"Telemetria nativa de cota Codex", tagline:"Cota do Codex visível sem perder o foco.", lead:"Uma janela nativa compacta para cota semanal, redefinições, saldo, plano, conta e assinatura, atualizada a cada segundo.", preparing:"Preparando download…", downloadMac:"Baixar para macOS", downloadWindows:"Baixar para Windows", chooseDownload:"Escolher sistema", source:"Ver código", share:"Compartilhar", shared:"Compartilhamento aberto.", copied:"Link copiado.", copyFailed:"Não foi possível copiar o link.", signal1:"Aplicativo nativo", signal2:"Atualização a cada segundo", signal3:"10 idiomas", featureTitle:"Os dados necessários em uma superfície discreta.", featureLead:"O site reflete o app real: barra semanal, expirações, cartões, conta, data da assinatura e controles compactos.", card1Title:"Sempre disponível", card1Text:"Fixe quando precisar e mantenha Dock, janela e ciclo de vida em um processo.", card2Title:"Dados ao vivo", card2Text:"Atualiza cota, redefinição, saldo, plano e créditos a cada segundo.", card3Title:"Local por design", card3Text:"Lê localmente a conta Codex conectada sem distribuir credenciais.", card4Title:"Atualizações nativas", card4Text:"Progresso, instalação e reinício automático dentro do app.", interfaceTitle:"O produto real, não um mockup redesenhado.", interfaceLead:"A prévia vem da mesma tela SwiftUI e preserva vidro, espaços, barra, cartões e controles.", detail1Title:"Exibição estável", detail1Text:"A detecção da conta evita mostrar rapidamente valores da conta anterior.", detail2Title:"Vidro adaptável", detail2Text:"Claro e escuro ajustam o vidro mantendo a leitura.", detail3Title:"Expiração visível", detail3Text:"Lista as datas e marca em vermelho as que vencem em três dias.", installTitle:"Um clique. O app certo.", installLead:"Sem terminal ou página de Releases. Detecta o sistema e baixa diretamente o instalador gráfico mais recente.", macText:"App SwiftUI universal para Apple silicon e Intel. Descompacte e abra o instalador.", windowsText:"App autônomo com Setup gráfico, sem PowerShell ou runtime adicional.", latest:"Versão mais recente", footer:"Companheiro local independente para cotas Codex." },
+      it: { system:"Segui sistema", eyebrow:"Telemetria nativa quota Codex", tagline:"Quota Codex visibile senza interrompere il lavoro.", lead:"Una finestra nativa compatta per quota settimanale, reset, saldo, piano, account e abbonamento, aggiornata ogni secondo.", preparing:"Preparazione download…", downloadMac:"Scarica per macOS", downloadWindows:"Scarica per Windows", chooseDownload:"Scegli il sistema", source:"Vedi sorgente", share:"Condividi", shared:"Condivisione aperta.", copied:"Link copiato.", copyFailed:"Impossibile copiare il link.", signal1:"App desktop nativa", signal2:"Aggiornamento ogni secondo", signal3:"10 lingue", featureTitle:"I dati utili in una superficie discreta.", featureLead:"Il sito riflette l’app reale: barra settimanale, scadenze, schede, account, abbonamento e controlli compatti.", card1Title:"Sempre disponibile", card1Text:"Fissa la finestra quando serve, con Dock e ciclo di vita in un processo.", card2Title:"Dati live", card2Text:"Aggiorna quota, reset, saldo, piano e crediti ogni secondo.", card3Title:"Locale per design", card3Text:"Legge localmente l’account Codex connesso senza distribuire credenziali.", card4Title:"Aggiornamenti nativi", card4Text:"Progresso, installazione e riavvio automatico dentro l’app.", interfaceTitle:"Il prodotto reale, non un mockup ridisegnato.", interfaceLead:"L’anteprima viene dalla stessa vista SwiftUI e mantiene vetro, spazi, barra, schede e controlli.", detail1Title:"Visualizzazione stabile", detail1Text:"Il riconoscimento account evita il lampo dei vecchi valori.", detail2Title:"Vetro adattivo", detail2Text:"Chiaro e scuro regolano il vetro mantenendo la leggibilità.", detail3Title:"Scadenze visibili", detail3Text:"Elenca le date e usa il rosso entro tre giorni.", installTitle:"Un clic. L’app giusta.", installLead:"Niente terminale o pagina Release: rileva il sistema e scarica direttamente l’installer grafico più recente.", macText:"App SwiftUI universale per Apple silicon e Intel. Estrai e apri l’installer.", windowsText:"App autonoma con Setup grafico, senza PowerShell o runtime separato.", latest:"Ultima versione", footer:"Compagno locale indipendente per la quota Codex." },
+      nl: { system:"Systeem volgen", eyebrow:"Native desktop-quotatelemetrie", tagline:"Codex-quota zichtbaar zonder je focus te breken.", lead:"Een compact native venster voor weekquota, resets, saldo, plan, account en abonnement, elke seconde bijgewerkt.", preparing:"Download voorbereiden…", downloadMac:"Download voor macOS", downloadWindows:"Download voor Windows", chooseDownload:"Kies je systeem", source:"Bron bekijken", share:"Delen", shared:"Deelvenster geopend.", copied:"Link gekopieerd.", copyFailed:"Link kon niet worden gekopieerd.", signal1:"Native desktop-app", signal2:"Elke seconde vernieuwd", signal3:"10 talen", featureTitle:"De juiste data op één rustig oppervlak.", featureLead:"De site volgt de echte app: weekbalk, vervaldata, kaarten, account, abonnementsdatum en compacte bediening.", card1Title:"Altijd beschikbaar", card1Text:"Zet vast wanneer nodig en houd Dock, venster en levenscyclus in één proces.", card2Title:"Live accountdata", card2Text:"Vernieuw quota, reset, saldo, plan en credits elke seconde.", card3Title:"Lokaal ontworpen", card3Text:"Leest het ingelogde Codex-account lokaal zonder inloggegevens mee te leveren.", card4Title:"Native updates", card4Text:"Voortgang, installatie en automatische herstart gebeuren in de app.", interfaceTitle:"Het echte product, geen nagetekende mockup.", interfaceLead:"De preview komt uit dezelfde SwiftUI-weergave en behoudt glas, ruimte, balk, kaarten en bediening.", detail1Title:"Stabiele weergave", detail1Text:"Accountdetectie voorkomt kortstondige waarden van het vorige account.", detail2Title:"Adaptief glas", detail2Text:"Licht en donker sturen het glas met behoud van leesbaarheid.", detail3Title:"Verval in één oogopslag", detail3Text:"Toont resetdata en markeert minder dan drie dagen rood.", installTitle:"Eén klik. De juiste app.", installLead:"Geen terminal of Release-pagina. Detecteert het systeem en downloadt de nieuwste grafische installer direct.", macText:"Universele SwiftUI-app voor Apple silicon en Intel. Pak uit en open de installer.", windowsText:"Zelfstandige app met grafische Setup, zonder PowerShell of extra runtime.", latest:"Nieuwste versie", footer:"Onafhankelijke lokale metgezel voor Codex-quota." }
     };
 
+    const fallbackRelease = {
+      tag: "v3.0.5",
+      mac: "https://github.com/itzhaolei/codex-usage-widget/releases/download/v3.0.5/QuotaBubble-3.0.5-macOS-Installer.zip",
+      windows: "https://github.com/itzhaolei/codex-usage-widget/releases/download/v3.0.5/QuotaBubble-3.0.5-Windows-Setup.exe"
+    };
+    let release = { ...fallbackRelease };
     const supported = Object.keys(translations);
-    const stored = localStorage.getItem("quota-bubble-language") || "system";
-    const browser = (navigator.language || "en").slice(0, 2).toLowerCase();
-    const systemLanguage = supported.includes(browser) ? browser : "en";
-    const initial = supported.includes(stored) ? stored : systemLanguage;
+    const browserLanguage = (navigator.language || "en").slice(0, 2).toLowerCase();
+    const systemLanguage = supported.includes(browserLanguage) ? browserLanguage : "en";
+    const storedLanguage = localStorage.getItem("quota-bubble-language") || "system";
+    let activeLanguage = supported.includes(storedLanguage) ? storedLanguage : systemLanguage;
 
+    function dict() { return translations[activeLanguage] || translations.en; }
     function applyLanguage(code) {
-      const effectiveCode = supported.includes(code) ? code : systemLanguage;
-      const dict = translations[effectiveCode] || translations.en;
-      document.documentElement.lang = effectiveCode;
-      document.querySelectorAll("[data-i18n]").forEach((node) => {
-        node.textContent = dict[node.dataset.i18n] || translations.en[node.dataset.i18n] || "";
-      });
-      document.querySelectorAll("[data-i18n-html]").forEach((node) => {
-        node.innerHTML = dict[node.dataset.i18nHtml] || translations.en[node.dataset.i18nHtml] || "";
-      });
-      const languageSelect = document.getElementById("languageSelect");
-      languageSelect.value = supported.includes(code) ? code : "system";
-      languageSelect.options[0].textContent = dict.system || translations.en.system;
+      activeLanguage = supported.includes(code) ? code : systemLanguage;
+      const copy = dict();
+      document.documentElement.lang = activeLanguage;
+      document.querySelectorAll("[data-i18n]").forEach((node) => { node.textContent = copy[node.dataset.i18n] || translations.en[node.dataset.i18n] || ""; });
+      const select = document.getElementById("languageSelect");
+      select.value = supported.includes(code) ? code : "system";
+      select.options[0].textContent = copy.system || translations.en.system;
       localStorage.setItem("quota-bubble-language", supported.includes(code) ? code : "system");
+      updateDownloadUI();
     }
 
-    async function copyShareLink(text) {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-        return;
-      }
-      const input = document.createElement("textarea");
-      input.value = text;
-      input.setAttribute("readonly", "");
-      input.style.position = "fixed";
-      input.style.opacity = "0";
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand("copy");
-      input.remove();
+    function platformKind() {
+      const value = `${navigator.userAgentData?.platform || ""} ${navigator.platform || ""} ${navigator.userAgent || ""}`.toLowerCase();
+      if (value.includes("win")) return "windows";
+      if (value.includes("mac")) return "mac";
+      return "other";
     }
 
-    async function copyInstallCommand() {
-      const currentLang = localStorage.getItem("quota-bubble-language") || initial;
-      const dict = translations[supported.includes(currentLang) ? currentLang : systemLanguage] || translations.en;
-      const note = document.getElementById("shareNote");
+    function updateDownloadUI() {
+      const copy = dict();
+      const smart = document.getElementById("smartDownload");
+      const platform = platformKind();
+      document.getElementById("macDownload").href = release.mac;
+      document.getElementById("windowsDownload").href = release.windows;
+      document.querySelectorAll("[data-release-tag]").forEach((node) => { node.textContent = `${copy.latest || translations.en.latest} · ${release.tag}`; });
+      if (platform === "mac") { smart.href = release.mac; smart.textContent = copy.downloadMac; }
+      else if (platform === "windows") { smart.href = release.windows; smart.textContent = copy.downloadWindows; }
+      else { smart.href = "#platformDownloads"; smart.textContent = copy.chooseDownload; }
+    }
+
+    async function loadLatestRelease() {
       try {
-        await copyShareLink(document.getElementById("installCommand").textContent.trim());
-        note.textContent = dict.commandCopied || translations.en.commandCopied;
-      } catch (error) {
-        note.textContent = dict.copyFailed || translations.en.copyFailed;
+        const response = await fetch("https://api.github.com/repos/itzhaolei/codex-usage-widget/releases/latest", { headers: { Accept: "application/vnd.github+json" } });
+        if (!response.ok) throw new Error("release lookup failed");
+        const json = await response.json();
+        const assets = Array.isArray(json.assets) ? json.assets : [];
+        const mac = assets.find((asset) => asset.name?.endsWith("macOS-Installer.zip"));
+        const windows = assets.find((asset) => asset.name?.endsWith("Windows-Setup.exe"));
+        release = { tag: json.tag_name || fallbackRelease.tag, mac: mac?.browser_download_url || fallbackRelease.mac, windows: windows?.browser_download_url || fallbackRelease.windows };
+      } catch (_) {
+        release = { ...fallbackRelease };
       }
+      updateDownloadUI();
     }
 
     async function shareSite() {
-      const currentLang = localStorage.getItem("quota-bubble-language") || initial;
-      const dict = translations[supported.includes(currentLang) ? currentLang : systemLanguage] || translations.en;
       const note = document.getElementById("shareNote");
-      const url = window.location.href;
-      const text = "Quota Bubble - " + (dict.eyebrow || translations.en.eyebrow);
       try {
-        if (navigator.share) {
-          await navigator.share({ title: "Quota Bubble", text, url });
-          note.textContent = dict.shared || translations.en.shared;
-          return;
-        }
-        await copyShareLink(url);
-        note.textContent = dict.copied || translations.en.copied;
-      } catch (error) {
-        if (error?.name === "AbortError") return;
-        note.textContent = dict.copyFailed || translations.en.copyFailed;
-      }
+        if (navigator.share) { await navigator.share({ title: "Quota Bubble", text: dict().tagline, url: location.href }); note.textContent = dict().shared; return; }
+        await navigator.clipboard.writeText(location.href); note.textContent = dict().copied;
+      } catch (error) { if (error?.name !== "AbortError") note.textContent = dict().copyFailed; }
     }
 
     document.getElementById("languageSelect").addEventListener("change", (event) => applyLanguage(event.target.value));
     document.getElementById("shareButton").addEventListener("click", shareSite);
-    document.getElementById("copyCommandButton").addEventListener("click", copyInstallCommand);
-    applyLanguage(stored === "system" ? "system" : initial);
+    applyLanguage(storedLanguage);
+    loadLatestRelease();
   </script>
 </body>
 </html>

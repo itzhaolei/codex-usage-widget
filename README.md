@@ -3,12 +3,12 @@
 <table>
   <tr>
     <td width="72">
-      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260621-1"><img src="assets/app-icon.png?raw=1" width="56" alt="Quota Bubble app icon"></a>
+      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-1"><img src="assets/app-icon.png?raw=1" width="56" alt="Quota Bubble app icon"></a>
     </td>
     <td>
       <strong>Official Website</strong><br>
-      Download the installer, copy the one-line install command, and preview the multilingual product page.<br>
-      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260621-1"><strong>Open website preview →</strong></a>
+      Detect your operating system and download the latest graphical installer directly.<br>
+      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-1"><strong>Open official website →</strong></a>
     </td>
   </tr>
 </table>
@@ -19,12 +19,12 @@ A local floating widget for watching Codex usage limits on macOS and Windows wit
 
 Website source lives in `public/` and is ready for Cloudflare Pages. Recommended Pages settings: project name `quota-bubble`, production branch `main`, build command `exit 0`, output directory `public`. Suggested free domain: `quotabubble.dpdns.org` after dpdns approval.
 
-![Quota Bubble preview](assets/preview-plus.png?raw=1)
+![Quota Bubble preview](assets/preview-v3.png?raw=1)
 
 ## Features
 
 - Floating quota HUD for Codex desktop.
-- Shows 5-hour usage, weekly usage, USD balance, and available reset credits.
+- Shows weekly quota, reset timing, USD balance, plan, and available reset credits.
 - Lists reset-credit expiration dates with red and green urgency indicators on macOS.
 - Shows the current account and subscription expiration locally on macOS without copying credentials into the quota snapshot.
 - Stabilizes live quota values and prevents data from a previous account appearing after an account switch.
@@ -39,60 +39,21 @@ Website source lives in `public/` and is ready for Cloudflare Pages. Recommended
 
 ## Install
 
+[Open the official website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-1) and click the main download button. The website detects macOS or Windows and downloads the latest matching graphical installer directly, without opening the GitHub Release page.
+
 ### macOS
 
-#### Method 1: App Installer
+Requires macOS 13 or later. Unzip the downloaded `macOS-Installer.zip`, then open `Install Quota Bubble.app`. It installs the universal SwiftUI app for Apple silicon and Intel, adds it to Applications and Dock, enables login startup, and launches it.
 
-For users who do not want to use Terminal, open the latest release page and download the macOS installer asset named `QuotaBubble-*-macOS-Installer.zip`:
-
-[Open the latest release page](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
-
-Unzip it, then double-click `Install Quota Bubble.app`. The installer copies the prebuilt SwiftUI app, registers login startup, adds Quota Bubble to Dock, and opens the widget.
-
-The README always links to the latest release page. To install an older version, open [all releases](https://github.com/itzhaolei/codex-usage-widget/releases) and download the installer from that version's page.
-
-Quota Bubble reads local Codex quota data from the current user account and opens directly without prerequisite prompts.
-The macOS app fetches quota data natively in Swift. End users do not need Node.js, npm, a separately installed Codex CLI, Xcode, or command-line tools; they only need macOS 13 or later, a signed-in Codex installation that has created `~/.codex/auth.json`, and network access to Codex.
-
-#### Method 2: One-Line Install
-
-```bash
-CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"
-```
-
-This installs the prebuilt app from the latest macOS release, so end users do not need Xcode Command Line Tools.
-
-#### Method 3: Local Install
-
-```bash
-bash scripts/install.sh
-```
-
-The installer builds:
-
-- `/Applications/Quota Bubble.app`
-- `~/Library/LaunchAgents/com.codex.usage-widget.autostart.plist`
+Quota Bubble fetches data natively in Swift. End users do not need Node.js, npm, a separately installed Codex CLI, Xcode, or command-line tools. Codex must be signed in and have created `~/.codex/auth.json`.
 
 ### Windows
 
-The current macOS and Windows release is v3.0.5. Open the release page to download the graphical Windows installer:
-
-[Open the latest release](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
-
-Download and double-click `QuotaBubble-*-Windows-Setup.exe`. The setup wizard installs the app, creates shortcuts, offers launch-at-sign-in, and opens Quota Bubble. Updating and uninstalling are also graphical.
-
-Quota Bubble for Windows is a compiled, self-contained `.NET 8` desktop application. End users do not need PowerShell, Node.js, npm, a terminal, or a separately installed .NET runtime.
-
-Windows requirements:
-
-- Windows 10 or later.
-- Codex CLI local data under `%USERPROFILE%\.codex`, or `CODEX_HOME` pointing to a compatible Codex data directory.
+Requires Windows 10 or later. Open the downloaded `Windows-Setup.exe` and follow the graphical setup wizard. It installs the self-contained desktop app, creates shortcuts, can enable launch at sign-in, and opens Quota Bubble. PowerShell, Node.js, a terminal, a separate .NET runtime, and manual commands are not required.
 
 ## Uninstall
 
-```bash
-bash scripts/uninstall.sh
-```
+On macOS, choose **Quota Bubble > Uninstall** from the application menu and confirm. On Windows, uninstall Quota Bubble from **Settings > Apps > Installed apps**.
 
 ## Git Workflow
 

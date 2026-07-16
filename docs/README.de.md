@@ -2,13 +2,13 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Ein schwebendes Fenster für macOS und Windows zum Anzeigen des Codex 5-Stunden-Limits, des Wochenlimits und verfügbarer Reset-Credits.
+Ein natives schwebendes Fenster für Codex-Wochenkontingent, Reset-Zeit, Guthaben, Tarif, Konto und Reset-Credits unter macOS und Windows.
 
-![Quota Bubble preview](../assets/preview-plus.png)
+![Quota Bubble preview](../assets/preview-v3.png)
 
 ## Funktionen
 
-- Zeigt Codex 5-Stunden-Nutzung, Wochennutzung und verfügbare Reset-Credits.
+- Zeigt Codex-Wochenkontingent, Reset-Zeit, Guthaben, Tarif und verfügbare Reset-Credits.
 - Zeigt unter macOS die Ablaufdaten einzelner Reset-Credits mit einem roten Punkt innerhalb von drei Tagen und sonst mit einem grünen Punkt.
 - Zeigt unter macOS das aktuelle Konto und das Ablaufdatum des Abonnements lokal an, ohne Anmeldedaten im Kontingent-Snapshot zu speichern.
 - Hält Kontingentwerte beim Wechsel zwischen Live-Nutzung und lokalem Sitzungsprotokoll stabil.
@@ -22,36 +22,19 @@ Ein schwebendes Fenster für macOS und Windows zum Anzeigen des Codex 5-Stunden-
 
 ## Installation
 
-### Methode 1: App-Installer
+Öffnen Sie die [Quota Bubble-Website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-1) und klicken Sie auf den Hauptdownload. Die Website erkennt macOS oder Windows und lädt den passenden aktuellen grafischen Installer direkt, ohne Umweg über die Release-Seite.
 
-Wenn Sie Terminal nicht verwenden möchten, öffnen Sie die neueste Release-Seite und laden Sie dort den Installer-Anhang herunter:
+### macOS
 
-[Neueste Release-Seite öffnen](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
+macOS 13 oder neuer. Entpacken Sie `macOS-Installer.zip` und öffnen Sie `Install Quota Bubble.app`. Node.js, npm, eine separate Codex CLI, Xcode und Befehlszeilentools sind nicht erforderlich. Codex muss angemeldet sein und `~/.codex/auth.json` erstellt haben.
 
-Entpacken Sie die Datei und doppelklicken Sie auf `Install Quota Bubble.app`. Quota Bubble liest die lokalen Codex-Kontingentdaten des aktuellen Benutzerkontos und startet direkt ohne Einrichtungsdialog.
-Die macOS-App ruft Kontingentdaten nativ in Swift ab. Benutzer benötigen weder Node.js, npm, eine separat installierte Codex CLI, Xcode noch Befehlszeilentools, sondern nur macOS 13 oder neuer, eine angemeldete Codex-Installation mit `~/.codex/auth.json` und Netzwerkzugriff auf Codex.
+### Windows
 
-Windows ist jetzt wie macOS auf v3.0.5. Laden Sie `QuotaBubble-*-Windows-Setup.exe` von der [neuesten Release-Seite](https://github.com/itzhaolei/codex-usage-widget/releases/latest) herunter und starten Sie den grafischen Installer per Doppelklick. PowerShell, Node.js, die Befehlszeile und eine separate .NET-Laufzeit werden nicht benötigt.
-
-Die README verweist immer auf die neueste Release-Seite. Für ältere Versionen öffnen Sie [alle Releases](https://github.com/itzhaolei/codex-usage-widget/releases) und laden den Installer auf der jeweiligen Versionsseite herunter.
-
-### Methode 2: Einzeilige Installation
-
-```bash
-CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"
-```
-
-### Methode 3: Lokale Installation
-
-```bash
-bash scripts/install.sh
-```
+Windows 10 oder neuer. Öffnen Sie `Windows-Setup.exe` und folgen Sie dem grafischen Assistenten. PowerShell, Node.js, Terminalbefehle und eine separate .NET-Laufzeit sind nicht erforderlich.
 
 ## Deinstallation
 
-```bash
-bash scripts/uninstall.sh
-```
+Unter macOS wählen Sie **Quota Bubble > Deinstallieren** im App-Menü. Unter Windows verwenden Sie **Einstellungen > Apps > Installierte Apps**.
 
 ## Datenschutz
 

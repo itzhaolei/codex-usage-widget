@@ -52,7 +52,7 @@ struct AppCopy {
     let close: String
 }
 
-let officialWebsiteURLString = "https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260621-1"
+let officialWebsiteURLString = "https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-1"
 
 struct DialogCopy {
     let checking: String

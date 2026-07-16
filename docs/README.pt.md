@@ -2,13 +2,13 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Uma janela flutuante para macOS e Windows que mostra o uso de 5 horas, o uso semanal e as redefinições disponíveis do Codex.
+Uma janela nativa para macOS e Windows que mostra cota semanal do Codex, redefinição, saldo, plano, conta e redefinições disponíveis.
 
-![Quota Bubble preview](../assets/preview-plus.png)
+![Quota Bubble preview](../assets/preview-v3.png)
 
 ## Recursos
 
-- Mostra o uso de 5 horas, o uso semanal e as redefinições disponíveis do Codex.
+- Mostra cota semanal do Codex, redefinição, saldo, plano e redefinições disponíveis.
 - No macOS, mostra a validade de cada redefinição, com ponto vermelho quando expira em até três dias e verde nos demais casos.
 - No macOS, mostra localmente a conta atual e o vencimento da assinatura sem salvar credenciais no snapshot de cota.
 - Mantém os valores estáveis ao alternar entre o uso ao vivo e o log de sessão local.
@@ -22,36 +22,19 @@ Uma janela flutuante para macOS e Windows que mostra o uso de 5 horas, o uso sem
 
 ## Instalação
 
-### Método 1: instalador do app
+Abra o [site oficial do Quota Bubble](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-1) e clique no botão principal. O site detecta macOS ou Windows e baixa diretamente o instalador gráfico mais recente sem abrir a página Releases.
 
-Se você não quiser usar o Terminal, abra a página da versão mais recente e baixe o instalador ali:
+### macOS
 
-[Abrir a página da versão mais recente](https://github.com/itzhaolei/codex-usage-widget/releases/latest)
+macOS 13 ou posterior. Descompacte `macOS-Installer.zip` e abra `Install Quota Bubble.app`. Não exige Node.js, npm, Codex CLI separado, Xcode ou comandos. O Codex deve estar conectado e ter criado `~/.codex/auth.json`.
 
-Descompacte e dê dois cliques em `Install Quota Bubble.app`. O Quota Bubble lê os dados locais de cota do Codex da conta do usuário atual e abre diretamente, sem tela de configuração.
-O app para macOS obtém a cota nativamente em Swift. Não exige Node.js, npm, uma instalação separada do Codex CLI, Xcode ou ferramentas de linha de comando; basta macOS 13 ou posterior, Codex conectado com `~/.codex/auth.json` e acesso de rede ao Codex.
+### Windows
 
-O Windows está alinhado com o macOS na v3.0.5. Baixe `QuotaBubble-*-Windows-Setup.exe` na [versão mais recente](https://github.com/itzhaolei/codex-usage-widget/releases/latest) e abra o instalador gráfico com um duplo clique. Não é necessário PowerShell, Node.js, terminal ou runtime .NET separado.
-
-O README sempre aponta para a página da versão mais recente. Para instalar uma versão antiga, abra [todas as versões](https://github.com/itzhaolei/codex-usage-widget/releases) e baixe o instalador na página da versão desejada.
-
-### Método 2: instalação em uma linha
-
-```bash
-CODEX_USAGE_WIDGET_URL=https://github.com/itzhaolei/codex-usage-widget/archive/refs/heads/main.tar.gz bash -c "$(curl -fsSL https://raw.githubusercontent.com/itzhaolei/codex-usage-widget/main/scripts/bootstrap-install.sh)"
-```
-
-### Método 3: instalação local
-
-```bash
-bash scripts/install.sh
-```
+Windows 10 ou posterior. Abra `Windows-Setup.exe` e siga o assistente gráfico. Não exige PowerShell, Node.js, terminal ou runtime .NET separado.
 
 ## Desinstalar
 
-```bash
-bash scripts/uninstall.sh
-```
+No macOS use **Quota Bubble > Desinstalar**. No Windows use **Configurações > Aplicativos > Aplicativos instalados**.
 
 ## Privacidade
 
