@@ -31,7 +31,7 @@ Si no quieres usar Terminal, abre la página de la última release y descarga al
 Descomprímelo y haz doble clic en `Install Quota Bubble.app`. Quota Bubble lee los datos locales de cuota de Codex de la cuenta de usuario actual y se abre directamente, sin avisos de configuración.
 La app de macOS obtiene la cuota de forma nativa con Swift. No requiere Node.js, npm, una instalación separada de Codex CLI, Xcode ni herramientas de línea de comandos; solo macOS 13 o posterior, Codex con sesión iniciada y `~/.codex/auth.json`, y acceso de red a Codex.
 
-Windows está alineado con macOS en v3.0.3. Descarga `QuotaBubble-*-Windows-Setup.exe` desde la [última versión](https://github.com/itzhaolei/codex-usage-widget/releases/latest) y abre el instalador gráfico con doble clic. No requiere PowerShell, Node.js, terminal ni una instalación separada de .NET.
+Windows está alineado con macOS en v3.0.4. Descarga `QuotaBubble-*-Windows-Setup.exe` desde la [última versión](https://github.com/itzhaolei/codex-usage-widget/releases/latest) y abre el instalador gráfico con doble clic. No requiere PowerShell, Node.js, terminal ni una instalación separada de .NET.
 
 El README siempre enlaza a la última release. Para instalar una versión anterior, abre [todas las releases](https://github.com/itzhaolei/codex-usage-widget/releases) y descarga el instalador desde la página de esa versión.
 

@@ -4,6 +4,8 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.0.4 - 2026-07-16
+
 ### Added
 
 - Added a determinate progress bar and percentage to the macOS update window while the installer is downloading.
