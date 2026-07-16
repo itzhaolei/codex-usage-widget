@@ -4,6 +4,8 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.0.6 - 2026-07-16
+
 ### Added
 
 - Added a localized Official Website item to the macOS application menu that opens the GitHub-hosted website preview.
