@@ -22,7 +22,7 @@
 
 ## 安装
 
-打开 [Quota Bubble 官网](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-1)，点击主下载按钮。官网会自动识别 macOS 或 Windows，并直接下载对应的最新图形安装器，不再跳转 GitHub Release 页面。
+打开 [Quota Bubble 官网](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-3)，点击主下载按钮。官网会自动识别 macOS 或 Windows，并直接下载对应的最新图形安装器，不再跳转 GitHub Release 页面。
 
 ### macOS
 

@@ -52,7 +52,37 @@ struct AppCopy {
     let close: String
 }
 
-let officialWebsiteURLString = "https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-1"
+let officialWebsiteURLString = "https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-3"
+
+func localizedWebsiteShareLabel(_ code: String) -> String {
+    switch code {
+    case "zh": return "分享"
+    case "ja": return "共有"
+    case "ko": return "공유"
+    case "de": return "Teilen"
+    case "fr": return "Partager"
+    case "es": return "Compartir"
+    case "pt": return "Compartilhar"
+    case "it": return "Condividi"
+    case "nl": return "Delen"
+    default: return "Share"
+    }
+}
+
+func localizedWebsiteCopiedMessage(_ code: String) -> String {
+    switch code {
+    case "zh": return "已复制官网信息到剪贴板"
+    case "ja": return "公式サイトの情報をクリップボードにコピーしました"
+    case "ko": return "공식 웹사이트 정보를 클립보드에 복사했습니다"
+    case "de": return "Website-Informationen wurden in die Zwischenablage kopiert"
+    case "fr": return "Les informations du site ont été copiées dans le presse-papiers"
+    case "es": return "La información del sitio se copió al portapapeles"
+    case "pt": return "As informações do site foram copiadas para a área de transferência"
+    case "it": return "Le informazioni del sito sono state copiate negli appunti"
+    case "nl": return "De websitegegevens zijn naar het klembord gekopieerd"
+    default: return "Official website information copied to the clipboard"
+    }
+}
 
 struct DialogCopy {
     let checking: String

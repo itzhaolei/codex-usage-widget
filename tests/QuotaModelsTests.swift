@@ -8,7 +8,11 @@ enum QuotaModelsTests {
         expect(planBadgeText("chatgpt_pro_5x") == "Pro5x", "Pro5x badge")
         expect(planBadgeText("free") == "Free", "Free badge")
         expect(localizedCopy("zh").website == "官网", "Chinese website menu")
-        expect(URL(string: officialWebsiteURLString)?.host == "htmlpreview.github.io", "official website URL")
+    expect(URL(string: officialWebsiteURLString)?.host == "htmlpreview.github.io", "official website URL")
+    for language in supportedLanguages {
+        expect(!localizedWebsiteShareLabel(language.code).isEmpty, "share label for \(language.code)")
+        expect(!localizedWebsiteCopiedMessage(language.code).isEmpty, "share confirmation for \(language.code)")
+    }
         expect(
             macOSInstallerDownloadURL(for: "v3.0.4") == "https://github.com/itzhaolei/codex-usage-widget/releases/download/v3.0.4/QuotaBubble-3.0.4-macOS-Installer.zip",
             "fallback installer URL"

@@ -185,6 +185,7 @@ struct QuotaBubbleApp: App {
                     }
                 }
                 Button(languageMenu.copy.website) { appDelegate.openWebsite() }
+                Button(localizedWebsiteShareLabel(languageMenu.languageCode)) { appDelegate.shareWebsite() }
                 Button(languageMenu.copy.update) { appDelegate.checkForUpdates() }
                 Divider()
                 Button(role: .destructive) { appDelegate.confirmUninstall() } label: { Text(languageMenu.copy.uninstall) }
@@ -571,6 +572,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func openWebsite() {
         guard let url = URL(string: officialWebsiteURLString) else { return }
         NSWorkspace.shared.open(url)
+    }
+
+    func shareWebsite() {
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(officialWebsiteURLString, forType: .string)
+
+        let code = store?.languageCode ?? effectiveLanguageCode()
+        let alert = NSAlert()
+        alert.alertStyle = .informational
+        alert.messageText = localizedWebsiteCopiedMessage(code)
+        alert.informativeText = officialWebsiteURLString
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
     }
 
     func attach(window: NSWindow, store: QuotaStore) {

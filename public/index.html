@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Quota Bubble</title>
   <meta name="description" content="Quota Bubble keeps Codex quota, reset credits, balance, and account status visible on macOS and Windows.">
-  <link rel="icon" href="assets/icon.png?v=20260716-1">
+  <link rel="icon" href="assets/icon.png?v=20260716-3">
   <style>
     :root {
       color-scheme: dark;
@@ -157,7 +157,6 @@
       border: 1px solid rgba(255, 255, 255, 0.055);
       border-radius: 6px;
     }
-    .scan-line { position: absolute; left: 0; right: 0; top: 28%; height: 1px; background: rgba(0, 239, 38, 0.22); box-shadow: 0 0 18px rgba(0, 239, 38, 0.4); }
     .corner-label { position: absolute; color: rgba(225, 239, 229, 0.42); font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; }
     .corner-label.top { top: 24px; left: 26px; }
     .corner-label.bottom { right: 26px; bottom: 23px; }
@@ -196,6 +195,31 @@
     .telemetry-label { color: var(--green); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
     .telemetry-copy strong { display: block; margin-bottom: 6px; }
     .telemetry-copy span { color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .share-zone {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+    .share-copy,
+    .share-console {
+      min-height: 300px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+    .share-copy { display: flex; flex-direction: column; justify-content: center; }
+    .share-copy h2 { max-width: 12ch; }
+    .share-copy p { max-width: 560px; margin: 18px 0 0; color: var(--muted); line-height: 1.7; }
+    .share-console { display: flex; flex-direction: column; justify-content: space-between; background: var(--surface-strong); }
+    .share-status { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-bottom: 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.09); }
+    .share-status strong { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .share-status span { color: var(--green); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .share-points { display: grid; gap: 12px; margin: 24px 0; }
+    .share-point { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .share-point::before { content: "↗"; color: var(--green); font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .share-actions { display: flex; flex-wrap: wrap; gap: 10px; }
     .download-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .download-card { padding: 25px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-strong); }
     .platform { color: var(--muted); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
@@ -208,6 +232,7 @@
       .product-stage { min-height: 430px; }
       .feature-grid { grid-template-columns: 1fr 1fr; }
       .interface-grid { grid-template-columns: 1fr; }
+      .share-zone { grid-template-columns: 1fr; }
       .section-heading { grid-template-columns: 1fr; gap: 15px; }
     }
     @media (max-width: 600px) {
@@ -219,6 +244,7 @@
       .product-stage { min-height: 360px; }
       .widget-shot { width: min(330px, calc(100vw - 58px)); height: auto; }
       .feature-grid, .download-grid { grid-template-columns: 1fr; }
+      .share-copy, .share-console { min-height: 0; padding: 22px; }
       .feature-card { min-height: 150px; }
       .download-card p { min-height: 0; }
       footer { flex-direction: column; }
@@ -228,7 +254,7 @@
 <body>
   <div class="page">
     <header>
-      <div class="brand"><img src="assets/icon.png?v=20260716-1" alt="Quota Bubble app icon"><span>Quota Bubble</span></div>
+      <div class="brand"><img src="assets/icon.png?v=20260716-3" alt="Quota Bubble app icon"><span>Quota Bubble</span></div>
       <div class="topbar">
         <a class="text-link" href="https://github.com/itzhaolei/codex-usage-widget">GitHub</a>
         <div class="language-picker">
@@ -249,7 +275,7 @@
           <div class="actions">
             <a class="button primary" id="smartDownload" href="#platformDownloads" data-i18n="preparing">Preparing download…</a>
             <a class="button" href="https://github.com/itzhaolei/codex-usage-widget" data-i18n="source">View source</a>
-            <button class="button" type="button" id="shareButton" data-i18n="share">Share</button>
+            <button class="button" type="button" data-share-action data-i18n="share">Share</button>
           </div>
           <div class="share-note" id="shareNote" aria-live="polite"></div>
           <div class="signal-row">
@@ -259,8 +285,8 @@
           </div>
         </div>
         <div class="product-stage" aria-label="Quota Bubble app preview">
-          <span class="scan-line"></span><span class="corner-label top">LIVE / CODEX</span><span class="corner-label bottom">330 × 288 / SWIFTUI</span>
-          <img class="widget-shot" src="assets/hero-widget-v3.png?v=20260716-1" alt="Current Quota Bubble window rendered by the macOS app">
+          <span class="corner-label top">LIVE / CODEX</span><span class="corner-label bottom">330 × 288 / SWIFTUI</span>
+          <img class="widget-shot" src="assets/hero-widget-v3.png?v=20260716-3" alt="Current Quota Bubble window rendered by the macOS app">
         </div>
       </section>
 
@@ -283,7 +309,7 @@
           <p class="section-lead" data-i18n="interfaceLead">This preview is exported from the same SwiftUI view users run. The glass, spacing, progress treatment, cards, typography, and controls stay true to the application.</p>
         </div>
         <div class="interface-grid">
-          <div class="interface-panel"><img src="assets/hero-widget-v3.png?v=20260716-1" alt="Quota Bubble real interface"></div>
+          <div class="interface-panel"><img src="assets/hero-widget-v3.png?v=20260716-3" alt="Quota Bubble real interface"></div>
           <div class="interface-panel telemetry">
             <div class="telemetry-row"><span class="telemetry-label">QUOTA</span><div class="telemetry-copy"><strong data-i18n="detail1Title">Stable quota display</strong><span data-i18n="detail1Text">Account-aware updates prevent values from a previous account flashing into the current session.</span></div></div>
             <div class="telemetry-row"><span class="telemetry-label">GLASS</span><div class="telemetry-copy"><strong data-i18n="detail2Title">Adaptive glass</strong><span data-i18n="detail2Text">Dark and light modes control the glass treatment while preserving legibility.</span></div></div>
@@ -292,9 +318,32 @@
         </div>
       </section>
 
+      <section class="section" id="share">
+        <div class="share-zone">
+          <div class="share-copy">
+            <span class="section-index">03 / SHARE</span>
+            <h2 data-i18n="shareTitle">Share a calmer way to watch Codex quota.</h2>
+            <p data-i18n="shareLead">Someone in your team is probably still opening settings to check quota. Send them Quota Bubble so they can keep the same information beside their work.</p>
+          </div>
+          <div class="share-console">
+            <div class="share-status"><strong>QUOTA BUBBLE / SHARE</strong><span data-i18n="shareReady">READY</span></div>
+            <div class="share-points">
+              <div class="share-point" data-i18n="sharePoint1">Help a teammate discover the native desktop window.</div>
+              <div class="share-point" data-i18n="sharePoint2">The shared link follows their language and detects their system.</div>
+              <div class="share-point" data-i18n="sharePoint3">No account data or quota values are included in the link.</div>
+            </div>
+            <div class="share-actions">
+              <button class="button primary" type="button" data-share-action data-i18n="shareCTA">Share Quota Bubble</button>
+              <button class="button" type="button" id="copyLinkButton" data-i18n="copyLink">Copy website link</button>
+            </div>
+            <div class="share-note" id="shareSectionNote" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
       <section class="section" id="platformDownloads">
         <div class="section-heading">
-          <div><span class="section-index">03 / INSTALL</span><h2 data-i18n="installTitle">Click once. Install the right app.</h2></div>
+          <div><span class="section-index">04 / INSTALL</span><h2 data-i18n="installTitle">Click once. Install the right app.</h2></div>
           <p class="section-lead" data-i18n="installLead">No terminal and no release-page detour. The main download button detects your operating system; these platform buttons always download the latest graphical installer directly.</p>
         </div>
         <div class="download-grid">
@@ -320,6 +369,20 @@
       it: { system:"Segui sistema", eyebrow:"Telemetria nativa quota Codex", tagline:"Quota Codex visibile senza interrompere il lavoro.", lead:"Una finestra nativa compatta per quota settimanale, reset, saldo, piano, account e abbonamento, aggiornata ogni secondo.", preparing:"Preparazione download…", downloadMac:"Scarica per macOS", downloadWindows:"Scarica per Windows", chooseDownload:"Scegli il sistema", source:"Vedi sorgente", share:"Condividi", shared:"Condivisione aperta.", copied:"Link copiato.", copyFailed:"Impossibile copiare il link.", signal1:"App desktop nativa", signal2:"Aggiornamento ogni secondo", signal3:"10 lingue", featureTitle:"I dati utili in una superficie discreta.", featureLead:"Il sito riflette l’app reale: barra settimanale, scadenze, schede, account, abbonamento e controlli compatti.", card1Title:"Sempre disponibile", card1Text:"Fissa la finestra quando serve, con Dock e ciclo di vita in un processo.", card2Title:"Dati live", card2Text:"Aggiorna quota, reset, saldo, piano e crediti ogni secondo.", card3Title:"Locale per design", card3Text:"Legge localmente l’account Codex connesso senza distribuire credenziali.", card4Title:"Aggiornamenti nativi", card4Text:"Progresso, installazione e riavvio automatico dentro l’app.", interfaceTitle:"Il prodotto reale, non un mockup ridisegnato.", interfaceLead:"L’anteprima viene dalla stessa vista SwiftUI e mantiene vetro, spazi, barra, schede e controlli.", detail1Title:"Visualizzazione stabile", detail1Text:"Il riconoscimento account evita il lampo dei vecchi valori.", detail2Title:"Vetro adattivo", detail2Text:"Chiaro e scuro regolano il vetro mantenendo la leggibilità.", detail3Title:"Scadenze visibili", detail3Text:"Elenca le date e usa il rosso entro tre giorni.", installTitle:"Un clic. L’app giusta.", installLead:"Niente terminale o pagina Release: rileva il sistema e scarica direttamente l’installer grafico più recente.", macText:"App SwiftUI universale per Apple silicon e Intel. Estrai e apri l’installer.", windowsText:"App autonoma con Setup grafico, senza PowerShell o runtime separato.", latest:"Ultima versione", footer:"Compagno locale indipendente per la quota Codex." },
       nl: { system:"Systeem volgen", eyebrow:"Native desktop-quotatelemetrie", tagline:"Codex-quota zichtbaar zonder je focus te breken.", lead:"Een compact native venster voor weekquota, resets, saldo, plan, account en abonnement, elke seconde bijgewerkt.", preparing:"Download voorbereiden…", downloadMac:"Download voor macOS", downloadWindows:"Download voor Windows", chooseDownload:"Kies je systeem", source:"Bron bekijken", share:"Delen", shared:"Deelvenster geopend.", copied:"Link gekopieerd.", copyFailed:"Link kon niet worden gekopieerd.", signal1:"Native desktop-app", signal2:"Elke seconde vernieuwd", signal3:"10 talen", featureTitle:"De juiste data op één rustig oppervlak.", featureLead:"De site volgt de echte app: weekbalk, vervaldata, kaarten, account, abonnementsdatum en compacte bediening.", card1Title:"Altijd beschikbaar", card1Text:"Zet vast wanneer nodig en houd Dock, venster en levenscyclus in één proces.", card2Title:"Live accountdata", card2Text:"Vernieuw quota, reset, saldo, plan en credits elke seconde.", card3Title:"Lokaal ontworpen", card3Text:"Leest het ingelogde Codex-account lokaal zonder inloggegevens mee te leveren.", card4Title:"Native updates", card4Text:"Voortgang, installatie en automatische herstart gebeuren in de app.", interfaceTitle:"Het echte product, geen nagetekende mockup.", interfaceLead:"De preview komt uit dezelfde SwiftUI-weergave en behoudt glas, ruimte, balk, kaarten en bediening.", detail1Title:"Stabiele weergave", detail1Text:"Accountdetectie voorkomt kortstondige waarden van het vorige account.", detail2Title:"Adaptief glas", detail2Text:"Licht en donker sturen het glas met behoud van leesbaarheid.", detail3Title:"Verval in één oogopslag", detail3Text:"Toont resetdata en markeert minder dan drie dagen rood.", installTitle:"Eén klik. De juiste app.", installLead:"Geen terminal of Release-pagina. Detecteert het systeem en downloadt de nieuwste grafische installer direct.", macText:"Universele SwiftUI-app voor Apple silicon en Intel. Pak uit en open de installer.", windowsText:"Zelfstandige app met grafische Setup, zonder PowerShell of extra runtime.", latest:"Nieuwste versie", footer:"Onafhankelijke lokale metgezel voor Codex-quota." }
     };
+
+    const shareTranslations = {
+      en: { shareTitle:"Share a calmer way to watch Codex quota.", shareLead:"Someone in your team is probably still opening settings to check quota. Send them Quota Bubble so they can keep the same information beside their work.", shareReady:"READY", sharePoint1:"Help a teammate discover the native desktop window.", sharePoint2:"The shared link follows their language and detects their system.", sharePoint3:"No account data or quota values are included in the link.", shareCTA:"Share Quota Bubble", copyLink:"Copy website link" },
+      zh: { shareTitle:"把更轻松的 Codex 配额查看方式分享出去。", shareLead:"你的同事或朋友可能还在反复打开设置查看配额。把 Quota Bubble 分享给他们，让关键信息也能安静地待在工作区旁边。", shareReady:"可以分享", sharePoint1:"帮助身边的人发现原生桌面悬浮窗口。", sharePoint2:"分享链接会跟随对方语言，并自动识别电脑系统。", sharePoint3:"链接中不包含账号信息或任何配额数据。", shareCTA:"分享 Quota Bubble", copyLink:"复制官网链接" },
+      ja: { shareTitle:"Codex クォータをもっと静かに確認する方法を共有。", shareLead:"設定を何度も開いている仲間に Quota Bubble を送り、必要な情報を作業のそばに置いてもらいましょう。", shareReady:"共有可能", sharePoint1:"ネイティブのフローティングウィンドウを仲間に紹介。", sharePoint2:"共有リンクは相手の言語と OS を自動判定。", sharePoint3:"リンクにアカウントやクォータ情報は含まれません。", shareCTA:"Quota Bubble を共有", copyLink:"サイトリンクをコピー" },
+      ko: { shareTitle:"Codex 할당량을 더 편하게 보는 방법을 공유하세요.", shareLead:"설정을 반복해서 여는 동료에게 Quota Bubble을 보내 필요한 정보를 작업 공간 옆에 두도록 도와주세요.", shareReady:"공유 준비", sharePoint1:"네이티브 플로팅 창을 팀원에게 소개합니다.", sharePoint2:"공유 링크는 상대 언어와 운영 체제를 감지합니다.", sharePoint3:"링크에는 계정이나 할당량 데이터가 포함되지 않습니다.", shareCTA:"Quota Bubble 공유", copyLink:"웹사이트 링크 복사" },
+      de: { shareTitle:"Teile die ruhigere Art, Codex-Kontingent zu sehen.", shareLead:"Jemand im Team öffnet sicher noch die Einstellungen. Teile Quota Bubble, damit die wichtigen Daten direkt neben der Arbeit bleiben.", shareReady:"BEREIT", sharePoint1:"Zeige Teammitgliedern das native schwebende Fenster.", sharePoint2:"Der Link folgt ihrer Sprache und erkennt ihr System.", sharePoint3:"Der Link enthält keine Konto- oder Kontingentdaten.", shareCTA:"Quota Bubble teilen", copyLink:"Website-Link kopieren" },
+      fr: { shareTitle:"Partagez une façon plus calme de suivre le quota Codex.", shareLead:"Un collègue ouvre sans doute encore les réglages. Envoyez-lui Quota Bubble pour garder les données utiles près du travail.", shareReady:"PRÊT", sharePoint1:"Faites découvrir la fenêtre native à un collègue.", sharePoint2:"Le lien suit sa langue et détecte son système.", sharePoint3:"Le lien ne contient aucune donnée de compte ou de quota.", shareCTA:"Partager Quota Bubble", copyLink:"Copier le lien du site" },
+      es: { shareTitle:"Comparte una forma más tranquila de ver la cuota Codex.", shareLead:"Alguien de tu equipo aún abre ajustes para verla. Envíale Quota Bubble para mantener la información junto al trabajo.", shareReady:"LISTO", sharePoint1:"Ayuda a un compañero a descubrir la ventana nativa.", sharePoint2:"El enlace sigue su idioma y detecta su sistema.", sharePoint3:"El enlace no incluye datos de cuenta ni de cuota.", shareCTA:"Compartir Quota Bubble", copyLink:"Copiar enlace del sitio" },
+      pt: { shareTitle:"Compartilhe uma forma mais tranquila de ver a cota Codex.", shareLead:"Alguém da equipe ainda abre as configurações. Envie o Quota Bubble para manter os dados ao lado do trabalho.", shareReady:"PRONTO", sharePoint1:"Ajude um colega a descobrir a janela nativa.", sharePoint2:"O link segue o idioma e detecta o sistema da pessoa.", sharePoint3:"O link não inclui dados de conta ou de cota.", shareCTA:"Compartilhar Quota Bubble", copyLink:"Copiar link do site" },
+      it: { shareTitle:"Condividi un modo più tranquillo di vedere la quota Codex.", shareLead:"Qualcuno nel team apre ancora le impostazioni. Invia Quota Bubble per tenere i dati accanto al lavoro.", shareReady:"PRONTO", sharePoint1:"Fai scoprire la finestra nativa a un collega.", sharePoint2:"Il link segue la lingua e rileva il sistema.", sharePoint3:"Il link non contiene dati account o quota.", shareCTA:"Condividi Quota Bubble", copyLink:"Copia link del sito" },
+      nl: { shareTitle:"Deel een rustigere manier om Codex-quota te bekijken.", shareLead:"Iemand in je team opent vast nog instellingen. Stuur Quota Bubble zodat de informatie naast het werk blijft.", shareReady:"GEREED", sharePoint1:"Laat een collega het native zwevende venster ontdekken.", sharePoint2:"De link volgt de taal en detecteert het systeem.", sharePoint3:"De link bevat geen account- of quotagegevens.", shareCTA:"Quota Bubble delen", copyLink:"Websitelink kopiëren" }
+    };
+    Object.entries(shareTranslations).forEach(([code, values]) => Object.assign(translations[code], values));
 
     const fallbackRelease = {
       tag: "v3.0.5",
@@ -381,15 +444,35 @@
     }
 
     async function shareSite() {
-      const note = document.getElementById("shareNote");
       try {
-        if (navigator.share) { await navigator.share({ title: "Quota Bubble", text: dict().tagline, url: location.href }); note.textContent = dict().shared; return; }
-        await navigator.clipboard.writeText(location.href); note.textContent = dict().copied;
-      } catch (error) { if (error?.name !== "AbortError") note.textContent = dict().copyFailed; }
+        if (navigator.share) { await navigator.share({ title: "Quota Bubble", text: dict().tagline, url: location.href }); setShareNote(dict().shared); return; }
+        await copyWebsiteLink();
+      } catch (error) { if (error?.name !== "AbortError") setShareNote(dict().copyFailed); }
+    }
+
+    function setShareNote(message) {
+      document.querySelectorAll(".share-note").forEach((note) => { note.textContent = message; });
+    }
+
+    async function copyWebsiteLink() {
+      const input = document.createElement("textarea");
+      input.value = location.href;
+      input.setAttribute("readonly", "");
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.appendChild(input);
+      input.select();
+      let copied = document.execCommand("copy");
+      input.remove();
+      if (!copied && navigator.clipboard?.writeText) {
+        try { await navigator.clipboard.writeText(location.href); copied = true; } catch (_) {}
+      }
+      setShareNote(copied ? dict().copied : dict().copyFailed);
     }
 
     document.getElementById("languageSelect").addEventListener("change", (event) => applyLanguage(event.target.value));
-    document.getElementById("shareButton").addEventListener("click", shareSite);
+    document.querySelectorAll("[data-share-action]").forEach((button) => button.addEventListener("click", shareSite));
+    document.getElementById("copyLinkButton").addEventListener("click", copyWebsiteLink);
     applyLanguage(storedLanguage);
     loadLatestRelease();
   </script>

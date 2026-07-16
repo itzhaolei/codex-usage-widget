@@ -22,7 +22,7 @@ Een native venster voor macOS en Windows met Codex-weekquota, resettijd, saldo, 
 
 ## Installatie
 
-Open de [officiële Quota Bubble-website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-1) en klik op de hoofdknop. De site detecteert macOS of Windows en downloadt de nieuwste grafische installer direct zonder de Release-pagina te openen.
+Open de [officiële Quota Bubble-website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-3) en klik op de hoofdknop. De site detecteert macOS of Windows en downloadt de nieuwste grafische installer direct zonder de Release-pagina te openen.
 
 ### macOS
 
