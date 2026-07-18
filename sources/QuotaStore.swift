@@ -45,8 +45,8 @@ final class QuotaStore: ObservableObject {
     }
 
     var copy: AppCopy { localizedCopy(languageCode) }
-    var remainingPercentage: Int? { remainingPercent(fromUsedPercent: snapshot?.five_hour?.used_percentage) }
-    var resetText: String { compactDuration(until: snapshot?.five_hour?.resets_at, copy: copy) }
+    var remainingPercentage: Int? { remainingPercent(fromUsedPercent: snapshot?.seven_day?.used_percentage) }
+    var resetText: String { compactDuration(until: snapshot?.seven_day?.resets_at, copy: copy) }
     var planText: String { planBadgeText(snapshot?.plan_type) }
     var balanceText: String { formattedBalance(snapshot?.balance_usd) }
     var resetCountText: String { snapshot?.reset_credits?.available_count.map(String.init) ?? "—" }

@@ -14,7 +14,7 @@ enum QuotaStoreTests {
 
         let store = QuotaStore(codexHome: root.path, refreshesRemotely: false)
         store.tick()
-        expect(store.snapshot?.five_hour?.used_percentage == 20, "same-account snapshot loads")
+        expect(store.snapshot?.seven_day?.used_percentage == 20, "same-account weekly snapshot loads")
         expect(store.accountText == "a@example.test", "account A loads")
 
         try writeAuth(accountID: "account-b", email: "b@example.test", root: root)
@@ -24,7 +24,7 @@ enum QuotaStoreTests {
 
         try writeSnapshot(accountID: "account-b", used: 63, root: root)
         store.tick()
-        expect(store.snapshot?.five_hour?.used_percentage == 63, "new-account snapshot loads")
+        expect(store.snapshot?.seven_day?.used_percentage == 63, "new-account weekly snapshot loads")
         expect(store.remainingPercentage == 37, "new-account remaining quota")
 
         print("Quota store tests passed.")
@@ -46,7 +46,7 @@ enum QuotaStoreTests {
         let snapshot: [String: Any] = [
             "account_fingerprint": "account:\(digest.prefix(16))",
             "plan_type": "plus",
-            "five_hour": ["used_percentage": used, "resets_at": Date().addingTimeInterval(3_600).timeIntervalSince1970],
+            "seven_day": ["used_percentage": used, "resets_at": Date().addingTimeInterval(7 * 86_400).timeIntervalSince1970],
             "reset_credits": ["available_count": 0, "expires_at": []],
         ]
         let data = try JSONSerialization.data(withJSONObject: snapshot)
