@@ -22,7 +22,7 @@ Ein natives schwebendes Fenster für Codex-Wochenkontingent, Reset-Zeit, Guthabe
 
 ## Installation
 
-Öffnen Sie die [Quota Bubble-Website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-3) und klicken Sie auf den Hauptdownload. Die Website erkennt macOS oder Windows und lädt den passenden aktuellen grafischen Installer direkt, ohne Umweg über die Release-Seite.
+Öffnen Sie die [Quota Bubble-Website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260718-1) und klicken Sie auf den Hauptdownload. Die Website erkennt macOS oder Windows und lädt den passenden aktuellen grafischen Installer direkt, ohne Umweg über die Release-Seite.
 
 ### macOS
 

@@ -22,7 +22,7 @@ Una finestra nativa per macOS e Windows che mostra quota settimanale Codex, rese
 
 ## Installazione
 
-Apri il [sito ufficiale Quota Bubble](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-3) e premi il pulsante principale. Il sito rileva macOS o Windows e scarica direttamente l’ultimo installer grafico senza aprire la pagina Releases.
+Apri il [sito ufficiale Quota Bubble](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260718-1) e premi il pulsante principale. Il sito rileva macOS o Windows e scarica direttamente l’ultimo installer grafico senza aprire la pagina Releases.
 
 ### macOS
 

@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Quota Bubble</title>
-  <meta name="description" content="Quota Bubble keeps Codex quota, reset credits, balance, and account status visible on macOS and Windows.">
-  <link rel="icon" href="assets/icon.png?v=20260716-3">
+  <meta name="description" content="Quota Bubble keeps Codex weekly quota, resets, balance, and account status visible, with stable refreshes and a native recharge animation.">
+  <link rel="icon" href="assets/icon.png?v=20260718-1">
   <style>
     :root {
       color-scheme: dark;
@@ -254,7 +254,7 @@
 <body>
   <div class="page">
     <header>
-      <div class="brand"><img src="assets/icon.png?v=20260716-3" alt="Quota Bubble app icon"><span>Quota Bubble</span></div>
+      <div class="brand"><img src="assets/icon.png?v=20260718-1" alt="Quota Bubble app icon"><span>Quota Bubble</span></div>
       <div class="topbar">
         <a class="text-link" href="https://github.com/itzhaolei/codex-usage-widget">GitHub</a>
         <div class="language-picker">
@@ -286,7 +286,7 @@
         </div>
         <div class="product-stage" aria-label="Quota Bubble app preview">
           <span class="corner-label top">LIVE / CODEX</span><span class="corner-label bottom">330 × 288 / SWIFTUI</span>
-          <img class="widget-shot" src="assets/hero-widget-v3.png?v=20260716-3" alt="Current Quota Bubble window rendered by the macOS app">
+          <img class="widget-shot" src="assets/hero-widget-v3.png?v=20260718-1" alt="Current Quota Bubble window rendered by the macOS app">
         </div>
       </section>
 
@@ -309,11 +309,11 @@
           <p class="section-lead" data-i18n="interfaceLead">This preview is exported from the same SwiftUI view users run. The glass, spacing, progress treatment, cards, typography, and controls stay true to the application.</p>
         </div>
         <div class="interface-grid">
-          <div class="interface-panel"><img src="assets/hero-widget-v3.png?v=20260716-3" alt="Quota Bubble real interface"></div>
+          <div class="interface-panel"><img src="assets/hero-widget-v3.png?v=20260718-1" alt="Quota Bubble real interface"></div>
           <div class="interface-panel telemetry">
             <div class="telemetry-row"><span class="telemetry-label">QUOTA</span><div class="telemetry-copy"><strong data-i18n="detail1Title">Stable quota display</strong><span data-i18n="detail1Text">Account-aware updates prevent values from a previous account flashing into the current session.</span></div></div>
             <div class="telemetry-row"><span class="telemetry-label">GLASS</span><div class="telemetry-copy"><strong data-i18n="detail2Title">Adaptive glass</strong><span data-i18n="detail2Text">Dark and light modes control the glass treatment while preserving legibility.</span></div></div>
-            <div class="telemetry-row"><span class="telemetry-label">RESET</span><div class="telemetry-copy"><strong data-i18n="detail3Title">Expiration at a glance</strong><span data-i18n="detail3Text">Reset credits list their dates, with red indicators when expiration is within three days.</span></div></div>
+            <div class="telemetry-row"><span class="telemetry-label">RESET</span><div class="telemetry-copy"><strong data-i18n="detail3Title">Recharge in motion</strong><span data-i18n="detail3Text">A genuine weekly reset drives the selected color, progress sweep, and coordinated orbit animation.</span></div></div>
           </div>
         </div>
       </section>
@@ -347,8 +347,8 @@
           <p class="section-lead" data-i18n="installLead">No terminal and no release-page detour. The main download button detects your operating system; these platform buttons always download the latest graphical installer directly.</p>
         </div>
         <div class="download-grid">
-          <article class="download-card"><span class="platform">macOS 13+</span><h3>Quota Bubble for macOS</h3><p data-i18n="macText">Universal SwiftUI app for Apple silicon and Intel. Unzip, then open the graphical installer.</p><a class="button primary platform-download" id="macDownload" href="#" data-i18n="downloadMac">Download for macOS</a><div class="release-tag" data-release-tag>Latest release</div></article>
-          <article class="download-card"><span class="platform">Windows 10+</span><h3>Quota Bubble for Windows</h3><p data-i18n="windowsText">Self-contained desktop app with a graphical Setup wizard. No PowerShell or separate runtime required.</p><a class="button primary platform-download" id="windowsDownload" href="#" data-i18n="downloadWindows">Download for Windows</a><div class="release-tag" data-release-tag>Latest release</div></article>
+          <article class="download-card"><span class="platform">macOS 13+</span><h3>Quota Bubble for macOS</h3><p data-i18n="macText">Universal SwiftUI app for Apple silicon and Intel. Unzip, then open the graphical installer.</p><a class="button primary platform-download" id="macDownload" href="#" data-i18n="downloadMac">Download for macOS</a><div class="release-tag" id="macReleaseTag">Latest release</div></article>
+          <article class="download-card"><span class="platform">Windows 10+</span><h3>Quota Bubble for Windows</h3><p data-i18n="windowsText">Self-contained desktop app with a graphical Setup wizard. No PowerShell or separate runtime required.</p><a class="button primary platform-download" id="windowsDownload" href="#" data-i18n="downloadWindows">Download for Windows</a><div class="release-tag" id="windowsReleaseTag">Latest release</div></article>
         </div>
       </section>
     </main>
@@ -384,9 +384,25 @@
     };
     Object.entries(shareTranslations).forEach(([code, values]) => Object.assign(translations[code], values));
 
+    const releaseTranslations = {
+      en: { detail3Title:"Recharge in motion", detail3Text:"A genuine weekly reset drives the selected color, progress sweep, and coordinated orbit animation." },
+      zh: { detail3Title:"周配额回充动效", detail3Text:"真实周配额重置时，选中色彩、进度推进与轨道粒子会协调完成一次回充动画。" },
+      ja: { detail3Title:"週間クォータの回復演出", detail3Text:"実際の週間リセット時に、選択色、進捗スイープ、軌道アニメーションが連動します。" },
+      ko: { detail3Title:"주간 할당량 충전 애니메이션", detail3Text:"실제 주간 재설정 때 선택 색상, 진행 스윕, 궤도 애니메이션이 함께 움직입니다." },
+      de: { detail3Title:"Wöchentliche Aufladeanimation", detail3Text:"Ein echter Wochen-Reset verbindet gewählte Farbe, Fortschrittslauf und koordinierte Umlaufanimation." },
+      fr: { detail3Title:"Recharge hebdomadaire animée", detail3Text:"Un véritable reset hebdomadaire synchronise la couleur choisie, la progression et l’animation orbitale." },
+      es: { detail3Title:"Recarga semanal animada", detail3Text:"Un reinicio semanal real coordina el color elegido, el avance de la barra y la animación orbital." },
+      pt: { detail3Title:"Recarga semanal animada", detail3Text:"Uma redefinição semanal real coordena a cor escolhida, o avanço da barra e a animação orbital." },
+      it: { detail3Title:"Ricarica settimanale animata", detail3Text:"Un vero reset settimanale coordina colore scelto, avanzamento della barra e animazione orbitale." },
+      nl: { detail3Title:"Geanimeerde weekreset", detail3Text:"Een echte weekreset stemt de gekozen kleur, voortgang en baananimatie op elkaar af." }
+    };
+    Object.entries(releaseTranslations).forEach(([code, values]) => Object.assign(translations[code], values));
+
     const fallbackRelease = {
-      tag: "v3.0.7",
-      mac: "https://github.com/itzhaolei/codex-usage-widget/releases/download/v3.0.7/QuotaBubble-3.0.7-macOS-Installer.zip",
+      tag: "v3.0.8",
+      macTag: "v3.0.8",
+      windowsTag: "v3.0.7",
+      mac: "https://github.com/itzhaolei/codex-usage-widget/releases/download/v3.0.8/QuotaBubble-3.0.8-macOS-Installer.zip",
       windows: "https://github.com/itzhaolei/codex-usage-widget/releases/download/v3.0.7/QuotaBubble-3.0.7-Windows-Setup.exe"
     };
     let release = { ...fallbackRelease };
@@ -422,7 +438,8 @@
       const platform = platformKind();
       document.getElementById("macDownload").href = release.mac;
       document.getElementById("windowsDownload").href = release.windows;
-      document.querySelectorAll("[data-release-tag]").forEach((node) => { node.textContent = `${copy.latest || translations.en.latest} · ${release.tag}`; });
+      document.getElementById("macReleaseTag").textContent = `${copy.latest || translations.en.latest} · ${release.macTag}`;
+      document.getElementById("windowsReleaseTag").textContent = `${copy.latest || translations.en.latest} · ${release.windowsTag}`;
       if (platform === "mac") { smart.href = release.mac; smart.textContent = copy.downloadMac; }
       else if (platform === "windows") { smart.href = release.windows; smart.textContent = copy.downloadWindows; }
       else { smart.href = "#platformDownloads"; smart.textContent = copy.chooseDownload; }
@@ -436,7 +453,14 @@
         const assets = Array.isArray(json.assets) ? json.assets : [];
         const mac = assets.find((asset) => asset.name?.endsWith("macOS-Installer.zip"));
         const windows = assets.find((asset) => asset.name?.endsWith("Windows-Setup.exe"));
-        release = { tag: json.tag_name || fallbackRelease.tag, mac: mac?.browser_download_url || fallbackRelease.mac, windows: windows?.browser_download_url || fallbackRelease.windows };
+        const tag = json.tag_name || fallbackRelease.tag;
+        release = {
+          tag,
+          macTag: mac ? tag : fallbackRelease.macTag,
+          windowsTag: windows ? tag : fallbackRelease.windowsTag,
+          mac: mac?.browser_download_url || fallbackRelease.mac,
+          windows: windows?.browser_download_url || fallbackRelease.windows
+        };
       } catch (_) {
         release = { ...fallbackRelease };
       }

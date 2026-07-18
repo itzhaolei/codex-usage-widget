@@ -4,6 +4,10 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+### Changed
+
+- Updated the multilingual website for v3.0.8 with direct installer fallbacks, weekly recharge-animation details, and refreshed cache-safe website links across the application and README pages.
+
 ## 3.0.8 - 2026-07-18
 
 ### Added

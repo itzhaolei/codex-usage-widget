@@ -83,7 +83,7 @@ struct AppCopy {
     let close: String
 }
 
-let officialWebsiteURLString = "https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260716-3"
+let officialWebsiteURLString = "https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260718-1"
 
 func localizedWebsiteShareLabel(_ code: String) -> String {
     switch code {
