@@ -25,11 +25,13 @@ enum NativeQuotaParser {
             ResetCredits(available_count: max(0, $0), expires_at: resetExpirations(from: resetValue ?? [:], limit: max(0, $0)))
         }
 
+        let primaryWindow = usageWindow(object(rateLimit?["primary_window"]))
+        let secondaryWindow = usageWindow(object(rateLimit?["secondary_window"]))
         let payload = NativeUsagePayload(
             planType: planType(in: root),
             balanceUsd: balance(credits?["balance"]),
-            fiveHour: usageWindow(object(rateLimit?["primary_window"])),
-            sevenDay: usageWindow(object(rateLimit?["secondary_window"])),
+            fiveHour: secondaryWindow == nil ? nil : primaryWindow,
+            sevenDay: secondaryWindow ?? primaryWindow,
             resetCredits: resetCredits
         )
         guard payload.fiveHour != nil || payload.sevenDay != nil || payload.resetCredits != nil || payload.balanceUsd != nil else {

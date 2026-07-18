@@ -35,6 +35,7 @@ enum QuotaModelsTests {
         expect(snapshot.five_hour?.used_percentage == 45, "snapshot percentage")
         expect(snapshot.reset_credits?.expires_at?.count == 2, "snapshot reset expirations")
         expect(snapshot.account_fingerprint == "account:0123456789abcdef", "snapshot account fingerprint")
+        expect(weeklyUsageWindow(from: snapshot)?.used_percentage == 45, "legacy single-window snapshot remains readable")
 
         let oldCycle = UsageSnapshot(account_fingerprint: "same", seven_day: UsageWindow(used_percentage: 50, resets_at: 1_000))
         let newCycle = UsageSnapshot(account_fingerprint: "same", seven_day: UsageWindow(used_percentage: 0, resets_at: 20_000))

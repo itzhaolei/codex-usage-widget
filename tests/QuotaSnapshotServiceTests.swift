@@ -11,6 +11,11 @@ enum QuotaSnapshotServiceTests {
         expect(usage.balanceUsd == "1.50", "balance")
         expect(usage.resetCredits?.available_count == 2, "reset count")
 
+        let weeklyOnlyJSON = #"{"rate_limit":{"primary_window":{"used_percent":98,"reset_at":1784950166}}}"#.data(using: .utf8)!
+        let weeklyOnly = try require(NativeQuotaParser.usage(from: weeklyOnlyJSON), "weekly-only payload")
+        expect(weeklyOnly.fiveHour == nil, "single window is not treated as five-hour quota")
+        expect(weeklyOnly.sevenDay?.used_percentage == 98, "single window maps to weekly quota")
+
         let resetJSON = #"{"available_count":2,"grants":[{"expires_at":"2026-08-13T01:45:00Z"},{"expires_at":"2026-08-01T04:15:00Z"}]}"#.data(using: .utf8)!
         let resets = try require(NativeQuotaParser.detailedResetCredits(from: resetJSON), "reset payload")
         expect(resets.expires_at?.count == 2, "reset expirations")

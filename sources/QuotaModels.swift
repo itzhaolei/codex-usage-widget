@@ -43,13 +43,17 @@ struct QuotaRechargeAnimationEvent: Equatable {
     let toPercentage: Int
 }
 
+func weeklyUsageWindow(from snapshot: UsageSnapshot?) -> UsageWindow? {
+    snapshot?.seven_day ?? snapshot?.five_hour
+}
+
 func quotaRechargeTransition(previous: UsageSnapshot?, next: UsageSnapshot?) -> QuotaRechargeTransition? {
     guard let previous,
           let next,
           let previousFingerprint = previous.account_fingerprint,
           previousFingerprint == next.account_fingerprint,
-          let previousWindow = previous.seven_day,
-          let nextWindow = next.seven_day,
+          let previousWindow = weeklyUsageWindow(from: previous),
+          let nextWindow = weeklyUsageWindow(from: next),
           let previousReset = previousWindow.resets_at,
           let nextReset = nextWindow.resets_at,
           nextReset > previousReset + 5 * 60,
