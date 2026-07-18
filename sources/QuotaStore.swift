@@ -9,8 +9,8 @@ final class QuotaStore: ObservableObject {
     @Published private(set) var resetRows: [ResetExpirationRow] = []
     @Published private(set) var hasUpdate = false
     @Published private(set) var languageCode = effectiveLanguageCode()
-    @Published private(set) var rechargeAnimationID: UInt = 0
-    @Published private(set) var rechargeStartPercentage: Int?
+    @Published private(set) var rechargeAnimationEvent: QuotaRechargeAnimationEvent?
+    @Published private(set) var progressColorIndex: Int
     @Published var isLightMode: Bool {
         didSet { UserDefaults.standard.set(isLightMode, forKey: Self.lightModeKey) }
     }
@@ -20,6 +20,7 @@ final class QuotaStore: ObservableObject {
 
     static let lightModeKey = "CodexUsageWidget.isLightMode"
     static let pinnedKey = "CodexUsageWidget.isPinned"
+    static let progressColorKey = "CodexUsageWidget.progressColorIndex"
     static let savedFrameKey = "CodexUsageWidget.savedFrame"
 
     private let codexHome: String
@@ -30,6 +31,7 @@ final class QuotaStore: ObservableObject {
     private var refreshInFlight = false
     private var lastVersionCheck = Date.distantPast
     private var authReadFailureSince: Date?
+    private var nextRechargeAnimationID: UInt = 0
 
     init(codexHome: String? = nil, refreshesRemotely: Bool = true) {
         let resolvedHome = codexHome ?? ProcessInfo.processInfo.environment["CODEX_HOME"]
@@ -39,6 +41,7 @@ final class QuotaStore: ObservableObject {
         Self.migrateLegacyPreferences()
         isLightMode = UserDefaults.standard.bool(forKey: Self.lightModeKey)
         isPinned = UserDefaults.standard.object(forKey: Self.pinnedKey) as? Bool ?? true
+        progressColorIndex = min(4, max(0, UserDefaults.standard.integer(forKey: Self.progressColorKey)))
     }
 
     var copy: AppCopy { localizedCopy(languageCode) }
@@ -54,7 +57,7 @@ final class QuotaStore: ObservableObject {
         return "v\(version)"
     }
     var desiredHeight: CGFloat {
-        234 + (resetRows.isEmpty ? 0 : 18 + CGFloat(resetRows.count) * 18)
+        253 + (resetRows.isEmpty ? 0 : 18 + CGFloat(resetRows.count) * 18)
     }
 
     func start() {
@@ -62,15 +65,6 @@ final class QuotaStore: ObservableObject {
         readLocalState()
         refreshSnapshot(force: true)
         checkVersion(force: true)
-        if CommandLine.arguments.contains("--preview-recharge") {
-            Task { [weak self] in
-                try? await Task.sleep(nanoseconds: 700_000_000)
-                for _ in 0..<3 {
-                    self?.previewRechargeAnimation()
-                    try? await Task.sleep(nanoseconds: 2_200_000_000)
-                }
-            }
-        }
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerDidFire), userInfo: nil, repeats: true)
         RunLoop.main.add(timer!, forMode: .common)
     }
@@ -98,12 +92,20 @@ final class QuotaStore: ObservableObject {
 
     func toggleTheme() { isLightMode.toggle() }
     func togglePinned() { isPinned.toggle() }
+    func selectProgressColor(_ index: Int) {
+        guard (0..<5).contains(index) else { return }
+        progressColorIndex = index
+        UserDefaults.standard.set(index, forKey: Self.progressColorKey)
+    }
     func markUpdateInstalled() { hasUpdate = false }
 
-    private func previewRechargeAnimation() {
-        guard let target = remainingPercentage else { return }
-        rechargeStartPercentage = max(0, target - 50)
-        rechargeAnimationID &+= 1
+    private func publishRechargeAnimation(from: Int, to: Int) {
+        nextRechargeAnimationID &+= 1
+        rechargeAnimationEvent = QuotaRechargeAnimationEvent(
+            id: nextRechargeAnimationID,
+            fromPercentage: from,
+            toPercentage: to
+        )
     }
 
     private func readLocalState() {
@@ -136,8 +138,7 @@ final class QuotaStore: ObservableObject {
             }
         }
         if let transition = quotaRechargeTransition(previous: previousSnapshot, next: snapshot) {
-            rechargeStartPercentage = transition.fromPercentage
-            rechargeAnimationID &+= 1
+            publishRechargeAnimation(from: transition.fromPercentage, to: transition.toPercentage)
         }
         auth = currentAuth
         rebuildDerivedState()
@@ -237,7 +238,7 @@ final class QuotaStore: ObservableObject {
         let current = UserDefaults.standard
         guard current.object(forKey: pinnedKey) == nil,
               let legacy = UserDefaults(suiteName: "local.codex.usage-widget") else { return }
-        for key in [lightModeKey, pinnedKey, savedFrameKey] {
+        for key in [lightModeKey, pinnedKey, progressColorKey, savedFrameKey] {
             if let value = legacy.object(forKey: key) { current.set(value, forKey: key) }
         }
     }

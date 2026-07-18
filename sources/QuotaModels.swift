@@ -37,6 +37,12 @@ struct QuotaRechargeTransition: Equatable {
     let toPercentage: Int
 }
 
+struct QuotaRechargeAnimationEvent: Equatable {
+    let id: UInt
+    let fromPercentage: Int
+    let toPercentage: Int
+}
+
 func quotaRechargeTransition(previous: UsageSnapshot?, next: UsageSnapshot?) -> QuotaRechargeTransition? {
     guard let previous,
           let next,
