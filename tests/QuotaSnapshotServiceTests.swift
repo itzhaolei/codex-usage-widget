@@ -22,6 +22,16 @@ enum QuotaSnapshotServiceTests {
         expect(stabilized?.used_percentage == 79, "same-cycle usage cannot move backward")
         expect(NativeQuotaParser.mergedWindow(existing: existing, next: transient, sameAccount: false)?.used_percentage == 22, "new account does not inherit usage")
 
+        let oldCycle = UsageWindow(used_percentage: 50, resets_at: 1_784_644_000)
+        let newCycle = UsageWindow(used_percentage: 0, resets_at: 1_784_662_000)
+        let acceptedReset = NativeQuotaParser.mergedWindow(existing: oldCycle, next: newCycle, sameAccount: true)
+        expect(acceptedReset?.used_percentage == 0, "new quota cycle is accepted")
+        expect(acceptedReset?.resets_at == newCycle.resets_at, "new quota cycle reset time is retained")
+
+        let rejectedStaleCycle = NativeQuotaParser.mergedWindow(existing: acceptedReset, next: oldCycle, sameAccount: true)
+        expect(rejectedStaleCycle == acceptedReset, "stale previous-cycle response cannot replace the new cycle")
+        expect(NativeQuotaParser.mergedWindow(existing: newCycle, next: oldCycle, sameAccount: false) == oldCycle, "account changes may use an earlier reset time")
+
         print("Native quota snapshot tests passed.")
     }
 

@@ -50,14 +50,20 @@ enum NativeQuotaParser {
 
     static func mergedWindow(existing: UsageWindow?, next: UsageWindow?, sameAccount: Bool) -> UsageWindow? {
         guard let next else { return sameAccount ? existing : nil }
-        guard sameAccount,
-              let existing,
-              let existingUsed = existing.used_percentage,
-              let nextUsed = next.used_percentage,
-              let existingReset = existing.resets_at,
-              let nextReset = next.resets_at,
-              abs(existingReset - nextReset) <= 5 * 60 else { return next }
-        return UsageWindow(used_percentage: max(existingUsed, nextUsed), resets_at: existingReset)
+        guard sameAccount, let existing else { return next }
+
+        if let existingReset = existing.resets_at, let nextReset = next.resets_at {
+            let cycleTolerance: TimeInterval = 5 * 60
+            if nextReset < existingReset - cycleTolerance {
+                return existing
+            }
+            if abs(existingReset - nextReset) <= cycleTolerance,
+               let existingUsed = existing.used_percentage,
+               let nextUsed = next.used_percentage {
+                return UsageWindow(used_percentage: max(existingUsed, nextUsed), resets_at: existingReset)
+            }
+        }
+        return next
     }
 
     private static func usageWindow(_ value: [String: Any]?) -> UsageWindow? {
