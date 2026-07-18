@@ -4,9 +4,20 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.0.8 - 2026-07-18
+
 ### Added
 
 - Added three 1080 x 1920 short-video campaign posters highlighting live quota visibility, local account isolation, and native Liquid Glass installation and updates.
+- Added a coordinated weekly-quota recharge animation that begins at the previous real percentage and preserves the existing progress-bar appearance.
+- Added five selectable progress colors with subtle moving star highlights and an orbiting color-card transition during a genuine quota reset.
+
+### Fixed
+
+- Prevented stale pre-reset snapshots from making the weekly quota alternate between old and newly reset values.
+- Restricted recharge animation triggers to a real weekly reset for the same account, so account switching cannot play the reset animation.
+- Correctly treats a single API usage window as the weekly quota when no separate secondary window is returned.
+- Removed preview arguments, simulated percentages, and automatic debug animation playback from the production application.
 
 ## 3.0.7 - 2026-07-16
 
