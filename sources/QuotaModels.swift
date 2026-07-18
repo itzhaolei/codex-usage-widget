@@ -32,6 +32,27 @@ struct AuthDisplayInfo: Equatable {
     var accountFingerprint: String?
 }
 
+struct QuotaRechargeTransition: Equatable {
+    let fromPercentage: Int
+    let toPercentage: Int
+}
+
+func quotaRechargeTransition(previous: UsageSnapshot?, next: UsageSnapshot?) -> QuotaRechargeTransition? {
+    guard let previous,
+          let next,
+          let previousFingerprint = previous.account_fingerprint,
+          previousFingerprint == next.account_fingerprint,
+          let previousWindow = previous.five_hour,
+          let nextWindow = next.five_hour,
+          let previousReset = previousWindow.resets_at,
+          let nextReset = nextWindow.resets_at,
+          nextReset > previousReset + 5 * 60,
+          let from = remainingPercent(fromUsedPercent: previousWindow.used_percentage),
+          let to = remainingPercent(fromUsedPercent: nextWindow.used_percentage),
+          to > from else { return nil }
+    return QuotaRechargeTransition(fromPercentage: from, toPercentage: to)
+}
+
 struct AppCopy {
     let title: String
     let week: String

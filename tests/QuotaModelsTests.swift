@@ -36,6 +36,17 @@ enum QuotaModelsTests {
         expect(snapshot.reset_credits?.expires_at?.count == 2, "snapshot reset expirations")
         expect(snapshot.account_fingerprint == "account:0123456789abcdef", "snapshot account fingerprint")
 
+        let oldCycle = UsageSnapshot(account_fingerprint: "same", five_hour: UsageWindow(used_percentage: 50, resets_at: 1_000))
+        let newCycle = UsageSnapshot(account_fingerprint: "same", five_hour: UsageWindow(used_percentage: 0, resets_at: 20_000))
+        expect(
+            quotaRechargeTransition(previous: oldCycle, next: newCycle) == QuotaRechargeTransition(fromPercentage: 50, toPercentage: 100),
+            "new quota cycle triggers recharge animation"
+        )
+        let ordinaryUsage = UsageSnapshot(account_fingerprint: "same", five_hour: UsageWindow(used_percentage: 55, resets_at: 1_000))
+        expect(quotaRechargeTransition(previous: oldCycle, next: ordinaryUsage) == nil, "ordinary usage does not trigger recharge animation")
+        let switchedAccount = UsageSnapshot(account_fingerprint: "other", five_hour: UsageWindow(used_percentage: 0, resets_at: 20_000))
+        expect(quotaRechargeTransition(previous: oldCycle, next: switchedAccount) == nil, "account switch does not trigger recharge animation")
+
         print("Quota model tests passed.")
     }
 

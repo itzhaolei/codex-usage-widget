@@ -9,6 +9,8 @@ final class QuotaStore: ObservableObject {
     @Published private(set) var resetRows: [ResetExpirationRow] = []
     @Published private(set) var hasUpdate = false
     @Published private(set) var languageCode = effectiveLanguageCode()
+    @Published private(set) var rechargeAnimationID: UInt = 0
+    @Published private(set) var rechargeStartPercentage: Int?
     @Published var isLightMode: Bool {
         didSet { UserDefaults.standard.set(isLightMode, forKey: Self.lightModeKey) }
     }
@@ -60,6 +62,15 @@ final class QuotaStore: ObservableObject {
         readLocalState()
         refreshSnapshot(force: true)
         checkVersion(force: true)
+        if CommandLine.arguments.contains("--preview-recharge") {
+            Task { [weak self] in
+                try? await Task.sleep(nanoseconds: 700_000_000)
+                for _ in 0..<3 {
+                    self?.previewRechargeAnimation()
+                    try? await Task.sleep(nanoseconds: 2_200_000_000)
+                }
+            }
+        }
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerDidFire), userInfo: nil, repeats: true)
         RunLoop.main.add(timer!, forMode: .common)
     }
@@ -89,7 +100,14 @@ final class QuotaStore: ObservableObject {
     func togglePinned() { isPinned.toggle() }
     func markUpdateInstalled() { hasUpdate = false }
 
+    private func previewRechargeAnimation() {
+        guard let target = remainingPercentage else { return }
+        rechargeStartPercentage = max(0, target - 50)
+        rechargeAnimationID &+= 1
+    }
+
     private func readLocalState() {
+        let previousSnapshot = snapshot
         let currentAuth: AuthDisplayInfo
         if let decodedAuth = readAuthInfo() {
             authReadFailureSince = nil
@@ -116,6 +134,10 @@ final class QuotaStore: ObservableObject {
             } else {
                 snapshot = nil
             }
+        }
+        if let transition = quotaRechargeTransition(previous: previousSnapshot, next: snapshot) {
+            rechargeStartPercentage = transition.fromPercentage
+            rechargeAnimationID &+= 1
         }
         auth = currentAuth
         rebuildDerivedState()

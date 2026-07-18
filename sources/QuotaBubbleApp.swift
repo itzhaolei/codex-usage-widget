@@ -382,9 +382,18 @@ private struct QuotaBubbleView: View {
                     .truncationMode(.tail)
             }
             HStack(spacing: 12) {
-                QuotaProgressBar(percentage: store.remainingPercentage, color: barColor)
+                QuotaProgressBar(
+                    percentage: store.remainingPercentage,
+                    color: barColor,
+                    rechargeAnimationID: store.rechargeAnimationID,
+                    rechargeStartPercentage: store.rechargeStartPercentage
+                )
                     .frame(width: 231, height: 35)
-                Text(store.remainingPercentage.map { "\($0)%" } ?? "—")
+                AnimatedPercentageText(
+                    percentage: store.remainingPercentage,
+                    rechargeAnimationID: store.rechargeAnimationID,
+                    rechargeStartPercentage: store.rechargeStartPercentage
+                )
                     .font(.system(size: 11, weight: .regular, design: .monospaced))
                     .foregroundStyle(primary)
                     .frame(width: 38, alignment: .leading)
@@ -506,27 +515,137 @@ private struct InfoRow: View {
 private struct QuotaProgressBar: View {
     let percentage: Int?
     let color: Color
+    let rechargeAnimationID: UInt
+    let rechargeStartPercentage: Int?
+
+    @State private var renderedPercentage: CGFloat = 0
+    @State private var sweepProgress: CGFloat = 1
+    @State private var glowOpacity: Double = 0
+    @State private var isRecharging = false
 
     var body: some View {
-        Canvas { context, size in
-            let percent = CGFloat(min(100, max(0, percentage ?? 0))) / 100
-            let filled = size.width * percent
-            context.fill(Path(CGRect(x: 0, y: 0, width: filled, height: size.height)), with: .color(color))
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                Canvas { context, size in
+                    let percent = min(100, max(0, renderedPercentage)) / 100
+                    let filled = size.width * percent
+                    context.fill(Path(CGRect(x: 0, y: 0, width: filled, height: size.height)), with: .color(color))
 
-            if filled < size.width {
-                for x in stride(from: max(0, filled + 1), through: size.width, by: 3) {
-                    for y in stride(from: CGFloat(1), through: size.height, by: 3) {
-                        let offset = Int(y / 3).isMultiple(of: 2) ? 0.0 : 1.5
-                        context.fill(Path(ellipseIn: CGRect(x: x + offset, y: y, width: 1, height: 1)), with: .color(color))
+                    if filled < size.width {
+                        for x in stride(from: max(0, filled + 1), through: size.width, by: 3) {
+                            for y in stride(from: CGFloat(1), through: size.height, by: 3) {
+                                let offset = Int(y / 3).isMultiple(of: 2) ? 0.0 : 1.5
+                                context.fill(Path(ellipseIn: CGRect(x: x + offset, y: y, width: 1, height: 1)), with: .color(color))
+                            }
+                        }
+                    }
+                    let separator = color.opacity(0.48)
+                    for index in 1..<5 {
+                        let x = size.width * CGFloat(index) / 5
+                        context.fill(Path(CGRect(x: x, y: 0, width: 0.6, height: size.height)), with: .color(separator))
                     }
                 }
+
+                if isRecharging {
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: [.clear, color.opacity(0.18), .white.opacity(0.92), color.opacity(0.62), .clear],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: 24, height: geometry.size.height)
+                        .blur(radius: 0.7)
+                        .blendMode(.plusLighter)
+                        .offset(x: geometry.size.width * sweepProgress - 12)
+                }
             }
-            let separator = color.opacity(0.48)
-            for index in 1..<5 {
-                let x = size.width * CGFloat(index) / 5
-                context.fill(Path(CGRect(x: x, y: 0, width: 0.6, height: size.height)), with: .color(separator))
+            .clipped()
+            .overlay(Rectangle().stroke(color.opacity(glowOpacity), lineWidth: 1))
+        }
+        .onAppear { renderedPercentage = CGFloat(percentage ?? 0) }
+        .onChange(of: percentage) { newValue in
+            guard !isRecharging else { return }
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) { renderedPercentage = CGFloat(newValue ?? 0) }
+        }
+        .onChange(of: rechargeAnimationID) { _ in runRechargeAnimation() }
+    }
+
+    private func runRechargeAnimation() {
+        let start = CGFloat(rechargeStartPercentage ?? percentage ?? 0)
+        let target = CGFloat(percentage ?? 0)
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            renderedPercentage = start
+            sweepProgress = 0
+            glowOpacity = 0
+            isRecharging = true
+        }
+        withAnimation(.timingCurve(0.18, 0.78, 0.2, 1, duration: 0.95)) {
+            renderedPercentage = target
+        }
+        withAnimation(.timingCurve(0.2, 0.72, 0.18, 1, duration: 1.02)) {
+            sweepProgress = 1
+        }
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 820_000_000)
+            withAnimation(.easeOut(duration: 0.16)) { glowOpacity = 0.72 }
+            try? await Task.sleep(nanoseconds: 160_000_000)
+            withAnimation(.easeOut(duration: 0.28)) { glowOpacity = 0 }
+            try? await Task.sleep(nanoseconds: 280_000_000)
+            isRecharging = false
+        }
+    }
+}
+
+private struct AnimatedPercentageText: View {
+    let percentage: Int?
+    let rechargeAnimationID: UInt
+    let rechargeStartPercentage: Int?
+
+    @State private var renderedPercentage: Double = 0
+
+    var body: some View {
+        Group {
+            if percentage == nil {
+                Text("—")
+            } else {
+                AnimatedPercentageValue(value: renderedPercentage)
             }
         }
+        .onAppear { renderedPercentage = Double(percentage ?? 0) }
+        .onChange(of: percentage) { newValue in
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) { renderedPercentage = Double(newValue ?? 0) }
+        }
+        .onChange(of: rechargeAnimationID) { _ in
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) {
+                renderedPercentage = Double(rechargeStartPercentage ?? percentage ?? 0)
+            }
+            withAnimation(.timingCurve(0.18, 0.78, 0.2, 1, duration: 0.95)) {
+                renderedPercentage = Double(percentage ?? 0)
+            }
+        }
+    }
+}
+
+private struct AnimatedPercentageValue: View, Animatable {
+    var value: Double
+
+    var animatableData: Double {
+        get { value }
+        set { value = newValue }
+    }
+
+    var body: some View {
+        Text("\(Int(value.rounded()))%")
     }
 }
 
