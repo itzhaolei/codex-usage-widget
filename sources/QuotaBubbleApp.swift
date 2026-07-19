@@ -1671,10 +1671,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         window.title = "Quota Bubble"
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
-        window.styleMask = [.titled, .closable, .fullSizeContentView]
-        window.standardWindowButton(.closeButton)?.isHidden = true
-        window.standardWindowButton(.miniaturizeButton)?.isHidden = true
-        window.standardWindowButton(.zoomButton)?.isHidden = true
+        window.styleMask = [.borderless, .fullSizeContentView]
         window.isOpaque = false
         window.backgroundColor = .clear
         window.hasShadow = true
@@ -1706,7 +1703,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     func close(window: NSWindow?) {
-        (window ?? NSApp.keyWindow ?? activeWindow)?.performClose(nil)
+        guard let target = window ?? NSApp.keyWindow ?? activeWindow else { return }
+        let visibleWindows = windows.values.filter(\.isVisible)
+        if visibleWindows.count <= 1 {
+            NSApp.terminate(nil)
+            return
+        }
+        saveFrame(target)
+        target.orderOut(nil)
+        unregisterWindow(target)
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
@@ -1756,6 +1761,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func windowWillClose(_ notification: Notification) {
         guard let window = notification.object as? NSWindow else { return }
         saveFrame(window)
+        unregisterWindow(window)
+    }
+
+    private func unregisterWindow(_ window: NSWindow) {
         let identifier = ObjectIdentifier(window)
         windows.removeValue(forKey: identifier)
         windowFrameKeys.removeValue(forKey: identifier)
