@@ -4,13 +4,15 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.0.9 - 2026-07-20
+
 ### Added
 
 - Added a localized New Window command with Command-N on macOS. Multiple windows run inside one app process and share the same live quota store while preserving separate window positions.
 
 ### Changed
 
-- Updated the multilingual website for v3.0.8 with direct installer fallbacks, weekly recharge-animation details, refreshed cache-safe links, and a new production SwiftUI preview showing the current color palette and layout.
+- Updated the multilingual website with direct installer fallbacks, weekly recharge-animation details, refreshed cache-safe links, and a production SwiftUI preview showing the current color palette and layout.
 - Kept quota and account data synchronized across windows while making theme, pin state, progress color, position, and close controls independent per window.
 
 ### Fixed
