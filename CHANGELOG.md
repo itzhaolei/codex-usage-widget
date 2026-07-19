@@ -6,7 +6,7 @@ All notable changes to Quota Bubble are documented here.
 
 ### Changed
 
-- Updated the multilingual website for v3.0.8 with direct installer fallbacks, weekly recharge-animation details, and refreshed cache-safe website links across the application and README pages.
+- Updated the multilingual website for v3.0.8 with direct installer fallbacks, weekly recharge-animation details, refreshed cache-safe links, and a new production SwiftUI preview showing the current color palette and layout.
 
 ## 3.0.8 - 2026-07-18
 

@@ -22,7 +22,7 @@ Uma janela nativa para macOS e Windows que mostra cota semanal do Codex, redefin
 
 ## Instalação
 
-Abra o [site oficial do Quota Bubble](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260718-1) e clique no botão principal. O site detecta macOS ou Windows e baixa diretamente o instalador gráfico mais recente sem abrir a página Releases.
+Abra o [site oficial do Quota Bubble](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1) e clique no botão principal. O site detecta macOS ou Windows e baixa diretamente o instalador gráfico mais recente sem abrir a página Releases.
 
 ### macOS
 

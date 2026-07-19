@@ -3,12 +3,12 @@
 <table>
   <tr>
     <td width="72">
-      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260718-1"><img src="assets/app-icon.png?raw=1" width="56" alt="Quota Bubble app icon"></a>
+      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1"><img src="assets/app-icon.png?raw=1" width="56" alt="Quota Bubble app icon"></a>
     </td>
     <td>
       <strong>Official Website</strong><br>
       Detect your operating system and download the latest graphical installer directly.<br>
-      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260718-1"><strong>Open official website →</strong></a>
+      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1"><strong>Open official website →</strong></a>
     </td>
   </tr>
 </table>
@@ -39,7 +39,7 @@ Website source lives in `public/` and is ready for Cloudflare Pages. Recommended
 
 ## Install
 
-[Open the official website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260718-1) and click the main download button. The website detects macOS or Windows and downloads the latest matching graphical installer directly, without opening the GitHub Release page.
+[Open the official website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1) and click the main download button. The website detects macOS or Windows and downloads the latest matching graphical installer directly, without opening the GitHub Release page.
 
 ### macOS
 
