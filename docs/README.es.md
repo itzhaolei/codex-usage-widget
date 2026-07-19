@@ -15,6 +15,7 @@ Una ventana nativa para macOS y Windows que muestra la cuota semanal de Codex, r
 - Se ejecuta de forma independiente y lee datos locales de cuota de Codex.
 - Recuerda posición, tema y estado fijado.
 - Una sola app SwiftUI gestiona el HUD, el icono del Dock, los menús y el ciclo de vida.
+- Abre varias ventanas sincronizadas desde el menú de la app o con `Command-N`. Todas comparten la misma cuota en vivo y guardan su posición por separado.
 - Añade acciones de menú para actualizar, desinstalar y cambiar idioma.
 - Muestra un pequeño punto rojo junto a la versión cuando hay una release más reciente en GitHub.
 - Soporta tema claro y oscuro.

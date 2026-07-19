@@ -15,6 +15,7 @@ Uma janela nativa para macOS e Windows que mostra cota semanal do Codex, redefin
 - Roda de forma independente e lê dados locais de cota do Codex.
 - Lembra posição, tema e estado fixado.
 - Um único app SwiftUI gerencia o HUD, o ícone do Dock, os menus e o ciclo de vida.
+- Abre várias janelas sincronizadas pelo menu do app ou com `Command-N`. Todas compartilham a mesma cota ao vivo e salvam a posição separadamente.
 - Adiciona ações de menu para atualizar, desinstalar e trocar idioma.
 - Mostra um pequeno ponto vermelho ao lado da versão quando há uma versão mais recente no GitHub.
 - Suporta tema claro e escuro.

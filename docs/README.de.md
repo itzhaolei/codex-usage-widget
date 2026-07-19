@@ -15,6 +15,7 @@ Ein natives schwebendes Fenster für Codex-Wochenkontingent, Reset-Zeit, Guthabe
 - Läuft unabhängig und liest lokale Codex-Kontingentdaten.
 - Speichert Fensterposition, Theme und Anheftstatus.
 - Eine SwiftUI-App verwaltet HUD, Dock-Symbol, Menüs und Lebenszyklus gemeinsam.
+- Öffnet über das App-Menü oder `Command-N` mehrere synchronisierte Fenster. Alle teilen dieselben Live-Kontingentdaten und speichern ihre Position getrennt.
 - Bietet Menüaktionen für Updates, Deinstallation und Sprachwechsel.
 - Zeigt einen kleinen roten Punkt neben der Versionsnummer, wenn auf GitHub eine neuere Version verfügbar ist.
 - Unterstützt dunkles und helles Theme.

@@ -15,6 +15,7 @@ Une fenêtre native pour macOS et Windows affichant le quota hebdomadaire Codex,
 - Fonctionne indépendamment et lit les données locales de quota Codex.
 - Mémorise la position, le thème et l’état épinglé.
 - Une seule app SwiftUI gère le HUD, l’icône du Dock, les menus et le cycle de vie.
+- Ouvre plusieurs fenêtres synchronisées depuis le menu de l’app ou avec `Command-N`. Elles partagent le même quota en direct et mémorisent leur position séparément.
 - Ajoute des actions de menu pour mettre à jour, désinstaller et changer de langue.
 - Affiche un petit point rouge à côté de la version lorsqu’une nouvelle release GitHub est disponible.
 - Prend en charge les thèmes clair et sombre.

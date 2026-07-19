@@ -168,17 +168,20 @@ private final class LanguageMenuState: ObservableObject {
 @main
 struct QuotaBubbleApp: App {
     @StateObject private var languageMenu = LanguageMenuState()
+    @StateObject private var store = QuotaStore()
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        Window("Quota Bubble", id: "main") {
-            QuotaBubbleRoot(appDelegate: appDelegate)
+        WindowGroup("Quota Bubble", id: "main") {
+            QuotaBubbleRoot(store: store, appDelegate: appDelegate)
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
         .commands {
             CommandGroup(replacing: .newItem) {}
             CommandGroup(after: .appInfo) {
+                Divider()
+                NewQuotaWindowButton(languageMenu: languageMenu)
                 Divider()
                 Menu(languageMenu.copy.language) {
                     Button {
@@ -213,8 +216,20 @@ struct QuotaBubbleApp: App {
     }
 }
 
+private struct NewQuotaWindowButton: View {
+    @ObservedObject var languageMenu: LanguageMenuState
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some View {
+        Button(localizedNewWindowLabel(languageMenu.languageCode)) {
+            openWindow(id: "main")
+        }
+        .keyboardShortcut("n", modifiers: .command)
+    }
+}
+
 private struct QuotaBubbleRoot: View {
-    @StateObject private var store = QuotaStore()
+    @ObservedObject var store: QuotaStore
     let appDelegate: AppDelegate
 
     var body: some View {
@@ -272,7 +287,6 @@ private struct QuotaBubbleView: View {
         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(windowStroke, lineWidth: 1))
         .environment(\.colorScheme, store.isLightMode ? .light : .dark)
         .onAppear { store.start() }
-        .onDisappear { store.stop() }
     }
 
     @ViewBuilder
@@ -1535,9 +1549,12 @@ private struct WindowAccessor: NSViewRepresentable {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
-    private weak var window: NSWindow?
+    private var windows: [ObjectIdentifier: NSWindow] = [:]
+    private var windowFrameKeys: [ObjectIdentifier: String] = [:]
+    private weak var activeWindow: NSWindow?
     private weak var store: QuotaStore?
-    private var configuredWindow = false
+    private var nextWindowIndex = 0
+    private var storeCancellables = Set<AnyCancellable>()
     private var updateWindow: NSWindow?
     private var updateDownload: UpdateDownload?
     private weak var updateProgressIndicator: NSProgressIndicator?
@@ -1550,7 +1567,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        window?.makeKeyAndOrderFront(nil)
+        (activeWindow ?? windows.values.first)?.makeKeyAndOrderFront(nil)
         sender.activate(ignoringOtherApps: true)
         return true
     }
@@ -1579,13 +1596,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     func attach(window: NSWindow, store: QuotaStore) {
-        self.window = window
-        self.store = store
-        guard !configuredWindow else {
-            resizeWindow()
+        observeStoreIfNeeded(store)
+        let identifier = ObjectIdentifier(window)
+        guard windows[identifier] == nil else {
+            resizeWindow(window, store: store)
             return
         }
-        configuredWindow = true
+        let cascadeSource = activeWindow ?? NSApp.keyWindow
+        let windowIndex = nextWindowIndex
+        nextWindowIndex += 1
+        windows[identifier] = window
+        windowFrameKeys[identifier] = windowIndex == 0 ? QuotaStore.savedFrameKey : "\(QuotaStore.savedFrameKey).\(windowIndex)"
         window.delegate = self
         window.title = "Quota Bubble"
         window.titleVisibility = .hidden
@@ -1597,33 +1618,52 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         window.isMovableByWindowBackground = true
         window.contentMinSize = NSSize(width: widgetWidth, height: 234)
         window.contentMaxSize = NSSize(width: widgetWidth, height: 1_000)
-        restoreWindowFrame()
+        restoreWindowFrame(window, store: store, cascadeFrom: cascadeSource)
+        activeWindow = window
         applyPinnedState()
-        store.$resetRows.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeWindow() }.store(in: &cancellables)
-        store.$languageCode.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeWindow() }.store(in: &cancellables)
-        store.$isPinned.removeDuplicates().receive(on: RunLoop.main).sink { [weak self] isPinned in
-            self?.applyPinnedState(isPinned)
-        }.store(in: &cancellables)
         window.makeKeyAndOrderFront(nil)
-        DispatchQueue.main.async { [weak self] in
-            self?.resizeWindow(force: true)
-            self?.applyPinnedState()
+        DispatchQueue.main.async { [weak self, weak window] in
+            guard let self, let window else { return }
+            self.resizeWindow(window, store: store, force: true)
+            self.applyPinnedState()
         }
     }
 
-    private var cancellables = Set<AnyCancellable>()
+    private func observeStoreIfNeeded(_ store: QuotaStore) {
+        guard self.store !== store else { return }
+        self.store = store
+        storeCancellables.removeAll()
+        store.$resetRows.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeAllWindows() }.store(in: &storeCancellables)
+        store.$languageCode.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeAllWindows() }.store(in: &storeCancellables)
+        store.$isPinned.removeDuplicates().receive(on: RunLoop.main).sink { [weak self] isPinned in
+            self?.applyPinnedState(isPinned)
+        }.store(in: &storeCancellables)
+    }
 
     func applyPinnedState(_ isPinned: Bool? = nil) {
         let pinned = isPinned ?? (store?.isPinned == true)
-        window?.level = pinned ? .statusBar : .normal
-        window?.collectionBehavior = [.managed]
+        for window in windows.values {
+            window.level = pinned ? .statusBar : .normal
+            window.collectionBehavior = [.managed]
+        }
     }
 
-    func windowDidBecomeKey(_ notification: Notification) { applyPinnedState() }
-    func windowDidBecomeMain(_ notification: Notification) { applyPinnedState() }
+    func windowDidBecomeKey(_ notification: Notification) {
+        activeWindow = notification.object as? NSWindow
+        applyPinnedState()
+    }
 
-    private func resizeWindow(force: Bool = false) {
-        guard let window, let store else { return }
+    func windowDidBecomeMain(_ notification: Notification) {
+        activeWindow = notification.object as? NSWindow
+        applyPinnedState()
+    }
+
+    private func resizeAllWindows() {
+        guard let store else { return }
+        for window in windows.values { resizeWindow(window, store: store) }
+    }
+
+    private func resizeWindow(_ window: NSWindow, store: QuotaStore, force: Bool = false) {
         let desired = widgetHeight(for: store)
         let contentSize = window.contentView?.frame.size ?? .zero
         guard force || abs(contentSize.width - widgetWidth) > 0.5 || abs(contentSize.height - desired) > 0.5 else { return }
@@ -1632,23 +1672,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         window.setFrameOrigin(NSPoint(x: window.frame.minX, y: top - window.frame.height))
     }
 
-    private func restoreWindowFrame() {
-        guard let window else { return }
-        if let value = UserDefaults.standard.string(forKey: QuotaStore.savedFrameKey) {
+    private func restoreWindowFrame(_ window: NSWindow, store: QuotaStore, cascadeFrom source: NSWindow?) {
+        let identifier = ObjectIdentifier(window)
+        let frameKey = windowFrameKeys[identifier] ?? QuotaStore.savedFrameKey
+        window.setContentSize(NSSize(width: widgetWidth, height: widgetHeight(for: store)))
+        if let value = UserDefaults.standard.string(forKey: frameKey) {
             let saved = NSRectFromString(value)
-            window.setContentSize(NSSize(width: widgetWidth, height: store.map { widgetHeight(for: $0) } ?? 234))
             window.setFrameOrigin(NSPoint(x: saved.minX, y: saved.maxY - window.frame.height))
+        } else if let source, source !== window {
+            window.setFrameOrigin(NSPoint(x: source.frame.minX + 24, y: source.frame.minY - 24))
         } else {
-            window.setContentSize(NSSize(width: widgetWidth, height: store.map { widgetHeight(for: $0) } ?? 234))
             window.center()
         }
     }
 
-    func windowDidMove(_ notification: Notification) { saveFrame() }
-    func windowDidResize(_ notification: Notification) { saveFrame() }
-    func windowWillClose(_ notification: Notification) { saveFrame() }
-    private func saveFrame() {
-        if let frame = window?.frame { UserDefaults.standard.set(NSStringFromRect(frame), forKey: QuotaStore.savedFrameKey) }
+    func windowDidMove(_ notification: Notification) {
+        if let window = notification.object as? NSWindow { saveFrame(window) }
+    }
+
+    func windowDidResize(_ notification: Notification) {
+        if let window = notification.object as? NSWindow { saveFrame(window) }
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow else { return }
+        saveFrame(window)
+        let identifier = ObjectIdentifier(window)
+        windows.removeValue(forKey: identifier)
+        windowFrameKeys.removeValue(forKey: identifier)
+        if activeWindow === window { activeWindow = windows.values.first }
+    }
+
+    private func saveFrame(_ window: NSWindow) {
+        let identifier = ObjectIdentifier(window)
+        guard let key = windowFrameKeys[identifier] else { return }
+        UserDefaults.standard.set(NSStringFromRect(window.frame), forKey: key)
     }
 
     func checkForUpdates() {

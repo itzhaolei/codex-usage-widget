@@ -85,6 +85,21 @@ struct AppCopy {
 
 let officialWebsiteURLString = "https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1"
 
+func localizedNewWindowLabel(_ code: String) -> String {
+    switch code {
+    case "zh": return "新建窗口"
+    case "ja": return "新規ウインドウ"
+    case "ko": return "새 윈도우"
+    case "de": return "Neues Fenster"
+    case "fr": return "Nouvelle fenêtre"
+    case "es": return "Nueva ventana"
+    case "pt": return "Nova janela"
+    case "it": return "Nuova finestra"
+    case "nl": return "Nieuw venster"
+    default: return "New Window"
+    }
+}
+
 func localizedWebsiteShareLabel(_ code: String) -> String {
     switch code {
     case "zh": return "分享"
