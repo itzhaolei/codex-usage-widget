@@ -232,6 +232,7 @@ private struct QuotaBubbleRoot: View {
     @ObservedObject var store: QuotaStore
     let appDelegate: AppDelegate
     @StateObject private var windowState = WindowState()
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         QuotaBubbleView(
@@ -241,7 +242,13 @@ private struct QuotaBubbleRoot: View {
                 appDelegate.applyPinnedState(isPinned, to: windowState.window)
             },
             onClose: {
-                appDelegate.close(window: windowState.window)
+                let isFinalWindow = appDelegate.isFinalWindow(windowState.window)
+                dismiss()
+                if isFinalWindow {
+                    DispatchQueue.main.async {
+                        NSApp.terminate(nil)
+                    }
+                }
             }
         )
             .background(WindowAccessor { window in
@@ -1702,13 +1709,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         window?.collectionBehavior = [.managed]
     }
 
-    func close(window: NSWindow?) {
-        guard let window else { return }
-        if windows.count <= 1 {
-            NSApp.terminate(nil)
-        } else {
-            window.close()
-        }
+    func isFinalWindow(_ window: NSWindow?) -> Bool {
+        guard let window else { return windows.count <= 1 }
+        return windows.keys.filter { $0 != ObjectIdentifier(window) }.isEmpty
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
