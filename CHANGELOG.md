@@ -12,6 +12,10 @@ All notable changes to Quota Bubble are documented here.
 
 - Updated the multilingual website for v3.0.8 with direct installer fallbacks, weekly recharge-animation details, refreshed cache-safe links, and a new production SwiftUI preview showing the current color palette and layout.
 
+### Fixed
+
+- Changed the window close control to close only the window where it was clicked; the app exits only after the final window closes.
+
 ## 3.0.8 - 2026-07-18
 
 ### Added

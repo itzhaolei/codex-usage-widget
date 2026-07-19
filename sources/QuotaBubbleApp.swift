@@ -231,12 +231,20 @@ private struct NewQuotaWindowButton: View {
 private struct QuotaBubbleRoot: View {
     @ObservedObject var store: QuotaStore
     let appDelegate: AppDelegate
+    @StateObject private var windowReference = WindowReference()
 
     var body: some View {
-        QuotaBubbleView(store: store) { isPinned in
-            appDelegate.applyPinnedState(isPinned)
-        }
+        QuotaBubbleView(
+            store: store,
+            onPinnedChange: { isPinned in
+                appDelegate.applyPinnedState(isPinned)
+            },
+            onClose: {
+                windowReference.window?.performClose(nil)
+            }
+        )
             .background(WindowAccessor { window in
+                windowReference.window = window
                 appDelegate.attach(window: window, store: store)
             })
     }
@@ -245,6 +253,7 @@ private struct QuotaBubbleRoot: View {
 private struct QuotaBubbleView: View {
     @ObservedObject var store: QuotaStore
     let onPinnedChange: (Bool) -> Void
+    let onClose: () -> Void
 
     private var primary: Color { store.isLightMode ? .black : .white }
     private var secondary: Color { primary.opacity(0.68) }
@@ -369,7 +378,7 @@ private struct QuotaBubbleView: View {
                 onPinnedChange(store.isPinned)
             }
             divider
-            capsuleButton("xmark", help: store.copy.close) { NSApp.terminate(nil) }
+            capsuleButton("xmark", help: store.copy.close, action: onClose)
         }
         .frame(width: 111, height: 28)
         .background(primary.opacity(0.04))
@@ -1533,6 +1542,11 @@ private struct VisualEffectView: NSViewRepresentable {
         view.appearance = NSAppearance(named: appearance)
         view.isEmphasized = true
     }
+}
+
+@MainActor
+private final class WindowReference: ObservableObject {
+    weak var window: NSWindow?
 }
 
 private struct WindowAccessor: NSViewRepresentable {
