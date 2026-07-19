@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import Darwin
 import SwiftUI
 
 private let widgetWidth: CGFloat = 330
@@ -1719,14 +1720,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     func close(window: NSWindow?) {
         guard let target = window ?? NSApp.keyWindow ?? activeWindow else { return }
-        let visibleWindows = windows.values.filter(\.isVisible)
-        if visibleWindows.count <= 1 {
-            NSApp.terminate(nil)
-            return
-        }
         saveFrame(target)
         target.orderOut(nil)
         unregisterWindow(target)
+        guard windows.values.allSatisfy({ !$0.isVisible }) else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            Darwin.exit(EXIT_SUCCESS)
+        }
+        NSApp.terminate(nil)
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
