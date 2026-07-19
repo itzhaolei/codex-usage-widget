@@ -232,7 +232,6 @@ private struct QuotaBubbleRoot: View {
     @ObservedObject var store: QuotaStore
     let appDelegate: AppDelegate
     @StateObject private var windowState = WindowState()
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         QuotaBubbleView(
@@ -242,13 +241,7 @@ private struct QuotaBubbleRoot: View {
                 appDelegate.applyPinnedState(isPinned, to: windowState.window)
             },
             onClose: {
-                let isFinalWindow = appDelegate.isFinalWindow(windowState.window)
-                dismiss()
-                if isFinalWindow {
-                    DispatchQueue.main.async {
-                        NSApp.terminate(nil)
-                    }
-                }
+                appDelegate.close(window: windowState.window)
             }
         )
             .background(WindowAccessor { window in
@@ -1678,7 +1671,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         window.title = "Quota Bubble"
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
-        window.styleMask = [.borderless, .fullSizeContentView]
+        window.styleMask = [.titled, .closable, .fullSizeContentView]
+        window.standardWindowButton(.closeButton)?.isHidden = true
+        window.standardWindowButton(.miniaturizeButton)?.isHidden = true
+        window.standardWindowButton(.zoomButton)?.isHidden = true
         window.isOpaque = false
         window.backgroundColor = .clear
         window.hasShadow = true
@@ -1709,9 +1705,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         window?.collectionBehavior = [.managed]
     }
 
-    func isFinalWindow(_ window: NSWindow?) -> Bool {
-        guard let window else { return windows.count <= 1 }
-        return windows.keys.filter { $0 != ObjectIdentifier(window) }.isEmpty
+    func close(window: NSWindow?) {
+        (window ?? NSApp.keyWindow ?? activeWindow)?.performClose(nil)
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
