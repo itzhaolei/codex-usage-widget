@@ -11,6 +11,7 @@ All notable changes to Quota Bubble are documented here.
 ### Changed
 
 - Updated the multilingual website for v3.0.8 with direct installer fallbacks, weekly recharge-animation details, refreshed cache-safe links, and a new production SwiftUI preview showing the current color palette and layout.
+- Kept quota and account data synchronized across windows while making theme, pin state, progress color, position, and close controls independent per window.
 
 ### Fixed
 

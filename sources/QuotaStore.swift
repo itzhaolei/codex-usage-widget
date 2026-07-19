@@ -10,13 +10,6 @@ final class QuotaStore: ObservableObject {
     @Published private(set) var hasUpdate = false
     @Published private(set) var languageCode = effectiveLanguageCode()
     @Published private(set) var rechargeAnimationEvent: QuotaRechargeAnimationEvent?
-    @Published private(set) var progressColorIndex: Int
-    @Published var isLightMode: Bool {
-        didSet { UserDefaults.standard.set(isLightMode, forKey: Self.lightModeKey) }
-    }
-    @Published var isPinned: Bool {
-        didSet { UserDefaults.standard.set(isPinned, forKey: Self.pinnedKey) }
-    }
 
     static let lightModeKey = "CodexUsageWidget.isLightMode"
     static let pinnedKey = "CodexUsageWidget.isPinned"
@@ -39,9 +32,6 @@ final class QuotaStore: ObservableObject {
         self.codexHome = resolvedHome
         snapshotService = refreshesRemotely ? QuotaSnapshotService(codexHome: resolvedHome) : nil
         Self.migrateLegacyPreferences()
-        isLightMode = UserDefaults.standard.bool(forKey: Self.lightModeKey)
-        isPinned = UserDefaults.standard.object(forKey: Self.pinnedKey) as? Bool ?? true
-        progressColorIndex = min(4, max(0, UserDefaults.standard.integer(forKey: Self.progressColorKey)))
     }
 
     var copy: AppCopy { localizedCopy(languageCode) }
@@ -90,13 +80,6 @@ final class QuotaStore: ObservableObject {
         rebuildDerivedState()
     }
 
-    func toggleTheme() { isLightMode.toggle() }
-    func togglePinned() { isPinned.toggle() }
-    func selectProgressColor(_ index: Int) {
-        guard (0..<5).contains(index) else { return }
-        progressColorIndex = index
-        UserDefaults.standard.set(index, forKey: Self.progressColorKey)
-    }
     func markUpdateInstalled() { hasUpdate = false }
 
     private func publishRechargeAnimation(from: Int, to: Int) {

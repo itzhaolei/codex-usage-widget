@@ -231,39 +231,41 @@ private struct NewQuotaWindowButton: View {
 private struct QuotaBubbleRoot: View {
     @ObservedObject var store: QuotaStore
     let appDelegate: AppDelegate
-    @StateObject private var windowReference = WindowReference()
+    @StateObject private var windowState = WindowState()
 
     var body: some View {
         QuotaBubbleView(
             store: store,
+            windowState: windowState,
             onPinnedChange: { isPinned in
-                appDelegate.applyPinnedState(isPinned)
+                appDelegate.applyPinnedState(isPinned, to: windowState.window)
             },
             onClose: {
-                windowReference.window?.performClose(nil)
+                windowState.window?.close()
             }
         )
             .background(WindowAccessor { window in
-                windowReference.window = window
-                appDelegate.attach(window: window, store: store)
+                windowState.window = window
+                appDelegate.attach(window: window, store: store, windowState: windowState)
             })
     }
 }
 
 private struct QuotaBubbleView: View {
     @ObservedObject var store: QuotaStore
+    @ObservedObject var windowState: WindowState
     let onPinnedChange: (Bool) -> Void
     let onClose: () -> Void
 
-    private var primary: Color { store.isLightMode ? .black : .white }
+    private var primary: Color { windowState.isLightMode ? .black : .white }
     private var secondary: Color { primary.opacity(0.68) }
     private var glassTint: Color {
-        store.isLightMode ? Color.white.opacity(0.12) : Color.black.opacity(0.38)
+        windowState.isLightMode ? Color.white.opacity(0.12) : Color.black.opacity(0.38)
     }
     private var liquidGlassTint: Color {
-        store.isLightMode ? Color.white.opacity(0.05) : Color.black.opacity(0.30)
+        windowState.isLightMode ? Color.white.opacity(0.05) : Color.black.opacity(0.30)
     }
-    private var windowStroke: Color { store.isLightMode ? Color.white.opacity(0.56) : primary.opacity(0.14) }
+    private var windowStroke: Color { windowState.isLightMode ? Color.white.opacity(0.56) : primary.opacity(0.14) }
 
     var body: some View {
         ZStack {
@@ -294,7 +296,7 @@ private struct QuotaBubbleView: View {
         .frame(width: widgetWidth, height: widgetHeight(for: store))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(windowStroke, lineWidth: 1))
-        .environment(\.colorScheme, store.isLightMode ? .light : .dark)
+        .environment(\.colorScheme, windowState.isLightMode ? .light : .dark)
         .onAppear { store.start() }
     }
 
@@ -302,7 +304,7 @@ private struct QuotaBubbleView: View {
     private var windowBackground: some View {
 #if compiler(>=6.2)
         if #available(macOS 26.0, *) {
-            if store.isLightMode {
+            if windowState.isLightMode {
                 Color.clear
                     .glassEffect(
                         .clear.tint(liquidGlassTint).interactive(),
@@ -316,11 +318,11 @@ private struct QuotaBubbleView: View {
                     )
             }
         } else {
-            VisualEffectView(material: .hudWindow, appearance: store.isLightMode ? .vibrantLight : .vibrantDark)
+            VisualEffectView(material: .hudWindow, appearance: windowState.isLightMode ? .vibrantLight : .vibrantDark)
             glassTint
         }
 #else
-        VisualEffectView(material: .hudWindow, appearance: store.isLightMode ? .vibrantLight : .vibrantDark)
+        VisualEffectView(material: .hudWindow, appearance: windowState.isLightMode ? .vibrantLight : .vibrantDark)
         glassTint
 #endif
     }
@@ -365,17 +367,17 @@ private struct QuotaBubbleView: View {
 
     private var controlCapsule: some View {
         HStack(spacing: 0) {
-            capsuleButton(store.isLightMode ? "moon.fill" : "sun.max.fill", help: store.isLightMode ? store.copy.switchToDark : store.copy.switchToLight) {
-                store.toggleTheme()
+            capsuleButton(windowState.isLightMode ? "moon.fill" : "sun.max.fill", help: windowState.isLightMode ? store.copy.switchToDark : store.copy.switchToLight) {
+                windowState.toggleTheme()
             }
             divider
             capsuleButton(
-                store.isPinned ? "pin.fill" : "pin.slash.fill",
-                help: store.isPinned ? store.copy.unpin : store.copy.pin,
-                isActive: store.isPinned
+                windowState.isPinned ? "pin.fill" : "pin.slash.fill",
+                help: windowState.isPinned ? store.copy.unpin : store.copy.pin,
+                isActive: windowState.isPinned
             ) {
-                store.togglePinned()
-                onPinnedChange(store.isPinned)
+                windowState.togglePinned()
+                onPinnedChange(windowState.isPinned)
             }
             divider
             capsuleButton("xmark", help: store.copy.close, action: onClose)
@@ -422,8 +424,8 @@ private struct QuotaBubbleView: View {
             HStack(spacing: 12) {
                 QuotaProgressBar(
                     percentage: store.remainingPercentage,
-                    emphasizeSparkles: store.progressColorIndex == 0,
-                    selectedColorIndex: store.progressColorIndex,
+                    emphasizeSparkles: windowState.progressColorIndex == 0,
+                    selectedColorIndex: windowState.progressColorIndex,
                     rechargeEvent: store.rechargeAnimationEvent
                 )
                     .frame(width: 231, height: 35)
@@ -459,8 +461,8 @@ private struct QuotaBubbleView: View {
     private var metricCards: some View {
         let height = metricCardHeight(for: store.copy)
         return HStack(spacing: 10) {
-            MetricCard(title: "\(store.copy.balance)（$）", value: store.balanceText, height: height, lightMode: store.isLightMode, secondary: secondary)
-            MetricCard(title: "\(store.copy.availableReset)（\(store.copy.times)）", value: store.resetCountText, height: height, lightMode: store.isLightMode, secondary: secondary)
+            MetricCard(title: "\(store.copy.balance)（$）", value: store.balanceText, height: height, lightMode: windowState.isLightMode, secondary: secondary)
+            MetricCard(title: "\(store.copy.availableReset)（\(store.copy.times)）", value: store.resetCountText, height: height, lightMode: windowState.isLightMode, secondary: secondary)
         }
         .frame(width: 272, height: height, alignment: .leading)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -475,10 +477,10 @@ private struct QuotaBubbleView: View {
 
     private var colorPalette: some View {
         ColorPaletteView(
-            selectedIndex: store.progressColorIndex,
+            selectedIndex: windowState.progressColorIndex,
             primary: primary,
             rechargeEvent: store.rechargeAnimationEvent,
-            onSelect: store.selectProgressColor
+            onSelect: windowState.selectProgressColor
         )
     }
 
@@ -1545,8 +1547,50 @@ private struct VisualEffectView: NSViewRepresentable {
 }
 
 @MainActor
-private final class WindowReference: ObservableObject {
+private final class WindowState: ObservableObject {
     weak var window: NSWindow?
+    @Published private(set) var isLightMode = UserDefaults.standard.bool(forKey: QuotaStore.lightModeKey)
+    @Published private(set) var isPinned = UserDefaults.standard.object(forKey: QuotaStore.pinnedKey) as? Bool ?? true
+    @Published private(set) var progressColorIndex = min(4, max(0, UserDefaults.standard.integer(forKey: QuotaStore.progressColorKey)))
+
+    private var lightModeKey: String?
+    private var pinnedKey: String?
+    private var progressColorKey: String?
+
+    func configure(preferenceIndex: Int) {
+        guard lightModeKey == nil else { return }
+        let suffix = preferenceIndex == 0 ? "" : ".\(preferenceIndex)"
+        lightModeKey = QuotaStore.lightModeKey + suffix
+        pinnedKey = QuotaStore.pinnedKey + suffix
+        progressColorKey = QuotaStore.progressColorKey + suffix
+
+        let defaults = UserDefaults.standard
+        if let lightModeKey, defaults.object(forKey: lightModeKey) != nil {
+            isLightMode = defaults.bool(forKey: lightModeKey)
+        }
+        if let pinnedKey, let saved = defaults.object(forKey: pinnedKey) as? Bool {
+            isPinned = saved
+        }
+        if let progressColorKey, defaults.object(forKey: progressColorKey) != nil {
+            progressColorIndex = min(4, max(0, defaults.integer(forKey: progressColorKey)))
+        }
+    }
+
+    func toggleTheme() {
+        isLightMode.toggle()
+        if let lightModeKey { UserDefaults.standard.set(isLightMode, forKey: lightModeKey) }
+    }
+
+    func togglePinned() {
+        isPinned.toggle()
+        if let pinnedKey { UserDefaults.standard.set(isPinned, forKey: pinnedKey) }
+    }
+
+    func selectProgressColor(_ index: Int) {
+        guard (0..<progressPalette.count).contains(index) else { return }
+        progressColorIndex = index
+        if let progressColorKey { UserDefaults.standard.set(index, forKey: progressColorKey) }
+    }
 }
 
 private struct WindowAccessor: NSViewRepresentable {
@@ -1565,9 +1609,9 @@ private struct WindowAccessor: NSViewRepresentable {
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var windows: [ObjectIdentifier: NSWindow] = [:]
     private var windowFrameKeys: [ObjectIdentifier: String] = [:]
+    private var windowPreferenceIndexes: [ObjectIdentifier: Int] = [:]
     private weak var activeWindow: NSWindow?
     private weak var store: QuotaStore?
-    private var nextWindowIndex = 0
     private var storeCancellables = Set<AnyCancellable>()
     private var updateWindow: NSWindow?
     private var updateDownload: UpdateDownload?
@@ -1609,7 +1653,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         alert.runModal()
     }
 
-    func attach(window: NSWindow, store: QuotaStore) {
+    fileprivate func attach(window: NSWindow, store: QuotaStore, windowState: WindowState) {
         observeStoreIfNeeded(store)
         let identifier = ObjectIdentifier(window)
         guard windows[identifier] == nil else {
@@ -1617,9 +1661,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             return
         }
         let cascadeSource = activeWindow ?? NSApp.keyWindow
-        let windowIndex = nextWindowIndex
-        nextWindowIndex += 1
+        let usedIndexes = Set(windowPreferenceIndexes.values)
+        let windowIndex = (0...).first { !usedIndexes.contains($0) } ?? 0
+        windowState.configure(preferenceIndex: windowIndex)
         windows[identifier] = window
+        windowPreferenceIndexes[identifier] = windowIndex
         windowFrameKeys[identifier] = windowIndex == 0 ? QuotaStore.savedFrameKey : "\(QuotaStore.savedFrameKey).\(windowIndex)"
         window.delegate = self
         window.title = "Quota Bubble"
@@ -1634,12 +1680,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         window.contentMaxSize = NSSize(width: widgetWidth, height: 1_000)
         restoreWindowFrame(window, store: store, cascadeFrom: cascadeSource)
         activeWindow = window
-        applyPinnedState()
+        applyPinnedState(windowState.isPinned, to: window)
         window.makeKeyAndOrderFront(nil)
         DispatchQueue.main.async { [weak self, weak window] in
             guard let self, let window else { return }
             self.resizeWindow(window, store: store, force: true)
-            self.applyPinnedState()
+            self.applyPinnedState(windowState.isPinned, to: window)
         }
     }
 
@@ -1649,27 +1695,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         storeCancellables.removeAll()
         store.$resetRows.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeAllWindows() }.store(in: &storeCancellables)
         store.$languageCode.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeAllWindows() }.store(in: &storeCancellables)
-        store.$isPinned.removeDuplicates().receive(on: RunLoop.main).sink { [weak self] isPinned in
-            self?.applyPinnedState(isPinned)
-        }.store(in: &storeCancellables)
     }
 
-    func applyPinnedState(_ isPinned: Bool? = nil) {
-        let pinned = isPinned ?? (store?.isPinned == true)
-        for window in windows.values {
-            window.level = pinned ? .statusBar : .normal
-            window.collectionBehavior = [.managed]
-        }
+    func applyPinnedState(_ isPinned: Bool, to window: NSWindow?) {
+        window?.level = isPinned ? .statusBar : .normal
+        window?.collectionBehavior = [.managed]
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
         activeWindow = notification.object as? NSWindow
-        applyPinnedState()
     }
 
     func windowDidBecomeMain(_ notification: Notification) {
         activeWindow = notification.object as? NSWindow
-        applyPinnedState()
     }
 
     private func resizeAllWindows() {
@@ -1714,6 +1752,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let identifier = ObjectIdentifier(window)
         windows.removeValue(forKey: identifier)
         windowFrameKeys.removeValue(forKey: identifier)
+        windowPreferenceIndexes.removeValue(forKey: identifier)
         if activeWindow === window { activeWindow = windows.values.first }
     }
 
