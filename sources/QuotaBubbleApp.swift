@@ -241,7 +241,7 @@ private struct QuotaBubbleRoot: View {
                 appDelegate.applyPinnedState(isPinned, to: windowState.window)
             },
             onClose: {
-                windowState.window?.close()
+                appDelegate.close(window: windowState.window)
             }
         )
             .background(WindowAccessor { window in
@@ -1700,6 +1700,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applyPinnedState(_ isPinned: Bool, to window: NSWindow?) {
         window?.level = isPinned ? .statusBar : .normal
         window?.collectionBehavior = [.managed]
+    }
+
+    func close(window: NSWindow?) {
+        guard let window else { return }
+        if windows.count <= 1 {
+            NSApp.terminate(nil)
+        } else {
+            window.close()
+        }
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
