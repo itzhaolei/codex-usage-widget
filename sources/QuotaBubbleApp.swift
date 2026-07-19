@@ -232,6 +232,7 @@ private struct QuotaBubbleRoot: View {
     @ObservedObject var store: QuotaStore
     let appDelegate: AppDelegate
     @StateObject private var windowState = WindowState()
+    @SceneStorage("QuotaBubble.windowID") private var windowID = UUID().uuidString
 
     var body: some View {
         QuotaBubbleView(
@@ -246,7 +247,7 @@ private struct QuotaBubbleRoot: View {
         )
             .background(WindowAccessor { window in
                 windowState.window = window
-                appDelegate.attach(window: window, store: store, windowState: windowState)
+                appDelegate.attach(window: window, store: store, windowState: windowState, windowID: windowID)
             })
     }
 }
@@ -1557,23 +1558,31 @@ private final class WindowState: ObservableObject {
     private var pinnedKey: String?
     private var progressColorKey: String?
 
-    func configure(preferenceIndex: Int) {
+    func configure(preferenceID: String, legacyIndex: Int) {
         guard lightModeKey == nil else { return }
-        let suffix = preferenceIndex == 0 ? "" : ".\(preferenceIndex)"
-        lightModeKey = QuotaStore.lightModeKey + suffix
-        pinnedKey = QuotaStore.pinnedKey + suffix
-        progressColorKey = QuotaStore.progressColorKey + suffix
+        let stableSuffix = ".window.\(preferenceID)"
+        lightModeKey = QuotaStore.lightModeKey + stableSuffix
+        pinnedKey = QuotaStore.pinnedKey + stableSuffix
+        progressColorKey = QuotaStore.progressColorKey + stableSuffix
 
         let defaults = UserDefaults.standard
-        if let lightModeKey, defaults.object(forKey: lightModeKey) != nil {
-            isLightMode = defaults.bool(forKey: lightModeKey)
-        }
-        if let pinnedKey, let saved = defaults.object(forKey: pinnedKey) as? Bool {
-            isPinned = saved
-        }
-        if let progressColorKey, defaults.object(forKey: progressColorKey) != nil {
-            progressColorIndex = min(4, max(0, defaults.integer(forKey: progressColorKey)))
-        }
+        let legacySuffix = legacyIndex == 0 ? "" : ".\(legacyIndex)"
+        isLightMode = readBool(defaults, stableKey: lightModeKey, legacyKey: QuotaStore.lightModeKey + legacySuffix, fallback: isLightMode)
+        isPinned = readBool(defaults, stableKey: pinnedKey, legacyKey: QuotaStore.pinnedKey + legacySuffix, fallback: isPinned)
+        progressColorIndex = min(4, max(0, readInt(defaults, stableKey: progressColorKey, legacyKey: QuotaStore.progressColorKey + legacySuffix, fallback: progressColorIndex)))
+        if let lightModeKey { defaults.set(isLightMode, forKey: lightModeKey) }
+        if let pinnedKey { defaults.set(isPinned, forKey: pinnedKey) }
+        if let progressColorKey { defaults.set(progressColorIndex, forKey: progressColorKey) }
+    }
+
+    private func readBool(_ defaults: UserDefaults, stableKey: String?, legacyKey: String, fallback: Bool) -> Bool {
+        if let stableKey, let value = defaults.object(forKey: stableKey) as? Bool { return value }
+        return defaults.object(forKey: legacyKey) as? Bool ?? fallback
+    }
+
+    private func readInt(_ defaults: UserDefaults, stableKey: String?, legacyKey: String, fallback: Int) -> Int {
+        if let stableKey, defaults.object(forKey: stableKey) != nil { return defaults.integer(forKey: stableKey) }
+        return defaults.object(forKey: legacyKey) != nil ? defaults.integer(forKey: legacyKey) : fallback
     }
 
     func toggleTheme() {
@@ -1653,7 +1662,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         alert.runModal()
     }
 
-    fileprivate func attach(window: NSWindow, store: QuotaStore, windowState: WindowState) {
+    fileprivate func attach(window: NSWindow, store: QuotaStore, windowState: WindowState, windowID: String) {
         observeStoreIfNeeded(store)
         let identifier = ObjectIdentifier(window)
         guard windows[identifier] == nil else {
@@ -1663,10 +1672,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let cascadeSource = activeWindow ?? NSApp.keyWindow
         let usedIndexes = Set(windowPreferenceIndexes.values)
         let windowIndex = (0...).first { !usedIndexes.contains($0) } ?? 0
-        windowState.configure(preferenceIndex: windowIndex)
+        windowState.configure(preferenceID: windowID, legacyIndex: windowIndex)
         windows[identifier] = window
         windowPreferenceIndexes[identifier] = windowIndex
-        windowFrameKeys[identifier] = windowIndex == 0 ? QuotaStore.savedFrameKey : "\(QuotaStore.savedFrameKey).\(windowIndex)"
+        let stableFrameKey = "\(QuotaStore.savedFrameKey).window.\(windowID)"
+        let legacyFrameKey = windowIndex == 0 ? QuotaStore.savedFrameKey : "\(QuotaStore.savedFrameKey).\(windowIndex)"
+        if UserDefaults.standard.object(forKey: stableFrameKey) == nil,
+           let legacyFrame = UserDefaults.standard.string(forKey: legacyFrameKey) {
+            UserDefaults.standard.set(legacyFrame, forKey: stableFrameKey)
+        }
+        windowFrameKeys[identifier] = stableFrameKey
         window.delegate = self
         window.title = "Quota Bubble"
         window.titleVisibility = .hidden

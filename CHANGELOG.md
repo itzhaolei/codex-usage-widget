@@ -16,6 +16,7 @@ All notable changes to Quota Bubble are documented here.
 ### Fixed
 
 - Changed the window close control to close only the window where it was clicked; the app exits only after the final window closes.
+- Bound each window's theme, pin state, progress color, and position to a persistent scene identifier so restored windows cannot exchange settings when macOS changes their creation order.
 
 ## 3.0.8 - 2026-07-18
 
