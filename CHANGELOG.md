@@ -8,7 +8,7 @@ All notable changes to Quota Bubble are documented here.
 
 ### Added
 
-- Added a native macOS menu-bar indicator with a compact Codex-style icon and the live weekly quota percentage from the shared quota store.
+- Added a native macOS menu-bar indicator showing the live weekly quota percentage from the shared quota store.
 
 ### Changed
 

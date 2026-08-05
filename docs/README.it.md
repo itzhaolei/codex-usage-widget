@@ -9,7 +9,7 @@ Una finestra nativa per macOS e Windows che mostra quota settimanale Codex, rese
 ## Funzionalità
 
 - Mostra quota settimanale Codex, reset, saldo, piano e ripristini disponibili.
-- Mostra nella barra dei menu macOS un'icona Codex e la percentuale settimanale sincronizzata in tempo reale.
+- Mostra nella barra dei menu macOS la percentuale settimanale sincronizzata in tempo reale.
 - Su macOS mostra la scadenza di ogni ripristino, con un punto rosso entro tre giorni e verde negli altri casi.
 - Su macOS mostra localmente l’account corrente e la scadenza dell’abbonamento senza salvare credenziali nello snapshot della quota.
 - Mantiene stabili le quote live e impedisce la visualizzazione dei dati dell’account precedente dopo un cambio account.
