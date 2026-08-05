@@ -56,7 +56,6 @@ final class QuotaStore: ObservableObject {
         refreshSnapshot(force: true)
         checkVersion(force: true)
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerDidFire), userInfo: nil, repeats: true)
-        RunLoop.main.add(timer!, forMode: .common)
     }
 
     func stop() {
