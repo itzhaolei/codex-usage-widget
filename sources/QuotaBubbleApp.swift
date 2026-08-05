@@ -229,25 +229,45 @@ private struct QuotaMenuBarLabel: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 4, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color(red: 0.25, green: 0.58, blue: 1), Color(red: 0.49, green: 0.34, blue: 0.94)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                Image(systemName: "terminal.fill")
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(.white)
-            }
-            .frame(width: 17, height: 17)
+            CodexOutlineMark()
+                .stroke(
+                    Color.primary,
+                    style: StrokeStyle(lineWidth: 1.3, lineCap: .round, lineJoin: .round)
+                )
+                .frame(width: 17, height: 17)
 
             Text(percentage.map { "\($0)%" } ?? "—")
                 .font(.system(size: 12, weight: .semibold, design: .monospaced))
                 .monospacedDigit()
         }
+    }
+}
+
+private struct CodexOutlineMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        let sx = rect.width / 18
+        let sy = rect.height / 18
+        func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: x * sx, y: y * sy) }
+
+        var path = Path()
+        path.move(to: point(5.1, 2.4))
+        path.addCurve(to: point(8.2, 2.9), control1: point(6.0, 1.6), control2: point(7.4, 1.8))
+        path.addCurve(to: point(12.6, 3.8), control1: point(9.6, 1.7), control2: point(12.0, 2.0))
+        path.addCurve(to: point(15.0, 7.4), control1: point(14.5, 3.9), control2: point(15.7, 5.6))
+        path.addCurve(to: point(14.8, 11.6), control1: point(16.4, 8.6), control2: point(16.3, 10.7))
+        path.addCurve(to: point(11.2, 14.7), control1: point(14.4, 13.6), control2: point(12.9, 14.8))
+        path.addCurve(to: point(7.0, 14.9), control1: point(10.1, 16.2), control2: point(7.9, 16.3))
+        path.addCurve(to: point(3.1, 12.4), control1: point(5.2, 15.3), control2: point(3.5, 14.2))
+        path.addCurve(to: point(2.8, 8.2), control1: point(1.5, 11.3), control2: point(1.3, 9.2))
+        path.addCurve(to: point(5.1, 2.4), control1: point(1.9, 6.0), control2: point(2.9, 3.5))
+        path.closeSubpath()
+
+        path.move(to: point(5.8, 6.5))
+        path.addLine(to: point(8.0, 8.6))
+        path.addLine(to: point(5.8, 10.7))
+        path.move(to: point(9.5, 10.7))
+        path.addLine(to: point(12.5, 10.7))
+        return path
     }
 }
 
