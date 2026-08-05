@@ -4,6 +4,13 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.1 - 2026-08-06
+
+### Fixed
+
+- Moved the live macOS menu-bar percentage to an AppKit status item that updates only when the weekly percentage changes, preventing quota refreshes from rebuilding open SwiftUI menus.
+- Paused the one-second quota timer while macOS is tracking application menus so language choices remain selectable, then automatically resumes refreshing when the menu closes.
+
 ## 3.1.0 - 2026-08-05
 
 ### Added
