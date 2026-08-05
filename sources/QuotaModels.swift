@@ -130,6 +130,21 @@ func localizedWebsiteCopiedMessage(_ code: String) -> String {
     }
 }
 
+func localizedPointsUnit(_ code: String) -> String {
+    switch code {
+    case "zh": return "点数"
+    case "ja": return "ポイント"
+    case "ko": return "포인트"
+    case "de": return "Punkte"
+    case "fr": return "points"
+    case "es": return "puntos"
+    case "pt": return "pontos"
+    case "it": return "punti"
+    case "nl": return "punten"
+    default: return "points"
+    }
+}
+
 struct DialogCopy {
     let checking: String
     let downloading: String
@@ -241,6 +256,10 @@ func secondsUntil(_ timestamp: TimeInterval?) -> Int? {
 func compactDuration(until timestamp: TimeInterval?, copy: AppCopy) -> String {
     guard let interval = secondsUntil(timestamp) else { return "—" }
     guard interval > 0 else { return copy.alreadyReset }
+    return compactDuration(seconds: interval)
+}
+
+func compactDuration(seconds interval: Int) -> String {
     let value = max(1, interval)
     let day = value / 86_400
     let hour = value % 86_400 / 3_600
@@ -256,8 +275,9 @@ func compactDuration(until timestamp: TimeInterval?, copy: AppCopy) -> String {
 
 func formattedBalance(_ rawValue: String?) -> String {
     guard let raw = rawValue?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else { return "—" }
-    if let value = Double(raw) { return String(format: "%.2f", value) }
-    return raw.hasPrefix("$") ? String(raw.dropFirst()) : raw
+    let normalized = raw.hasPrefix("$") ? String(raw.dropFirst()) : raw
+    guard let value = Double(normalized) else { return normalized }
+    return String(Int(value.rounded()))
 }
 
 func normalizedVersion(_ value: String?) -> [Int]? {

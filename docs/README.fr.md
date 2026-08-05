@@ -9,6 +9,7 @@ Une fenêtre native pour macOS et Windows affichant le quota hebdomadaire Codex,
 ## Fonctionnalités
 
 - Affiche le quota hebdomadaire Codex, le reset, le solde, l’offre et les réinitialisations disponibles.
+- Affiche dans la barre des menus macOS une icône Codex et le quota hebdomadaire synchronisé en direct.
 - Affiche sous macOS la date d’expiration de chaque réinitialisation, avec un point rouge à moins de trois jours et vert au-delà.
 - Affiche localement sous macOS le compte actuel et l’expiration de l’abonnement sans enregistrer les identifiants dans l’instantané de quota.
 - Stabilise les quotas en direct et empêche l’affichage des données du compte précédent après un changement de compte.

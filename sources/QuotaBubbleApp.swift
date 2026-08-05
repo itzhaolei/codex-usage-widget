@@ -30,7 +30,7 @@ private let progressPalette: [Color] = [
 private func metricCardHeight(for copy: AppCopy) -> CGFloat {
     let font = NSFont.monospacedSystemFont(ofSize: 9, weight: .medium)
     let availableWidth = metricCardWidth - 8
-    let titles = ["\(copy.balance)（$）", "\(copy.availableReset)（\(copy.times)）"]
+    let titles = ["\(copy.balance)（\(localizedPointsUnit(effectiveLanguageCode()))）", "\(copy.availableReset)（\(copy.times)）"]
     let needsTwoLines = titles.contains {
         ceil(($0 as NSString).size(withAttributes: [.font: font]).width) > availableWidth
     }
@@ -214,6 +214,57 @@ struct QuotaBubbleApp: App {
                 Button(role: .destructive) { appDelegate.confirmUninstall() } label: { Text(languageMenu.copy.uninstall) }
             }
         }
+
+        MenuBarExtra {
+            QuotaMenuBarMenu(store: store)
+        } label: {
+            QuotaMenuBarLabel(percentage: store.remainingPercentage)
+        }
+        .menuBarExtraStyle(.menu)
+    }
+}
+
+private struct QuotaMenuBarLabel: View {
+    let percentage: Int?
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(red: 0.25, green: 0.58, blue: 1), Color(red: 0.49, green: 0.34, blue: 0.94)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                Image(systemName: "terminal.fill")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(.white)
+            }
+            .frame(width: 17, height: 17)
+
+            Text(percentage.map { "\($0)%" } ?? "—")
+                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                .monospacedDigit()
+        }
+    }
+}
+
+private struct QuotaMenuBarMenu: View {
+    @ObservedObject var store: QuotaStore
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some View {
+        Button(store.copy.title) { openWindow(id: "main") }
+        Divider()
+        Button(localizedNewWindowLabel(store.languageCode)) { openWindow(id: "main") }
+            .keyboardShortcut("n", modifiers: .command)
+        Divider()
+        Button(store.copy.update) { (NSApp.delegate as? AppDelegate)?.checkForUpdates() }
+        Button(store.copy.website) { (NSApp.delegate as? AppDelegate)?.openWebsite() }
+        Divider()
+        Button(store.copy.close) { NSApp.terminate(nil) }
     }
 }
 
@@ -463,7 +514,7 @@ private struct QuotaBubbleView: View {
     private var metricCards: some View {
         let height = metricCardHeight(for: store.copy)
         return HStack(spacing: 10) {
-            MetricCard(title: "\(store.copy.balance)（$）", value: store.balanceText, height: height, lightMode: windowState.isLightMode, secondary: secondary)
+            MetricCard(title: "\(store.copy.balance)（\(localizedPointsUnit(store.languageCode))）", value: store.balanceText, height: height, lightMode: windowState.isLightMode, secondary: secondary)
             MetricCard(title: "\(store.copy.availableReset)（\(store.copy.times)）", value: store.resetCountText, height: height, lightMode: windowState.isLightMode, secondary: secondary)
         }
         .frame(width: 272, height: height, alignment: .leading)

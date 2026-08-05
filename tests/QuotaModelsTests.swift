@@ -11,6 +11,7 @@ enum QuotaModelsTests {
         expect(localizedNewWindowLabel("zh") == "新建窗口", "Chinese new-window menu")
         for language in supportedLanguages {
             expect(!localizedNewWindowLabel(language.code).isEmpty, "new-window label for \(language.code)")
+            expect(!localizedPointsUnit(language.code).isEmpty, "points unit for \(language.code)")
         }
     expect(URL(string: officialWebsiteURLString)?.host == "htmlpreview.github.io", "official website URL")
     for language in supportedLanguages {
@@ -26,12 +27,11 @@ enum QuotaModelsTests {
         expect(remainingPercent(fromUsedPercent: 0) == 100, "unused quota")
         expect(remainingPercent(fromUsedPercent: 29) == 71, "remaining quota")
         expect(remainingPercent(fromUsedPercent: 100) == 0, "exhausted quota")
-        expect(formattedBalance("$1.5") == "1.5", "prefixed balance")
-        expect(formattedBalance("2") == "2.00", "numeric balance")
+        expect(formattedBalance("$1.5") == "2", "prefixed balance rounds to an integer")
+        expect(formattedBalance("2") == "2", "integer balance has no decimal places")
+        expect(formattedBalance("12.49") == "12", "fractional balance rounds to the nearest integer")
 
-        let future = Date().addingTimeInterval(6 * 86_400 + 23 * 3_600 + 57 * 60 + 38).timeIntervalSince1970
-        let duration = compactDuration(until: future, copy: localizedCopy("en"))
-        expect(duration.hasPrefix("6d 23h 57m"), "compact duration")
+        expect(compactDuration(seconds: 6 * 86_400 + 23 * 3_600 + 57 * 60 + 38) == "6d 23h 57m 38s", "weekly duration includes days")
 
         let json = #"{"account_fingerprint":"account:0123456789abcdef","plan_type":"plus","balance_usd":"0","five_hour":{"used_percentage":45,"resets_at":1784644006},"reset_credits":{"available_count":2,"expires_at":["2026-08-01T04:15:00Z","2026-08-13T01:45:00Z"]}}"#.data(using: .utf8)!
         let snapshot = try JSONDecoder().decode(UsageSnapshot.self, from: json)

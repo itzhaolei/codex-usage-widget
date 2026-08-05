@@ -4,6 +4,17 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.0 - 2026-08-05
+
+### Added
+
+- Added a native macOS menu-bar indicator with a compact Codex-style icon and the live weekly quota percentage from the shared quota store.
+
+### Changed
+
+- Changed the balance card unit from USD to localized points and displays the balance as a rounded integer.
+- Made the weekly reset countdown explicitly include the `d` day unit whenever at least one day remains.
+
 ## 3.0.9 - 2026-07-20
 
 ### Added
