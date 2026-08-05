@@ -215,39 +215,6 @@ struct QuotaBubbleApp: App {
             }
         }
 
-        MenuBarExtra {
-            QuotaMenuBarMenu(store: store)
-        } label: {
-            QuotaMenuBarLabel(percentage: store.remainingPercentage)
-        }
-        .menuBarExtraStyle(.menu)
-    }
-}
-
-private struct QuotaMenuBarLabel: View {
-    let percentage: Int?
-
-    var body: some View {
-        Text(percentage.map { "\($0)%" } ?? "—")
-            .font(.system(size: 12, weight: .semibold, design: .monospaced))
-            .monospacedDigit()
-    }
-}
-
-private struct QuotaMenuBarMenu: View {
-    @ObservedObject var store: QuotaStore
-    @Environment(\.openWindow) private var openWindow
-
-    var body: some View {
-        Button(store.copy.title) { openWindow(id: "main") }
-        Divider()
-        Button(localizedNewWindowLabel(store.languageCode)) { openWindow(id: "main") }
-            .keyboardShortcut("n", modifiers: .command)
-        Divider()
-        Button(store.copy.update) { (NSApp.delegate as? AppDelegate)?.checkForUpdates() }
-        Button(store.copy.website) { (NSApp.delegate as? AppDelegate)?.openWebsite() }
-        Divider()
-        Button(store.copy.close) { NSApp.terminate(nil) }
     }
 }
 
@@ -1661,6 +1628,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var updateDownload: UpdateDownload?
     private weak var updateProgressIndicator: NSProgressIndicator?
     private weak var updateProgressLabel: NSTextField?
+    private var statusItem: NSStatusItem?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
@@ -1743,8 +1711,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         guard self.store !== store else { return }
         self.store = store
         storeCancellables.removeAll()
+        configureStatusItem()
+        updateStatusItem(percentage: store.remainingPercentage)
+        store.$snapshot
+            .map { remainingPercent(fromUsedPercent: weeklyUsageWindow(from: $0)?.used_percentage) }
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in self?.updateStatusItem(percentage: $0) }
+            .store(in: &storeCancellables)
         store.$resetRows.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeAllWindows() }.store(in: &storeCancellables)
         store.$languageCode.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeAllWindows() }.store(in: &storeCancellables)
+    }
+
+    private func configureStatusItem() {
+        guard statusItem == nil else { return }
+        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        item.button?.font = NSFont.monospacedSystemFont(ofSize: 12, weight: .semibold)
+        item.button?.target = self
+        item.button?.action = #selector(showQuotaWindow)
+        item.button?.toolTip = "Quota Bubble"
+        statusItem = item
+    }
+
+    private func updateStatusItem(percentage: Int?) {
+        statusItem?.button?.title = percentage.map { "\($0)%" } ?? "—"
+    }
+
+    @objc private func showQuotaWindow() {
+        let target = activeWindow ?? windows.values.first
+        target?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     func applyPinnedState(_ isPinned: Bool, to window: NSWindow?) {
