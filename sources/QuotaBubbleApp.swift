@@ -1629,10 +1629,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private weak var updateProgressIndicator: NSProgressIndicator?
     private weak var updateProgressLabel: NSTextField?
     private var statusItem: NSStatusItem?
+    private var menuTrackingDepth = 0
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
+        NotificationCenter.default.addObserver(self, selector: #selector(menuDidBeginTracking), name: NSMenu.didBeginTrackingNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(menuDidEndTracking), name: NSMenu.didEndTrackingNotification, object: nil)
     }
+
+    deinit { NotificationCenter.default.removeObserver(self) }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
 
@@ -1644,6 +1649,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     func selectLanguage(_ code: String?) {
         store?.selectLanguage(code)
+    }
+
+    @objc private func menuDidBeginTracking() {
+        menuTrackingDepth += 1
+        store?.setRefreshSuspended(true)
+    }
+
+    @objc private func menuDidEndTracking() {
+        menuTrackingDepth = max(0, menuTrackingDepth - 1)
+        if menuTrackingDepth == 0 { store?.setRefreshSuspended(false) }
     }
 
     func openWebsite() {

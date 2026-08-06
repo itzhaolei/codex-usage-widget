@@ -25,6 +25,7 @@ final class QuotaStore: ObservableObject {
     private var lastVersionCheck = Date.distantPast
     private var authReadFailureSince: Date?
     private var nextRechargeAnimationID: UInt = 0
+    private var refreshSuspended = false
 
     init(codexHome: String? = nil, refreshesRemotely: Bool = true) {
         let resolvedHome = codexHome ?? ProcessInfo.processInfo.environment["CODEX_HOME"]
@@ -56,6 +57,7 @@ final class QuotaStore: ObservableObject {
         refreshSnapshot(force: true)
         checkVersion(force: true)
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerDidFire), userInfo: nil, repeats: true)
+        RunLoop.main.add(timer!, forMode: .common)
     }
 
     func stop() {
@@ -71,7 +73,16 @@ final class QuotaStore: ObservableObject {
         checkVersion()
     }
 
-    @objc private func timerDidFire() { tick() }
+    @objc private func timerDidFire() {
+        guard !refreshSuspended else { return }
+        tick()
+    }
+
+    func setRefreshSuspended(_ suspended: Bool) {
+        let shouldCatchUp = refreshSuspended && !suspended
+        refreshSuspended = suspended
+        if shouldCatchUp { tick() }
+    }
 
     func selectLanguage(_ code: String?) {
         writeLanguageOverride(code)
