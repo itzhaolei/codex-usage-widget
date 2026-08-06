@@ -4,6 +4,13 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.2 - 2026-08-06
+
+### Fixed
+
+- Restored continuous one-second quota synchronization for the borderless macOS window by keeping the timer in the common run-loop modes.
+- Suspends refresh work only while an application menu is actively tracked, then immediately catches up when the menu closes, preserving both live progress updates and reliable language selection.
+
 ## 3.1.1 - 2026-08-06
 
 ### Fixed
