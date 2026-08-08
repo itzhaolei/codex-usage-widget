@@ -4,6 +4,18 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.6 - 2026-08-08
+
+### Fixed
+
+- Restored uninterrupted one-second quota polling by removing menu event-tracking checks from the refresh timer.
+- Kept the menu-bar percentage as a read-only subscriber so it cannot pause or otherwise control quota collection.
+
+### Reverted
+
+- Removed the unverified account-routing header, alternate payload aliases, and delayed failure-clearing changes from 3.1.5 because they did not fix the affected Macs.
+- Restored the previously proven native usage request and snapshot preservation behavior.
+
 ## 3.1.5 - 2026-08-08
 
 ### Fixed
