@@ -256,7 +256,7 @@ func formattedResetDate(_ timestamp: TimeInterval?) -> String {
     guard let date = dateFromTimestamp(timestamp) else { return "—" }
     let formatter = DateFormatter()
     formatter.locale = Locale(identifier: "en_US_POSIX")
-    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    formatter.dateFormat = "MM-dd HH:mm:ss"
     return formatter.string(from: date)
 }
 
