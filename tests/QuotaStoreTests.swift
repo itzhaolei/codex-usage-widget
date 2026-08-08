@@ -16,6 +16,16 @@ enum QuotaStoreTests {
         store.tick()
         expect(store.snapshot?.seven_day?.used_percentage == 20, "same-account weekly snapshot loads")
         expect(store.accountText == "a@example.test", "account A loads")
+        expect(store.availableStorageText.hasSuffix("G"), "available storage is refreshed")
+        expect(store.availableMemoryText.contains("G / "), "available memory is refreshed")
+        expect(
+            formattedAvailableStorage(SystemCapacity(available: 356_800_000_000, total: 494_380_000_000), languageCode: "zh") == "可用存储内存：356.8G",
+            "available storage formatting"
+        )
+        expect(
+            formattedAvailableMemory(SystemCapacity(available: 4_080_218_931, total: 17_179_869_184), languageCode: "zh") == "可用运行内存：3.8G / 16.0G",
+            "available memory formatting"
+        )
 
         try writeAuth(accountID: "account-b", email: "b@example.test", root: root)
         store.tick()

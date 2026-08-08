@@ -486,6 +486,8 @@ private struct QuotaBubbleView: View {
         VStack(spacing: 1) {
             InfoRow(symbol: "person.circle.fill", value: store.accountText, color: secondary)
             InfoRow(symbol: "calendar.badge.clock", value: store.subscriptionText, color: secondary)
+            InfoRow(symbol: "internaldrive", value: store.availableStorageText, color: secondary)
+            InfoRow(symbol: "memorychip", value: store.availableMemoryText, color: secondary)
         }
     }
 

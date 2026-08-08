@@ -1,5 +1,6 @@
 import Combine
 import CryptoKit
+import Darwin
 import Foundation
 
 @MainActor
@@ -10,6 +11,8 @@ final class QuotaStore: ObservableObject {
     @Published private(set) var hasUpdate = false
     @Published private(set) var languageCode = effectiveLanguageCode()
     @Published private(set) var rechargeAnimationEvent: QuotaRechargeAnimationEvent?
+    @Published private(set) var availableStorageText = "—"
+    @Published private(set) var availableMemoryText = "—"
 
     static let lightModeKey = "CodexUsageWidget.isLightMode"
     static let pinnedKey = "CodexUsageWidget.isPinned"
@@ -51,11 +54,12 @@ final class QuotaStore: ObservableObject {
         return "v\(version)"
     }
     var desiredHeight: CGFloat {
-        253 + (resetRows.isEmpty ? 0 : 18 + CGFloat(resetRows.count) * 18)
+        287 + (resetRows.isEmpty ? 0 : 18 + CGFloat(resetRows.count) * 18)
     }
 
     func start() {
         guard timer == nil else { return }
+        refreshSystemCapacity()
         readLocalState()
         refreshSnapshot(force: true)
         checkVersion(force: true)
@@ -71,6 +75,7 @@ final class QuotaStore: ObservableObject {
     func tick() {
         let currentLanguage = effectiveLanguageCode()
         if currentLanguage != languageCode { languageCode = currentLanguage }
+        refreshSystemCapacity()
         readLocalState()
         refreshSnapshot()
         checkVersion()
@@ -85,6 +90,11 @@ final class QuotaStore: ObservableObject {
     }
 
     func markUpdateInstalled() { hasUpdate = false }
+
+    private func refreshSystemCapacity() {
+        availableStorageText = formattedAvailableStorage(systemStorageCapacity(), languageCode: languageCode)
+        availableMemoryText = formattedAvailableMemory(systemMemoryCapacity(), languageCode: languageCode)
+    }
 
     private static func invalidateGeneratedSnapshotIfNeeded(codexHome: String) {
         let defaults = UserDefaults.standard
@@ -236,6 +246,91 @@ final class QuotaStore: ObservableObject {
             if let value = legacy.object(forKey: key) { current.set(value, forKey: key) }
         }
     }
+}
+
+struct SystemCapacity: Equatable {
+    let available: Int64
+    let total: Int64
+}
+
+func systemStorageCapacity() -> SystemCapacity? {
+    let home = URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)
+    if let values = try? home.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey, .volumeTotalCapacityKey]),
+       let available = values.volumeAvailableCapacityForImportantUsage,
+       let total = values.volumeTotalCapacity {
+        return SystemCapacity(available: max(0, available), total: max(0, Int64(total)))
+    }
+    guard let attributes = try? FileManager.default.attributesOfFileSystem(forPath: home.path),
+          let available = attributes[.systemFreeSize] as? NSNumber,
+          let total = attributes[.systemSize] as? NSNumber else { return nil }
+    return SystemCapacity(available: max(0, available.int64Value), total: max(0, total.int64Value))
+}
+
+func systemMemoryCapacity() -> SystemCapacity? {
+    var pageSize: vm_size_t = 0
+    guard host_page_size(mach_host_self(), &pageSize) == KERN_SUCCESS else { return nil }
+
+    var statistics = vm_statistics64()
+    var count = mach_msg_type_number_t(MemoryLayout<vm_statistics64_data_t>.size / MemoryLayout<integer_t>.size)
+    let result = withUnsafeMutablePointer(to: &statistics) { pointer in
+        pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+            host_statistics64(mach_host_self(), HOST_VM_INFO64, $0, &count)
+        }
+    }
+    guard result == KERN_SUCCESS else { return nil }
+
+    let availablePages = UInt64(statistics.free_count)
+        + UInt64(statistics.inactive_count)
+        + UInt64(statistics.speculative_count)
+    return SystemCapacity(
+        available: Int64(min(UInt64(Int64.max), availablePages * UInt64(pageSize))),
+        total: Int64(min(UInt64(Int64.max), ProcessInfo.processInfo.physicalMemory))
+    )
+}
+
+func formattedAvailableStorage(_ capacity: SystemCapacity?, languageCode: String) -> String {
+    let label: String
+    switch languageCode {
+    case "zh": label = "可用存储内存"
+    case "ja": label = "利用可能なストレージ"
+    case "ko": label = "사용 가능 저장 공간"
+    case "de": label = "Verfügbarer Speicherplatz"
+    case "fr": label = "Stockage disponible"
+    case "es": label = "Almacenamiento disponible"
+    case "pt": label = "Armazenamento disponível"
+    case "it": label = "Spazio disponibile"
+    case "nl": label = "Beschikbare opslag"
+    default: label = "Available storage"
+    }
+    guard let capacity else { return languageCode == "zh" ? "\(label)：—" : "\(label): —" }
+    let available = Double(capacity.available) / 1_000_000_000
+    let value = String(format: "%.1fG", available)
+    return languageCode == "zh" ? "\(label)：\(value)" : "\(label): \(value)"
+}
+
+func formattedAvailableMemory(_ capacity: SystemCapacity?, languageCode: String) -> String {
+    let label: String
+    switch languageCode {
+    case "zh": label = "可用运行内存"
+    case "ja": label = "利用可能メモリ"
+    case "ko": label = "사용 가능 메모리"
+    case "de": label = "Verfügbarer Speicher"
+    case "fr": label = "Mémoire disponible"
+    case "es": label = "Memoria disponible"
+    case "pt": label = "Memória disponível"
+    case "it": label = "Memoria disponibile"
+    case "nl": label = "Beschikbaar geheugen"
+    default: label = "Available memory"
+    }
+    return formattedCapacity(capacity, label: label, languageCode: languageCode, divisor: 1_073_741_824)
+}
+
+private func formattedCapacity(_ capacity: SystemCapacity?, label: String, languageCode: String, divisor: Double) -> String {
+    guard let capacity else { return languageCode == "zh" ? "\(label)：—" : "\(label): —" }
+    let available = Double(capacity.available) / divisor
+    let total = Double(capacity.total) / divisor
+    let value = String(format: "%.1fG / %.1fG", available, total)
+    return languageCode == "zh" ? "\(label)：\(value)" : "\(label): \(value)"
 }
 
 private func accountFingerprint(kind: String, value: String) -> String {

@@ -4,6 +4,17 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.8 - 2026-08-09
+
+### Added
+
+- Added live available storage and runtime-memory rows beneath the account information.
+- Both system-capacity values refresh once per second; storage stays compact and shows only its available value, while runtime memory includes total capacity.
+
+### Changed
+
+- Increased the macOS widget height to fit both new rows while keeping the version anchored at the bottom-right.
+
 ## 3.1.7 - 2026-08-09
 
 ### Fixed
