@@ -4,6 +4,15 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.5 - 2026-08-08
+
+### Fixed
+
+- Added the official `ChatGPT-Account-Id` routing header to quota and reset-credit requests so usage loads correctly for accounts that require explicit workspace routing.
+- Prevented a failed usage request from preserving a stale 100% quota indefinitely; stale quota windows are cleared after a 15-second transient-failure grace period.
+- Added compatibility for alternate usage field names, including remaining-percentage payloads, while preserving the normalized used-percentage model.
+- Added regression coverage for account-routed headers and alternate weekly quota payloads.
+
 ## 3.1.4 - 2026-08-08
 
 ### Added
