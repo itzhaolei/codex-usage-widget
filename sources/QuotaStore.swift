@@ -1,11 +1,6 @@
-import AppKit
 import Combine
 import CryptoKit
 import Foundation
-
-func shouldRunQuotaRefresh(in mode: RunLoop.Mode?) -> Bool {
-    mode != .eventTracking
-}
 
 @MainActor
 final class QuotaStore: ObservableObject {
@@ -78,10 +73,7 @@ final class QuotaStore: ObservableObject {
         checkVersion()
     }
 
-    @objc private func timerDidFire() {
-        guard shouldRunQuotaRefresh(in: RunLoop.current.currentMode) else { return }
-        tick()
-    }
+    @objc private func timerDidFire() { tick() }
 
     func selectLanguage(_ code: String?) {
         writeLanguageOverride(code)
