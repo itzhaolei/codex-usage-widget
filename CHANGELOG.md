@@ -4,6 +4,15 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.7 - 2026-08-09
+
+### Fixed
+
+- Fixed affected Macs remaining permanently at 100% after an incorrect snapshot stored a reset date later than the official weekly window.
+- Replaced the permanent earlier-cycle rejection with a three-second confirmation window: brief stale responses remain hidden, while a persistent official response automatically repairs the snapshot.
+- Invalidates the generated quota snapshot once after upgrading so previously affected installations immediately fetch fresh account data without changing authentication or window preferences.
+- Clears the generated snapshot during installer and source-based upgrades.
+
 ## 3.1.6 - 2026-08-08
 
 ### Fixed

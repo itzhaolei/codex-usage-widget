@@ -56,9 +56,6 @@ enum NativeQuotaParser {
 
         if let existingReset = existing.resets_at, let nextReset = next.resets_at {
             let cycleTolerance: TimeInterval = 5 * 60
-            if nextReset < existingReset - cycleTolerance {
-                return existing
-            }
             if abs(existingReset - nextReset) <= cycleTolerance,
                let existingUsed = existing.used_percentage,
                let nextUsed = next.used_percentage {
@@ -154,6 +151,45 @@ enum NativeQuotaParser {
     }
 }
 
+struct QuotaWindowReconciler {
+    private struct EarlierCycleCandidate {
+        var resetAt: TimeInterval
+        var firstSeenAt: Date
+    }
+
+    private var earlierCycleCandidate: EarlierCycleCandidate?
+    private let confirmationDelay: TimeInterval
+    private let cycleTolerance: TimeInterval = 5 * 60
+
+    init(confirmationDelay: TimeInterval = 3) {
+        self.confirmationDelay = confirmationDelay
+    }
+
+    mutating func merge(existing: UsageWindow?, next: UsageWindow?, sameAccount: Bool, now: Date = Date()) -> UsageWindow? {
+        guard sameAccount, let existing, let next else {
+            earlierCycleCandidate = nil
+            return NativeQuotaParser.mergedWindow(existing: existing, next: next, sameAccount: sameAccount)
+        }
+        guard let existingReset = existing.resets_at,
+              let nextReset = next.resets_at,
+              nextReset < existingReset - cycleTolerance else {
+            earlierCycleCandidate = nil
+            return NativeQuotaParser.mergedWindow(existing: existing, next: next, sameAccount: true)
+        }
+
+        if let candidate = earlierCycleCandidate,
+           abs(candidate.resetAt - nextReset) <= cycleTolerance {
+            if now.timeIntervalSince(candidate.firstSeenAt) >= confirmationDelay {
+                earlierCycleCandidate = nil
+                return next
+            }
+        } else {
+            earlierCycleCandidate = EarlierCycleCandidate(resetAt: nextReset, firstSeenAt: now)
+        }
+        return existing
+    }
+}
+
 actor QuotaSnapshotService {
     private struct ResetCache {
         let fingerprint: String
@@ -165,6 +201,8 @@ actor QuotaSnapshotService {
     private let authPath: String
     private let session: URLSession
     private var resetCache: ResetCache?
+    private var fiveHourReconciler = QuotaWindowReconciler()
+    private var sevenDayReconciler = QuotaWindowReconciler()
 
     init(codexHome: String) {
         snapshotPath = "\(codexHome)/codex-usage-snapshot.json"
@@ -198,8 +236,8 @@ actor QuotaSnapshotService {
             account_fingerprint: auth.fingerprint,
             plan_type: usage.planType ?? (sameAccount ? existing?.plan_type : nil),
             balance_usd: usage.balanceUsd ?? (sameAccount ? existing?.balance_usd : nil),
-            five_hour: NativeQuotaParser.mergedWindow(existing: existing?.five_hour, next: usage.fiveHour, sameAccount: sameAccount),
-            seven_day: NativeQuotaParser.mergedWindow(existing: existing?.seven_day, next: usage.sevenDay, sameAccount: sameAccount),
+            five_hour: fiveHourReconciler.merge(existing: existing?.five_hour, next: usage.fiveHour, sameAccount: sameAccount),
+            seven_day: sevenDayReconciler.merge(existing: existing?.seven_day, next: usage.sevenDay, sameAccount: sameAccount),
             reset_credits: nextResetCredits ?? (sameAccount ? existing?.reset_credits : nil)
         )
         write(snapshot)

@@ -67,6 +67,7 @@ for script in ensure-usage-widget.sh start-usage-widget.sh restart.sh status.sh 
     chmod +x "$INSTALL_DIR/$script"
 done
 rm -f "$CODEX_HOME/scripts/codex-usage-snapshot.mjs"
+rm -f "$CODEX_HOME/codex-usage-snapshot.json"
 
 swiftc -parse-as-library -o "$APP_EXE" \
     "$PLUGIN_DIR/sources/QuotaModels.swift" \

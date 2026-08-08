@@ -15,6 +15,8 @@ final class QuotaStore: ObservableObject {
     static let pinnedKey = "CodexUsageWidget.isPinned"
     static let progressColorKey = "CodexUsageWidget.progressColorIndex"
     static let savedFrameKey = "CodexUsageWidget.savedFrame"
+    private static let snapshotSchemaKey = "QuotaBubble.snapshotSchemaVersion"
+    private static let snapshotSchemaVersion = 2
 
     private let codexHome: String
     private let snapshotService: QuotaSnapshotService?
@@ -32,6 +34,7 @@ final class QuotaStore: ObservableObject {
         self.codexHome = resolvedHome
         snapshotService = refreshesRemotely ? QuotaSnapshotService(codexHome: resolvedHome) : nil
         Self.migrateLegacyPreferences()
+        if refreshesRemotely { Self.invalidateGeneratedSnapshotIfNeeded(codexHome: resolvedHome) }
     }
 
     var copy: AppCopy { localizedCopy(languageCode) }
@@ -82,6 +85,13 @@ final class QuotaStore: ObservableObject {
     }
 
     func markUpdateInstalled() { hasUpdate = false }
+
+    private static func invalidateGeneratedSnapshotIfNeeded(codexHome: String) {
+        let defaults = UserDefaults.standard
+        guard defaults.integer(forKey: snapshotSchemaKey) < snapshotSchemaVersion else { return }
+        try? FileManager.default.removeItem(atPath: "\(codexHome)/codex-usage-snapshot.json")
+        defaults.set(snapshotSchemaVersion, forKey: snapshotSchemaKey)
+    }
 
     private func publishRechargeAnimation(from: Int, to: Int) {
         nextRechargeAnimationID &+= 1

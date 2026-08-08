@@ -112,6 +112,7 @@ APPLESCRIPT
 fi
 for script in ensure-usage-widget.sh start-usage-widget.sh restart.sh status.sh uninstall.sh; do cp "$PAYLOAD/scripts/$script" "$INSTALL_DIR/$script"; chmod +x "$INSTALL_DIR/$script"; done
 rm -f "$CODEX_HOME/scripts/codex-usage-snapshot.mjs"
+rm -f "$CODEX_HOME/codex-usage-snapshot.json"
 xattr -dr com.apple.quarantine "$APP" >/dev/null 2>&1 || true
 touch "$APP"
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP"

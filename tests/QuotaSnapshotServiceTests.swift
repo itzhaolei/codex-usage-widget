@@ -34,8 +34,35 @@ enum QuotaSnapshotServiceTests {
         expect(acceptedReset?.resets_at == newCycle.resets_at, "new quota cycle reset time is retained")
 
         let rejectedStaleCycle = NativeQuotaParser.mergedWindow(existing: acceptedReset, next: oldCycle, sameAccount: true)
-        expect(rejectedStaleCycle == acceptedReset, "stale previous-cycle response cannot replace the new cycle")
+        expect(rejectedStaleCycle == oldCycle, "stateless window merge does not permanently lock a later reset date")
         expect(NativeQuotaParser.mergedWindow(existing: newCycle, next: oldCycle, sameAccount: false) == oldCycle, "account changes may use an earlier reset time")
+
+        var reconciler = QuotaWindowReconciler(confirmationDelay: 3)
+        let poisonedSnapshot = UsageWindow(used_percentage: 0, resets_at: 20_000)
+        let correctedSnapshot = UsageWindow(used_percentage: 82, resets_at: 10_000)
+        let startedAt = Date(timeIntervalSince1970: 1_000)
+        expect(
+            reconciler.merge(existing: poisonedSnapshot, next: correctedSnapshot, sameAccount: true, now: startedAt) == poisonedSnapshot,
+            "earlier reset date is initially debounced"
+        )
+        expect(
+            reconciler.merge(existing: poisonedSnapshot, next: correctedSnapshot, sameAccount: true, now: startedAt.addingTimeInterval(2)) == poisonedSnapshot,
+            "transient previous-cycle response remains hidden"
+        )
+        expect(
+            reconciler.merge(existing: poisonedSnapshot, next: correctedSnapshot, sameAccount: true, now: startedAt.addingTimeInterval(3)) == correctedSnapshot,
+            "persistent correct response heals a poisoned future snapshot"
+        )
+
+        var transientReconciler = QuotaWindowReconciler(confirmationDelay: 3)
+        expect(
+            transientReconciler.merge(existing: newCycle, next: oldCycle, sameAccount: true, now: startedAt) == newCycle,
+            "brief old-cycle response is rejected"
+        )
+        expect(
+            transientReconciler.merge(existing: newCycle, next: newCycle, sameAccount: true, now: startedAt.addingTimeInterval(1)) == newCycle,
+            "current-cycle response cancels the rollback candidate"
+        )
 
         print("Native quota snapshot tests passed.")
     }
