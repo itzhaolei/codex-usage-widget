@@ -424,7 +424,6 @@ private struct QuotaBubbleView: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .layoutPriority(0)
-                Spacer(minLength: 5)
                 Text(store.resetDateText)
                     .font(.system(size: 8, weight: .regular, design: .monospaced))
                     .foregroundStyle(primary.opacity(0.52))
