@@ -9,6 +9,7 @@ Uma janela nativa para macOS e Windows que mostra cota semanal do Codex, redefin
 ## Recursos
 
 - Mostra cota semanal do Codex, redefinição, saldo, plano e redefinições disponíveis.
+- Mostra após a contagem regressiva a data exata da redefinição semanal no horário local, com precisão de segundos.
 - Mostra na barra de menus do macOS a porcentagem semanal sincronizada ao vivo.
 - No macOS, mostra a validade de cada redefinição, com ponto vermelho quando expira em até três dias e verde nos demais casos.
 - No macOS, mostra localmente a conta atual e o vencimento da assinatura sem salvar credenciais no snapshot de cota.

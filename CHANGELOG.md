@@ -4,6 +4,16 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.4 - 2026-08-08
+
+### Added
+
+- Added the exact weekly reset date beside the live countdown, formatted in local time as `MM-dd HH:mm:ss`.
+
+### Changed
+
+- Added a subtle divider between the countdown and exact reset date, with smaller light-gray styling to preserve the existing compact layout.
+
 ## 3.1.3 - 2026-08-08
 
 ### Fixed

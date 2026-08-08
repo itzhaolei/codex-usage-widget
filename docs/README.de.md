@@ -9,6 +9,7 @@ Ein natives schwebendes Fenster für Codex-Wochenkontingent, Reset-Zeit, Guthabe
 ## Funktionen
 
 - Zeigt Codex-Wochenkontingent, Reset-Zeit, Guthaben, Tarif und verfügbare Reset-Credits.
+- Zeigt direkt nach dem Countdown den exakten wöchentlichen Reset-Zeitpunkt in lokaler Zeit bis zur Sekunde.
 - Zeigt in der macOS-Menüleiste das live synchronisierte Wochenkontingent in Prozent.
 - Zeigt unter macOS die Ablaufdaten einzelner Reset-Credits mit einem roten Punkt innerhalb von drei Tagen und sonst mit einem grünen Punkt.
 - Zeigt unter macOS das aktuelle Konto und das Ablaufdatum des Abonnements lokal an, ohne Anmeldedaten im Kontingent-Snapshot zu speichern.

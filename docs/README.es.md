@@ -9,6 +9,7 @@ Una ventana nativa para macOS y Windows que muestra la cuota semanal de Codex, r
 ## Funciones
 
 - Muestra la cuota semanal de Codex, el reinicio, el saldo, el plan y los reinicios disponibles.
+- Muestra tras la cuenta atrás la fecha exacta del reinicio semanal en hora local, con precisión de segundos.
 - Muestra en la barra de menús de macOS el porcentaje semanal sincronizado en vivo.
 - En macOS muestra la caducidad de cada reinicio, con un punto rojo si vence en tres días y verde en caso contrario.
 - En macOS muestra localmente la cuenta actual y la caducidad de la suscripción sin guardar credenciales en la instantánea de cuota.

@@ -25,6 +25,7 @@ Website source lives in `public/` and is ready for Cloudflare Pages. Recommended
 
 - Floating quota HUD for Codex desktop.
 - Shows weekly quota, reset timing, integer point balance, plan, and available reset credits.
+- Shows the exact weekly reset date in local time down to the second.
 - Shows the live weekly quota percentage in the macOS menu bar.
 - Lists reset-credit expiration dates with red and green urgency indicators on macOS.
 - Shows the current account and subscription expiration locally on macOS without copying credentials into the quota snapshot.

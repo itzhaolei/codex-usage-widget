@@ -9,6 +9,7 @@ Een native venster voor macOS en Windows met Codex-weekquota, resettijd, saldo, 
 ## Functies
 
 - Toont Codex-weekquota, resettijd, saldo, plan en beschikbare resets.
+- Toont direct na het aftellen de exacte wekelijkse resettijd in lokale tijd, tot op de seconde.
 - Toont in de macOS-menubalk het live gesynchroniseerde weekquotum als percentage.
 - Toont op macOS de vervaldatum van elke reset, met een rode stip binnen drie dagen en anders een groene stip.
 - Toont op macOS lokaal het huidige account en de vervaldatum van het abonnement zonder aanmeldgegevens in de quota-snapshot op te slaan.
