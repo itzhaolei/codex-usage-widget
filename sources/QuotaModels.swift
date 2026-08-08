@@ -248,9 +248,21 @@ func remainingPercent(fromUsedPercent value: Int?) -> Int? {
 }
 
 func secondsUntil(_ timestamp: TimeInterval?) -> Int? {
-    guard let timestamp, timestamp > 0 else { return nil }
-    let date = timestamp > 1_000_000_000_000 ? Date(timeIntervalSince1970: timestamp / 1000) : Date(timeIntervalSince1970: timestamp)
+    guard let date = dateFromTimestamp(timestamp) else { return nil }
     return Int(ceil(date.timeIntervalSinceNow))
+}
+
+func formattedResetDate(_ timestamp: TimeInterval?) -> String {
+    guard let date = dateFromTimestamp(timestamp) else { return "—" }
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    return formatter.string(from: date)
+}
+
+private func dateFromTimestamp(_ timestamp: TimeInterval?) -> Date? {
+    guard let timestamp, timestamp > 0 else { return nil }
+    return Date(timeIntervalSince1970: timestamp > 1_000_000_000_000 ? timestamp / 1000 : timestamp)
 }
 
 func compactDuration(until timestamp: TimeInterval?, copy: AppCopy) -> String {
