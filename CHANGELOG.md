@@ -4,6 +4,14 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.3 - 2026-08-08
+
+### Fixed
+
+- Replaced persistent menu-tracking suspension state with a stateless check of the current macOS run-loop mode.
+- Prevented missing or unbalanced menu tracking notifications on some Macs from freezing quota synchronization at a stale value such as 100%.
+- Added regression coverage proving normal run-loop modes refresh while active menu tracking skips only that individual timer tick.
+
 ## 3.1.2 - 2026-08-06
 
 ### Fixed
