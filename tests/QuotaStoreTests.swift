@@ -1,10 +1,15 @@
 import CryptoKit
 import Foundation
+import AppKit
 
 @main
 @MainActor
 enum QuotaStoreTests {
     static func main() throws {
+        expect(shouldRunQuotaRefresh(in: .default), "default run-loop mode refreshes")
+        expect(shouldRunQuotaRefresh(in: .common), "common run-loop mode refreshes")
+        expect(!shouldRunQuotaRefresh(in: .eventTracking), "menu tracking skips refresh without persistent state")
+
         let root = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("quota-store-tests-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
