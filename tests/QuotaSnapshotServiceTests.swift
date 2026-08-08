@@ -11,10 +11,19 @@ enum QuotaSnapshotServiceTests {
         expect(usage.balanceUsd == "1.50", "balance")
         expect(usage.resetCredits?.available_count == 2, "reset count")
 
+        let headers = quotaRequestHeaders(token: "secret", accountID: "account-123")
+        expect(headers["Authorization"] == "Bearer secret", "authorization header")
+        expect(headers["ChatGPT-Account-Id"] == "account-123", "account routing header")
+        expect(quotaRequestHeaders(token: "secret", accountID: nil)["ChatGPT-Account-Id"] == nil, "optional account routing header")
+
         let weeklyOnlyJSON = #"{"rate_limit":{"primary_window":{"used_percent":98,"reset_at":1784950166}}}"#.data(using: .utf8)!
         let weeklyOnly = try require(NativeQuotaParser.usage(from: weeklyOnlyJSON), "weekly-only payload")
         expect(weeklyOnly.fiveHour == nil, "single window is not treated as five-hour quota")
         expect(weeklyOnly.sevenDay?.used_percentage == 98, "single window maps to weekly quota")
+
+        let alternateJSON = #"{"rate_limits":{"primary":{"remaining_percent":73,"resets_at":1784950166}}}"#.data(using: .utf8)!
+        let alternate = try require(NativeQuotaParser.usage(from: alternateJSON), "alternate weekly payload")
+        expect(alternate.sevenDay?.used_percentage == 27, "remaining percentage converts to used percentage")
 
         let resetJSON = #"{"available_count":2,"grants":[{"expires_at":"2026-08-13T01:45:00Z"},{"expires_at":"2026-08-01T04:15:00Z"}]}"#.data(using: .utf8)!
         let resets = try require(NativeQuotaParser.detailedResetCredits(from: resetJSON), "reset payload")

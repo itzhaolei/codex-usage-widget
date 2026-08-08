@@ -3,7 +3,20 @@ import Foundation
 
 private struct NativeAuthContext: Equatable {
     let accessToken: String
+    let accountID: String?
     let fingerprint: String
+}
+
+func quotaRequestHeaders(token: String, accountID: String?) -> [String: String] {
+    var headers = [
+        "Authorization": "Bearer \(token)",
+        "OAI-Language": "en",
+        "originator": "Codex Desktop",
+    ]
+    if let accountID = accountID?.trimmingCharacters(in: .whitespacesAndNewlines), !accountID.isEmpty {
+        headers["ChatGPT-Account-Id"] = accountID
+    }
+    return headers
 }
 
 struct NativeUsagePayload: Equatable {
@@ -17,7 +30,7 @@ struct NativeUsagePayload: Equatable {
 enum NativeQuotaParser {
     static func usage(from data: Data) -> NativeUsagePayload? {
         guard let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
-        let rateLimit = object(root["rate_limit"])
+        let rateLimit = object(root["rate_limit"]) ?? object(root["rate_limits"])
         let credits = object(root["credits"])
         let resetValue = object(root["rate_limit_reset_credits"])
         let resetCount = integer(resetValue?["available_count"])
@@ -25,8 +38,8 @@ enum NativeQuotaParser {
             ResetCredits(available_count: max(0, $0), expires_at: resetExpirations(from: resetValue ?? [:], limit: max(0, $0)))
         }
 
-        let primaryWindow = usageWindow(object(rateLimit?["primary_window"]))
-        let secondaryWindow = usageWindow(object(rateLimit?["secondary_window"]))
+        let primaryWindow = usageWindow(object(rateLimit?["primary_window"]) ?? object(rateLimit?["primary"]))
+        let secondaryWindow = usageWindow(object(rateLimit?["secondary_window"]) ?? object(rateLimit?["secondary"]))
         let payload = NativeUsagePayload(
             planType: planType(in: root),
             balanceUsd: balance(credits?["balance"]),
@@ -69,8 +82,16 @@ enum NativeQuotaParser {
     }
 
     private static func usageWindow(_ value: [String: Any]?) -> UsageWindow? {
-        guard let used = number(value?["used_percent"]) else { return nil }
-        let reset = number(value?["reset_at"]) ?? number(value?["resets_at"])
+        let directUsed = number(value?["used_percent"])
+            ?? number(value?["used_percentage"])
+            ?? number(value?["usedPercent"])
+        let remaining = number(value?["remaining_percent"])
+            ?? number(value?["remaining_percentage"])
+            ?? number(value?["remainingPercent"])
+        guard let used = directUsed ?? remaining.map({ 100 - $0 }) else { return nil }
+        let reset = number(value?["reset_at"])
+            ?? number(value?["resets_at"])
+            ?? number(value?["resetAt"])
         return UsageWindow(
             used_percentage: min(100, max(0, Int(used.rounded()))),
             resets_at: reset
@@ -165,6 +186,8 @@ actor QuotaSnapshotService {
     private let authPath: String
     private let session: URLSession
     private var resetCache: ResetCache?
+    private var usageFailureStartedAt: Date?
+    private let staleQuotaGracePeriod: TimeInterval = 15
 
     init(codexHome: String) {
         snapshotPath = "\(codexHome)/codex-usage-snapshot.json"
@@ -179,16 +202,22 @@ actor QuotaSnapshotService {
     func refresh(existing: UsageSnapshot?) async -> UsageSnapshot? {
         guard let auth = readAuth() else { return nil }
         let sameAccount = existing?.account_fingerprint == auth.fingerprint
-        guard let usageData = await request("https://chatgpt.com/backend-api/wham/usage", token: auth.accessToken, timeout: 5),
+        guard let usageData = await request(
+            "https://chatgpt.com/backend-api/wham/usage",
+            token: auth.accessToken,
+            accountID: auth.accountID,
+            timeout: 5
+        ),
               let usage = NativeQuotaParser.usage(from: usageData) else {
-            return sameAccount ? existing : emptySnapshot(for: auth.fingerprint)
+            return snapshotAfterUsageFailure(existing: existing, fingerprint: auth.fingerprint, sameAccount: sameAccount)
         }
+        usageFailureStartedAt = nil
 
         var nextResetCredits = usage.resetCredits
         let needsDetails = nextResetCredits == nil
             || ((nextResetCredits?.available_count ?? 0) > 0 && (nextResetCredits?.expires_at?.isEmpty ?? true))
         if needsDetails {
-            nextResetCredits = await resetCredits(token: auth.accessToken, fingerprint: auth.fingerprint)
+            nextResetCredits = await resetCredits(token: auth.accessToken, accountID: auth.accountID, fingerprint: auth.fingerprint)
                 ?? (sameAccount ? existing?.reset_credits : nil)
         }
 
@@ -206,13 +235,18 @@ actor QuotaSnapshotService {
         return snapshot
     }
 
-    private func resetCredits(token: String, fingerprint: String) async -> ResetCredits? {
+    private func resetCredits(token: String, accountID: String?, fingerprint: String) async -> ResetCredits? {
         if let resetCache,
            resetCache.fingerprint == fingerprint,
            Date().timeIntervalSince(resetCache.fetchedAt) < 30 {
             return resetCache.value
         }
-        guard let data = await request("https://chatgpt.com/backend-api/wham/rate-limit-reset-credits", token: token, timeout: 3),
+        guard let data = await request(
+            "https://chatgpt.com/backend-api/wham/rate-limit-reset-credits",
+            token: token,
+            accountID: accountID,
+            timeout: 3
+        ),
               let value = NativeQuotaParser.detailedResetCredits(from: data) else {
             return resetCache?.fingerprint == fingerprint ? resetCache?.value : nil
         }
@@ -220,13 +254,13 @@ actor QuotaSnapshotService {
         return value
     }
 
-    private func request(_ rawURL: String, token: String, timeout: TimeInterval) async -> Data? {
+    private func request(_ rawURL: String, token: String, accountID: String?, timeout: TimeInterval) async -> Data? {
         guard let url = URL(string: rawURL) else { return nil }
         var request = URLRequest(url: url)
         request.timeoutInterval = timeout
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue("en", forHTTPHeaderField: "OAI-Language")
-        request.setValue("Codex Desktop", forHTTPHeaderField: "originator")
+        for (name, value) in quotaRequestHeaders(token: token, accountID: accountID) {
+            request.setValue(value, forHTTPHeaderField: name)
+        }
         do {
             let (data, response) = try await session.data(for: request)
             guard let response = response as? HTTPURLResponse, (200..<300).contains(response.statusCode) else { return nil }
@@ -246,7 +280,24 @@ actor QuotaSnapshotService {
         let kind = accountID == nil ? "token" : "account"
         let value = accountID ?? accessToken
         let digest = SHA256.hash(data: Data(value.utf8)).map { String(format: "%02x", $0) }.joined()
-        return NativeAuthContext(accessToken: accessToken, fingerprint: "\(kind):\(digest.prefix(16))")
+        return NativeAuthContext(accessToken: accessToken, accountID: accountID, fingerprint: "\(kind):\(digest.prefix(16))")
+    }
+
+    private func snapshotAfterUsageFailure(existing: UsageSnapshot?, fingerprint: String, sameAccount: Bool) -> UsageSnapshot {
+        let now = Date()
+        let failureStartedAt = usageFailureStartedAt ?? now
+        usageFailureStartedAt = failureStartedAt
+        if sameAccount, let existing, now.timeIntervalSince(failureStartedAt) < staleQuotaGracePeriod {
+            return existing
+        }
+
+        var snapshot = sameAccount ? (existing ?? emptySnapshot(for: fingerprint)) : emptySnapshot(for: fingerprint)
+        snapshot.updated_at = ISO8601DateFormatter().string(from: now)
+        snapshot.account_fingerprint = fingerprint
+        snapshot.five_hour = nil
+        snapshot.seven_day = nil
+        write(snapshot)
+        return snapshot
     }
 
     private func emptySnapshot(for fingerprint: String) -> UsageSnapshot {
