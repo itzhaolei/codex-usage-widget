@@ -13,6 +13,8 @@ final class QuotaStore: ObservableObject {
     @Published private(set) var rechargeAnimationEvent: QuotaRechargeAnimationEvent?
     @Published private(set) var availableStorageText = "—"
     @Published private(set) var availableMemoryText = "—"
+    @Published private(set) var availableStorageIsWarning: Bool?
+    @Published private(set) var availableMemoryIsWarning: Bool?
 
     static let lightModeKey = "CodexUsageWidget.isLightMode"
     static let pinnedKey = "CodexUsageWidget.isPinned"
@@ -92,8 +94,12 @@ final class QuotaStore: ObservableObject {
     func markUpdateInstalled() { hasUpdate = false }
 
     private func refreshSystemCapacity() {
-        availableStorageText = formattedAvailableStorage(systemStorageCapacity(), languageCode: languageCode)
-        availableMemoryText = formattedAvailableMemory(systemMemoryCapacity(), languageCode: languageCode)
+        let storage = systemStorageCapacity()
+        let memory = systemMemoryCapacity()
+        availableStorageText = formattedAvailableStorage(storage, languageCode: languageCode)
+        availableMemoryText = formattedAvailableMemory(memory, languageCode: languageCode)
+        availableStorageIsWarning = storage.map(isStorageCapacityWarning)
+        availableMemoryIsWarning = memory.map(isMemoryCapacityWarning)
     }
 
     private static func invalidateGeneratedSnapshotIfNeeded(codexHome: String) {
@@ -323,6 +329,14 @@ func formattedAvailableMemory(_ capacity: SystemCapacity?, languageCode: String)
     default: label = "Available memory"
     }
     return formattedCapacity(capacity, label: label, languageCode: languageCode, divisor: 1_073_741_824)
+}
+
+func isStorageCapacityWarning(_ capacity: SystemCapacity) -> Bool {
+    capacity.available < 50_000_000_000
+}
+
+func isMemoryCapacityWarning(_ capacity: SystemCapacity) -> Bool {
+    capacity.available > 11 * 1_073_741_824
 }
 
 private func formattedCapacity(_ capacity: SystemCapacity?, label: String, languageCode: String, divisor: Double) -> String {

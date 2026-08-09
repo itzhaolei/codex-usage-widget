@@ -4,6 +4,15 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.9 - 2026-08-09
+
+### Changed
+
+- Added live status colors to the available-storage and runtime-memory rows.
+- Available storage below 50 GB is shown in red; otherwise it uses the first green progress-palette color.
+- Available runtime memory above 11 GB is shown in red; otherwise it uses the same green progress-palette color.
+- Keeps unavailable system-capacity values gray so missing data is not presented as a healthy state.
+
 ## 3.1.8 - 2026-08-09
 
 ### Added

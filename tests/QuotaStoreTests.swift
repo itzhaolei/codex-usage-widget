@@ -26,6 +26,10 @@ enum QuotaStoreTests {
             formattedAvailableMemory(SystemCapacity(available: 4_080_218_931, total: 17_179_869_184), languageCode: "zh") == "可用运行内存：3.8G / 16.0G",
             "available memory formatting"
         )
+        expect(isStorageCapacityWarning(SystemCapacity(available: 49_999_999_999, total: 500_000_000_000)), "storage below 50G warns")
+        expect(!isStorageCapacityWarning(SystemCapacity(available: 50_000_000_000, total: 500_000_000_000)), "storage at 50G stays healthy")
+        expect(isMemoryCapacityWarning(SystemCapacity(available: 11 * 1_073_741_824 + 1, total: 17_179_869_184)), "memory above 11G warns")
+        expect(!isMemoryCapacityWarning(SystemCapacity(available: 11 * 1_073_741_824, total: 17_179_869_184)), "memory at 11G stays healthy")
 
         try writeAuth(accountID: "account-b", email: "b@example.test", root: root)
         store.tick()

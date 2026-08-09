@@ -486,9 +486,14 @@ private struct QuotaBubbleView: View {
         VStack(spacing: 1) {
             InfoRow(symbol: "person.circle.fill", value: store.accountText, color: secondary)
             InfoRow(symbol: "calendar.badge.clock", value: store.subscriptionText, color: secondary)
-            InfoRow(symbol: "internaldrive", value: store.availableStorageText, color: secondary)
-            InfoRow(symbol: "memorychip", value: store.availableMemoryText, color: secondary)
+            InfoRow(symbol: "internaldrive", value: store.availableStorageText, color: capacityColor(store.availableStorageIsWarning))
+            InfoRow(symbol: "memorychip", value: store.availableMemoryText, color: capacityColor(store.availableMemoryIsWarning))
         }
+    }
+
+    private func capacityColor(_ isWarning: Bool?) -> Color {
+        guard let isWarning else { return secondary }
+        return isWarning ? Color(red: 0.94, green: 0.20, blue: 0.22) : progressPalette[0]
     }
 
     private var colorPalette: some View {
