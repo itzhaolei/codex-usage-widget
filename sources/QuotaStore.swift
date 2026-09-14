@@ -43,6 +43,7 @@ final class QuotaStore: ObservableObject {
     }
 
     var copy: AppCopy { localizedCopy(languageCode) }
+    var fiveHourWindow: UsageWindow? { snapshot?.seven_day == nil ? nil : snapshot?.five_hour }
     var remainingPercentage: Int? { remainingPercent(fromUsedPercent: weeklyUsageWindow(from: snapshot)?.used_percentage) }
     var resetText: String { compactDuration(until: weeklyUsageWindow(from: snapshot)?.resets_at, copy: copy) }
     var resetDateText: String { formattedResetDate(weeklyUsageWindow(from: snapshot)?.resets_at) }
@@ -56,7 +57,7 @@ final class QuotaStore: ObservableObject {
         return "v\(version)"
     }
     var desiredHeight: CGFloat {
-        287 + (resetRows.isEmpty ? 0 : 18 + CGFloat(resetRows.count) * 18)
+        287 + (fiveHourWindow == nil ? 0 : 65) + (resetRows.isEmpty ? 0 : 18 + CGFloat(resetRows.count) * 18)
     }
 
     func start() {

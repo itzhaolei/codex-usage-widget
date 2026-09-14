@@ -260,6 +260,19 @@ func formattedResetDate(_ timestamp: TimeInterval?) -> String {
     return formatter.string(from: date)
 }
 
+func formattedResetWeekday(_ timestamp: TimeInterval?, languageCode: String) -> String {
+    guard let date = dateFromTimestamp(timestamp) else { return "—" }
+    if languageCode == "zh" {
+        let weekday = Calendar.current.component(.weekday, from: date)
+        let values = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"]
+        return values[max(0, min(values.count - 1, weekday - 1))]
+    }
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: languageCode)
+    formatter.dateFormat = "EEE"
+    return formatter.string(from: date)
+}
+
 private func dateFromTimestamp(_ timestamp: TimeInterval?) -> Date? {
     guard let timestamp, timestamp > 0 else { return nil }
     return Date(timeIntervalSince1970: timestamp > 1_000_000_000_000 ? timestamp / 1000 : timestamp)

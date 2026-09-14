@@ -276,6 +276,10 @@ private struct QuotaBubbleView: View {
 
             VStack(alignment: .leading, spacing: 0) {
                 header
+                if let window = store.fiveHourWindow {
+                    quotaBlock(title: "5h", window: window, rechargeEvent: nil)
+                        .padding(.top, 11)
+                }
                 quota
                     .padding(.top, 11)
 
@@ -410,15 +414,28 @@ private struct QuotaBubbleView: View {
 
     private var quota: some View {
         VStack(alignment: .leading, spacing: 4) {
+            quotaBlock(
+                title: store.copy.week,
+                window: weeklyUsageWindow(from: store.snapshot),
+                rechargeEvent: store.rechargeAnimationEvent,
+                showsWeekday: true
+            )
+            colorPalette
+        }
+    }
+
+    private func quotaBlock(title: String, window: UsageWindow?, rechargeEvent: QuotaRechargeAnimationEvent?, showsWeekday: Bool = false) -> some View {
+        let percentage = remainingPercent(fromUsedPercent: window?.used_percentage)
+        return VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 7) {
-                Text(store.copy.week)
+                Text(title)
                     .font(.system(size: 13, weight: .bold, design: .monospaced))
                     .foregroundStyle(primary)
                 Text("|")
                     .font(.system(size: 8, weight: .bold, design: .monospaced))
                     .foregroundStyle(secondary)
                     .baselineOffset(1)
-                Text("\(store.copy.reset) \(store.resetText)")
+                Text("\(store.copy.reset) \(compactDuration(until: window?.resets_at, copy: store.copy))")
                     .font(.system(size: 10, weight: .regular, design: .monospaced))
                     .foregroundStyle(secondary)
                     .lineLimit(1)
@@ -428,30 +445,41 @@ private struct QuotaBubbleView: View {
                     .font(.system(size: 8, weight: .regular, design: .monospaced))
                     .foregroundStyle(primary.opacity(0.52))
                     .baselineOffset(1)
-                Text(store.resetDateText)
+                Text(formattedResetDate(window?.resets_at))
                     .font(.system(size: 8, weight: .regular, design: .monospaced))
                     .foregroundStyle(primary.opacity(0.52))
                     .lineLimit(1)
                     .fixedSize(horizontal: true, vertical: false)
                     .layoutPriority(2)
+                if showsWeekday {
+                    Text("|")
+                        .font(.system(size: 8, weight: .regular, design: .monospaced))
+                        .foregroundStyle(primary.opacity(0.52))
+                        .baselineOffset(1)
+                    Text(formattedResetWeekday(window?.resets_at, languageCode: store.languageCode))
+                        .font(.system(size: 8, weight: .regular, design: .monospaced))
+                        .foregroundStyle(primary.opacity(0.52))
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .layoutPriority(2)
+                }
             }
             HStack(spacing: 12) {
                 QuotaProgressBar(
-                    percentage: store.remainingPercentage,
+                    percentage: percentage,
                     emphasizeSparkles: windowState.progressColorIndex == 0,
                     selectedColorIndex: windowState.progressColorIndex,
-                    rechargeEvent: store.rechargeAnimationEvent
+                    rechargeEvent: rechargeEvent
                 )
                     .frame(width: 231, height: 35)
                 AnimatedPercentageText(
-                    percentage: store.remainingPercentage,
-                    rechargeEvent: store.rechargeAnimationEvent
+                    percentage: percentage,
+                    rechargeEvent: rechargeEvent
                 )
                     .font(.system(size: 11, weight: .regular, design: .monospaced))
                     .foregroundStyle(primary)
                     .frame(width: 38, alignment: .leading)
             }
-            colorPalette
         }
     }
 
@@ -1736,6 +1764,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] in self?.updateStatusItem(percentage: $0) }
+            .store(in: &storeCancellables)
+        store.$snapshot
+            .map { $0?.seven_day != nil && $0?.five_hour != nil }
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.resizeAllWindows() }
             .store(in: &storeCancellables)
         store.$resetRows.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeAllWindows() }.store(in: &storeCancellables)
         store.$languageCode.dropFirst().receive(on: RunLoop.main).sink { [weak self] _ in self?.resizeAllWindows() }.store(in: &storeCancellables)

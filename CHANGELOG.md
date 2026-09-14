@@ -4,6 +4,17 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.10 - 2026-09-14
+
+### Added
+
+- Added a separate 5-hour quota block above the weekly quota when the account reports a 5-hour limit.
+- Added the reset weekday after the weekly quota reset timestamp.
+
+### Fixed
+
+- Clears stale cached 5-hour quota data when the native snapshot reports a weekly-only quota.
+
 ## 3.1.9 - 2026-08-09
 
 ### Changed

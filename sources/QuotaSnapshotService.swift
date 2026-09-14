@@ -236,7 +236,7 @@ actor QuotaSnapshotService {
             account_fingerprint: auth.fingerprint,
             plan_type: usage.planType ?? (sameAccount ? existing?.plan_type : nil),
             balance_usd: usage.balanceUsd ?? (sameAccount ? existing?.balance_usd : nil),
-            five_hour: fiveHourReconciler.merge(existing: existing?.five_hour, next: usage.fiveHour, sameAccount: sameAccount),
+            five_hour: usage.fiveHour == nil && usage.sevenDay != nil ? nil : fiveHourReconciler.merge(existing: existing?.five_hour, next: usage.fiveHour, sameAccount: sameAccount),
             seven_day: sevenDayReconciler.merge(existing: existing?.seven_day, next: usage.sevenDay, sameAccount: sameAccount),
             reset_credits: nextResetCredits ?? (sameAccount ? existing?.reset_credits : nil)
         )

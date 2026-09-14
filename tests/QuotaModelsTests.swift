@@ -34,6 +34,8 @@ enum QuotaModelsTests {
         expect(compactDuration(seconds: 6 * 86_400 + 23 * 3_600 + 57 * 60 + 38) == "6d 23h 57m 38s", "weekly duration includes days")
         expect(formattedResetDate(1_784_644_006).count == 14, "reset date includes month through seconds")
         expect(formattedResetDate(nil) == "—", "missing reset date placeholder")
+        expect(formattedResetWeekday(1_790_049_600, languageCode: "zh") == "周二", "Chinese reset weekday uses reset timestamp")
+        expect(formattedResetWeekday(nil, languageCode: "zh") == "—", "missing reset weekday placeholder")
 
         let json = #"{"account_fingerprint":"account:0123456789abcdef","plan_type":"plus","balance_usd":"0","five_hour":{"used_percentage":45,"resets_at":1784644006},"reset_credits":{"available_count":2,"expires_at":["2026-08-01T04:15:00Z","2026-08-13T01:45:00Z"]}}"#.data(using: .utf8)!
         let snapshot = try JSONDecoder().decode(UsageSnapshot.self, from: json)

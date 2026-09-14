@@ -41,6 +41,21 @@ enum QuotaStoreTests {
         expect(store.snapshot?.seven_day?.used_percentage == 63, "new-account weekly snapshot loads")
         expect(store.remainingPercentage == 37, "new-account remaining quota")
 
+        let weeklyHeight = store.desiredHeight
+        expect(store.fiveHourWindow == nil, "weekly-only account hides five-hour quota")
+        try writeSnapshot(accountID: "account-b", used: 63, fiveHourUsed: 0, root: root)
+        store.tick()
+        expect(store.fiveHourWindow?.used_percentage == 0, "unused five-hour quota is visible")
+        expect(store.remainingPercentage == 37, "five-hour quota does not change weekly quota")
+        expect(store.desiredHeight > weeklyHeight, "two quotas expand window")
+        try writeSnapshot(accountID: "account-b", used: 63, fiveHourUsed: 100, root: root)
+        store.tick()
+        expect(store.fiveHourWindow?.used_percentage == 100, "exhausted five-hour quota stays visible")
+        try writeSnapshot(accountID: "account-b", used: 63, root: root)
+        store.tick()
+        expect(store.fiveHourWindow == nil, "removed five-hour limit hides quota")
+        expect(store.desiredHeight == weeklyHeight, "weekly-only layout restores original height")
+
         print("Quota store tests passed.")
     }
 
@@ -55,14 +70,17 @@ enum QuotaStoreTests {
         try data.write(to: root.appendingPathComponent("auth.json"), options: .atomic)
     }
 
-    private static func writeSnapshot(accountID: String, used: Int, root: URL) throws {
+    private static func writeSnapshot(accountID: String, used: Int, fiveHourUsed: Int? = nil, root: URL) throws {
         let digest = SHA256.hash(data: Data(accountID.utf8)).map { String(format: "%02x", $0) }.joined()
-        let snapshot: [String: Any] = [
+        var snapshot: [String: Any] = [
             "account_fingerprint": "account:\(digest.prefix(16))",
             "plan_type": "plus",
             "seven_day": ["used_percentage": used, "resets_at": Date().addingTimeInterval(7 * 86_400).timeIntervalSince1970],
             "reset_credits": ["available_count": 0, "expires_at": []],
         ]
+        if let fiveHourUsed {
+            snapshot["five_hour"] = ["used_percentage": fiveHourUsed, "resets_at": Date().addingTimeInterval(5 * 3_600).timeIntervalSince1970]
+        }
         let data = try JSONSerialization.data(withJSONObject: snapshot)
         try data.write(to: root.appendingPathComponent("codex-usage-snapshot.json"), options: .atomic)
     }
