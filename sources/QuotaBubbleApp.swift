@@ -1758,9 +1758,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         self.store = store
         storeCancellables.removeAll()
         configureStatusItem()
-        updateStatusItem(percentage: store.remainingPercentage)
+        updateStatusItem(percentage: store.statusPercentage)
         store.$snapshot
-            .map { remainingPercent(fromUsedPercent: weeklyUsageWindow(from: $0)?.used_percentage) }
+            .map { snapshot in
+                let fiveHour = snapshot?.seven_day == nil ? nil : snapshot?.five_hour
+                return remainingPercent(fromUsedPercent: (fiveHour ?? weeklyUsageWindow(from: snapshot))?.used_percentage)
+            }
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] in self?.updateStatusItem(percentage: $0) }

@@ -40,6 +40,7 @@ enum QuotaStoreTests {
         store.tick()
         expect(store.snapshot?.seven_day?.used_percentage == 63, "new-account weekly snapshot loads")
         expect(store.remainingPercentage == 37, "new-account remaining quota")
+        expect(store.statusPercentage == 37, "weekly-only status item uses weekly quota")
 
         let weeklyHeight = store.desiredHeight
         expect(store.fiveHourWindow == nil, "weekly-only account hides five-hour quota")
@@ -47,13 +48,16 @@ enum QuotaStoreTests {
         store.tick()
         expect(store.fiveHourWindow?.used_percentage == 0, "unused five-hour quota is visible")
         expect(store.remainingPercentage == 37, "five-hour quota does not change weekly quota")
+        expect(store.statusPercentage == 100, "five-hour status item uses five-hour quota")
         expect(store.desiredHeight > weeklyHeight, "two quotas expand window")
         try writeSnapshot(accountID: "account-b", used: 63, fiveHourUsed: 100, root: root)
         store.tick()
         expect(store.fiveHourWindow?.used_percentage == 100, "exhausted five-hour quota stays visible")
+        expect(store.statusPercentage == 0, "exhausted five-hour status item stays visible")
         try writeSnapshot(accountID: "account-b", used: 63, root: root)
         store.tick()
         expect(store.fiveHourWindow == nil, "removed five-hour limit hides quota")
+        expect(store.statusPercentage == 37, "status item returns to weekly quota")
         expect(store.desiredHeight == weeklyHeight, "weekly-only layout restores original height")
 
         print("Quota store tests passed.")

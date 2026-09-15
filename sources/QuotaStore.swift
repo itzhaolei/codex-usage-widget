@@ -45,6 +45,7 @@ final class QuotaStore: ObservableObject {
     var copy: AppCopy { localizedCopy(languageCode) }
     var fiveHourWindow: UsageWindow? { snapshot?.seven_day == nil ? nil : snapshot?.five_hour }
     var remainingPercentage: Int? { remainingPercent(fromUsedPercent: weeklyUsageWindow(from: snapshot)?.used_percentage) }
+    var statusPercentage: Int? { remainingPercent(fromUsedPercent: (fiveHourWindow ?? weeklyUsageWindow(from: snapshot))?.used_percentage) }
     var resetText: String { compactDuration(until: weeklyUsageWindow(from: snapshot)?.resets_at, copy: copy) }
     var resetDateText: String { formattedResetDate(weeklyUsageWindow(from: snapshot)?.resets_at) }
     var planText: String { planBadgeText(snapshot?.plan_type) }

@@ -4,6 +4,13 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.11 - 2026-09-15
+
+### Fixed
+
+- Shows the 5-hour quota percentage in the macOS menu bar when a 5-hour quota window is present.
+- Falls back to the weekly quota percentage in the menu bar for weekly-only accounts.
+
 ## 3.1.10 - 2026-09-14
 
 ### Added
