@@ -15,6 +15,9 @@ AppSupportURL=https://github.com/itzhaolei/codex-usage-widget/issues
 AppUpdatesURL=https://github.com/itzhaolei/codex-usage-widget/releases/latest
 DefaultDirName={localappdata}\Programs\Quota Bubble
 DefaultGroupName=Quota Bubble
+UsePreviousAppDir=yes
+UsePreviousGroup=yes
+UsePreviousTasks=yes
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
@@ -38,6 +41,12 @@ Name: "startup"; Description: "Start Quota Bubble when I sign in"; GroupDescript
 
 [Files]
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[InstallDelete]
+Type: files; Name: "{userprofile}\.codex\usage-widget\QuotaBubble.ps1"
+Type: files; Name: "{userprofile}\.codex\usage-widget\VERSION"
+Type: files; Name: "{userprofile}\.codex\usage-widget\windows-state.json"
+Type: files; Name: "{userprofile}\.codex\scripts\codex-usage-snapshot.mjs"
 
 [Icons]
 Name: "{group}\Quota Bubble"; Filename: "{app}\QuotaBubble.exe"

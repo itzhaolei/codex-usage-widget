@@ -4,6 +4,14 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+### Changed
+
+- Windows upgrades now explicitly reuse the existing installation directory and preserve the current startup preference.
+
+### Fixed
+
+- Windows installation now removes legacy PowerShell widget files so an old script-based copy cannot remain beside the native application.
+
 ## 3.1.19 - 2026-09-19
 
 ### Added

@@ -67,6 +67,9 @@ assert.doesNotMatch(window, /MessageBox\.Show\(this, copy\.Updating/, "download 
 assert.match(window, /UpdateService\.OpenReleasesPage/, "interactive update failures open the manual download page");
 assert.doesNotMatch(window, /Windows installer asset not found/, "Windows update action does not show missing asset errors for macOS-only releases");
 assert.match(installer, /PrivilegesRequired=lowest/, "installer supports non-admin per-user installation");
+assert.match(installer, /UsePreviousAppDir=yes/, "upgrades explicitly reuse the existing installation directory");
+assert.match(installer, /UsePreviousTasks=yes/, "upgrades preserve the existing startup choice");
+assert.match(installer, /\[InstallDelete\][\s\S]*QuotaBubble\.ps1[\s\S]*windows-state\.json[\s\S]*codex-usage-snapshot\.mjs/, "native upgrades remove legacy PowerShell installation files");
 assert.match(installer, /Name: "\{autodesktop\}\\Quota Bubble"; Filename: "\{app\}\\QuotaBubble\.exe"\s*$/m, "installer always creates a desktop shortcut");
 assert.doesNotMatch(installer, /Name: "desktopicon"/, "desktop shortcut is not optional");
 assert.match(installer, /\[UninstallRun\]/, "installer provides graphical uninstall support");
@@ -75,6 +78,7 @@ assert.match(workflow, /Windows\.zip/, "release retains an automatic migration p
 assert.match(workflow, /dotnet publish/, "Windows CI compiles the application");
 assert.match(workflow, /Smoke launch installed application/, "Windows CI launches the installed app");
 assert.match(workflow, /Desktop shortcut was not created/, "Windows CI verifies the desktop shortcut");
+assert.match(workflow, /Legacy Windows file was not removed/, "Windows CI verifies legacy installation cleanup");
 for (const code of ["en", "zh", "ja", "ko", "de", "fr", "es", "pt", "it", "nl"]) {
   assert.match(read("windows/QuotaBubble/Localization.cs"), new RegExp(`\\["${code}"\\]`), `${code} localization exists`);
 }

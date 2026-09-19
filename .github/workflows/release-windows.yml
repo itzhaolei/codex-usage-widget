@@ -105,10 +105,21 @@ jobs:
         run: |
           $installer = (Resolve-Path "dist/QuotaBubble-$env:VERSION-Windows-Setup.exe").Path
           $installDir = Join-Path $env:RUNNER_TEMP "Quota Bubble Installed"
+          $legacyWidgetDir = Join-Path $env:USERPROFILE ".codex\usage-widget"
+          $legacyScriptsDir = Join-Path $env:USERPROFILE ".codex\scripts"
+          New-Item -ItemType Directory -Path $legacyWidgetDir, $legacyScriptsDir -Force | Out-Null
+          $legacyFiles = @(
+            (Join-Path $legacyWidgetDir "QuotaBubble.ps1"),
+            (Join-Path $legacyWidgetDir "VERSION"),
+            (Join-Path $legacyWidgetDir "windows-state.json"),
+            (Join-Path $legacyScriptsDir "codex-usage-snapshot.mjs")
+          )
+          $legacyFiles | ForEach-Object { Set-Content -Path $_ -Value "legacy" }
           $arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=`"$installDir`" /MERGETASKS=`"!startup`""
           $process = Start-Process $installer -ArgumentList $arguments -Wait -PassThru
           if ($process.ExitCode -ne 0) { throw "Installer exited with $($process.ExitCode)" }
           if (-not (Test-Path (Join-Path $installDir "QuotaBubble.exe"))) { throw "Installed application is missing" }
+          $legacyFiles | ForEach-Object { if (Test-Path $_) { throw "Legacy Windows file was not removed: $_" } }
           $desktopShortcut = Join-Path ([Environment]::GetFolderPath("Desktop")) "Quota Bubble.lnk"
           if (-not (Test-Path $desktopShortcut)) { throw "Desktop shortcut was not created" }
           "INSTALL_DIR=$installDir" | Out-File -FilePath $env:GITHUB_ENV -Append
