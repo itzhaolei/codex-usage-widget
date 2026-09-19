@@ -37,6 +37,9 @@ assert.match(windowXaml, /AccountIcon[\s\S]*SubscriptionIcon[\s\S]*StorageIcon[\
 assert.doesNotMatch(windowXaml, /Content="[●▣☀☾×]"/, "controls and information rows do not depend on font glyph icons");
 assert.match(windowXaml, /MetricCards[\s\S]*Height="47"/, "single-line metric cards match the compact macOS height");
 assert.match(windowXaml, /Background="#00C229"/, "Windows exposes the macOS progress color palette");
+for (const color of windowXaml.match(/#[0-9A-Fa-f]+/g) ?? []) {
+  assert.ok(color.length === 7 || color.length === 9, `XAML color ${color} uses RGB or ARGB syntax`);
+}
 assert.ok(capacity.includes('new DriveInfo(@"C:\\")'), "system capacity reads the C drive");
 assert.match(capacity, /GlobalMemoryStatusEx/, "system capacity reads Windows physical memory through the native API");
 assert.match(window, /RenderSystemCapacity\(\)/, "system capacity values refresh with the window");

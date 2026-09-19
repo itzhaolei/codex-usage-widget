@@ -126,13 +126,13 @@
 
         <Grid x:Name="MetricCards" Width="272" Height="47" HorizontalAlignment="Left" Margin="0,15,0,0">
           <Grid.ColumnDefinitions><ColumnDefinition Width="131"/><ColumnDefinition Width="10"/><ColumnDefinition Width="131"/></Grid.ColumnDefinitions>
-          <Border x:Name="BalanceCard" Grid.Column="0" Height="47" CornerRadius="9" Background="#127FFFFFFF" BorderBrush="#30FFFFFF" BorderThickness="1" Padding="4,7,4,5">
+          <Border x:Name="BalanceCard" Grid.Column="0" Height="47" CornerRadius="9" Background="#12FFFFFF" BorderBrush="#30FFFFFF" BorderThickness="1" Padding="4,7,4,5">
             <StackPanel>
               <TextBlock x:Name="BalanceTitle" Height="11" Foreground="#B8C2C7" FontSize="9" FontFamily="Consolas" FontWeight="Medium" TextAlignment="Center" TextWrapping="Wrap"/>
               <TextBlock x:Name="BalanceValue" Foreground="White" FontSize="13" FontFamily="Consolas" FontWeight="SemiBold" TextAlignment="Center" Margin="0,3,0,0"/>
             </StackPanel>
           </Border>
-          <Border x:Name="ResetCard" Grid.Column="2" Height="47" CornerRadius="9" Background="#127FFFFFFF" BorderBrush="#30FFFFFF" BorderThickness="1" Padding="4,7,4,5">
+          <Border x:Name="ResetCard" Grid.Column="2" Height="47" CornerRadius="9" Background="#12FFFFFF" BorderBrush="#30FFFFFF" BorderThickness="1" Padding="4,7,4,5">
             <StackPanel>
               <TextBlock x:Name="ResetTitle" Height="11" Foreground="#B8C2C7" FontSize="9" FontFamily="Consolas" FontWeight="Medium" TextAlignment="Center" TextWrapping="Wrap"/>
               <TextBlock x:Name="ResetValue" Foreground="White" FontSize="13" FontFamily="Consolas" FontWeight="SemiBold" TextAlignment="Center" Margin="0,3,0,0"/>
