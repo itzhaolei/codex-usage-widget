@@ -4,6 +4,10 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+### Changed
+
+- Replaced the application icon across macOS, Windows, the installer, plugin metadata, README, website, favicon, and social artwork with the new quota gauge bubble design.
+
 ## 3.1.21 - 2026-09-19
 
 ### Fixed

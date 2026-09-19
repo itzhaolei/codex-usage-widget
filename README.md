@@ -3,12 +3,12 @@
 <table>
   <tr>
     <td width="72">
-      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1"><img src="assets/app-icon.png?raw=1" width="56" alt="Quota Bubble app icon"></a>
+      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-2"><img src="assets/app-icon.png?raw=1" width="56" alt="Quota Bubble app icon"></a>
     </td>
     <td>
       <strong>Official Website</strong><br>
       Detect your operating system and download the latest graphical installer directly.<br>
-      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1"><strong>Open official website →</strong></a>
+      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-2"><strong>Open official website →</strong></a>
     </td>
   </tr>
 </table>
