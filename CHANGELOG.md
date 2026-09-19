@@ -4,6 +4,8 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.21 - 2026-09-19
+
 ### Fixed
 
 - Windows now automatically starts the newly installed application after an in-app update completes.
