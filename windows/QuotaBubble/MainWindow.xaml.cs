@@ -128,11 +128,12 @@ public partial class MainWindow : Window
     private void Render(QuotaSnapshot? snapshot, AuthIdentity? identity)
     {
         _lastRenderedCredits = snapshot?.ResetCredits;
-        var window = snapshot?.FiveHour;
-        var remaining = window is null ? (int?)null : Math.Clamp(100 - window.UsedPercentage, 0, 100);
-        ResetText.Text = $"{Localization.Get(_settings.Language).Reset} {FormatDuration(window?.ResetsAt)}";
-        PercentText.Text = remaining is null ? "—" : $"{remaining}%";
-        SetProgress(remaining);
+        var fiveHour = snapshot?.SevenDay is null ? null : snapshot?.FiveHour;
+        var weekly = snapshot?.SevenDay ?? snapshot?.FiveHour;
+        FiveHourQuotaPanel.Visibility = fiveHour is null ? Visibility.Collapsed : Visibility.Visible;
+        RenderQuota(fiveHour, FiveHourResetText, FiveHourResetDateText, null, FiveHourPercentText, FiveHourProgressFill, FiveHourProgressPattern);
+        RenderQuota(weekly, ResetText, ResetDateText, ResetWeekdayText, PercentText, ProgressFill, ProgressPattern);
+        UpdateTrayStatus(Remaining(fiveHour ?? weekly));
         SetPlan(snapshot?.PlanType);
 
         BalanceValue.Text = FormatBalance(snapshot?.BalanceUsd);
@@ -142,13 +143,36 @@ public partial class MainWindow : Window
         RenderResets(snapshot?.ResetCredits);
     }
 
-    private void SetProgress(int? remaining)
+    private void RenderQuota(
+        UsageWindow? window,
+        System.Windows.Controls.TextBlock resetText,
+        System.Windows.Controls.TextBlock resetDateText,
+        System.Windows.Controls.TextBlock? resetWeekdayText,
+        System.Windows.Controls.TextBlock percentText,
+        System.Windows.Shapes.Rectangle progressFill,
+        System.Windows.Shapes.Rectangle progressPattern)
     {
-        ProgressFill.Width = remaining is null ? 0 : 231 * remaining.Value / 100d;
+        var remaining = Remaining(window);
+        resetText.Text = $"{Localization.Get(_settings.Language).Reset} {FormatDuration(window?.ResetsAt)}";
+        resetDateText.Text = FormatResetDate(window?.ResetsAt);
+        if (resetWeekdayText is not null) resetWeekdayText.Text = FormatResetWeekday(window?.ResetsAt);
+        percentText.Text = remaining is null ? "—" : $"{remaining}%";
+        SetProgress(remaining, progressFill, progressPattern);
+    }
+
+    private void SetProgress(int? remaining, System.Windows.Shapes.Rectangle progressFill, System.Windows.Shapes.Rectangle progressPattern)
+    {
+        progressFill.Width = remaining is null ? 0 : 231 * remaining.Value / 100d;
         var color = new SolidColorBrush(remaining is <= 20 ? Color.FromRgb(255, 51, 51) : Color.FromRgb(0, 240, 32));
         color.Freeze();
-        ProgressFill.Fill = color;
-        if (ProgressPattern.Fill is VisualBrush brush && brush.Visual is System.Windows.Shapes.Ellipse dot) dot.Fill = color;
+        progressFill.Fill = color;
+        if (progressPattern.Fill is VisualBrush brush && brush.Visual is System.Windows.Shapes.Ellipse dot) dot.Fill = color;
+    }
+
+    private void UpdateTrayStatus(int? remaining)
+    {
+        if (_tray is null) return;
+        _tray.Text = remaining is null ? "Quota Bubble" : $"Quota Bubble {remaining}%";
     }
 
     private void SetPlan(string? raw)
@@ -200,8 +224,9 @@ public partial class MainWindow : Window
         var primary = new SolidColorBrush(_settings.Light ? Color.FromRgb(17, 24, 39) : Colors.White);
         var secondary = SecondaryBrush();
         Root.Background = new SolidColorBrush(_settings.Light ? Color.FromArgb(235, 243, 247, 248) : Color.FromArgb(235, 17, 29, 24));
-        foreach (var text in new[] { TitleText, WeekText, PercentText, BalanceValue, ResetValue }) text.Foreground = primary;
-        foreach (var text in new[] { ResetText, AccountText, SubscriptionText, VersionText, BalanceTitle, ResetTitle }) text.Foreground = secondary;
+        foreach (var text in new[] { TitleText, WeekText, FiveHourPercentText, PercentText, BalanceValue, ResetValue }) text.Foreground = primary;
+        foreach (var text in new[] { FiveHourResetText, ResetText, AccountText, SubscriptionText, VersionText, BalanceTitle, ResetTitle }) text.Foreground = secondary;
+        foreach (var text in new[] { FiveHourResetDateText, ResetDateText, ResetWeekdayText }) text.Foreground = new SolidColorBrush(_settings.Light ? Color.FromArgb(132, 17, 24, 39) : Color.FromArgb(132, 255, 255, 255));
         var card = new SolidColorBrush(_settings.Light ? Color.FromArgb(150, 255, 255, 255) : Color.FromArgb(74, 115, 123, 126));
         BalanceCard.Background = card;
         ResetCard.Background = card;
@@ -228,17 +253,20 @@ public partial class MainWindow : Window
         {
             _lastVersionCheck = DateTimeOffset.UtcNow;
             var release = await _updateService.LatestAsync();
-            if (release is null || !Version.TryParse(App.Version, out var current)) return;
+            var copy = Localization.Get(_settings.Language);
+            if (release is null || !Version.TryParse(App.Version, out var current))
+            {
+                if (interactive) MessageBox.Show(this, copy.Latest, "Quota Bubble", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
             var hasUpdate = release.Version > current;
             UpdateDot.Visibility = hasUpdate ? Visibility.Visible : Visibility.Collapsed;
             if (!interactive) return;
-            var copy = Localization.Get(_settings.Language);
             if (!hasUpdate)
             {
                 MessageBox.Show(this, copy.Latest, "Quota Bubble", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
-            if (string.IsNullOrWhiteSpace(release.InstallerUrl)) throw new InvalidOperationException("Windows installer asset not found.");
             MessageBox.Show(this, copy.Updating, "Quota Bubble", MessageBoxButton.OK, MessageBoxImage.Information);
             await _updateService.DownloadAndInstallAsync(release);
             _closing = true;
@@ -277,6 +305,28 @@ public partial class MainWindow : Window
         if (minutes > 0) parts.Add($"{minutes}m");
         if (seconds > 0 || parts.Count == 0) parts.Add($"{seconds}s");
         return string.Join(' ', parts);
+    }
+
+    private static int? Remaining(UsageWindow? window) => window is null ? null : Math.Clamp(100 - window.UsedPercentage, 0, 100);
+
+    private static string FormatResetDate(long? epoch)
+    {
+        if (epoch is null) return "—";
+        return DateTimeOffset.FromUnixTimeSeconds(epoch.Value > 1_000_000_000_000 ? epoch.Value / 1000 : epoch.Value)
+            .ToLocalTime()
+            .ToString("MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+    }
+
+    private string FormatResetWeekday(long? epoch)
+    {
+        if (epoch is null) return "—";
+        var date = DateTimeOffset.FromUnixTimeSeconds(epoch.Value > 1_000_000_000_000 ? epoch.Value / 1000 : epoch.Value).ToLocalTime();
+        if (Localization.ResolveLanguage(_settings.Language) == "zh")
+        {
+            var values = new[] { "周日", "周一", "周二", "周三", "周四", "周五", "周六" };
+            return values[(int)date.DayOfWeek];
+        }
+        return date.ToString("ddd", CultureInfo.CurrentUICulture);
     }
 
     private static string FormatDate(DateTimeOffset? date) => date?.ToLocalTime().ToString("g", CultureInfo.CurrentCulture) ?? "—";

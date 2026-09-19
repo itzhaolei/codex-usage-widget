@@ -54,6 +54,8 @@ public sealed class QuotaService : IDisposable
             var rateLimit = Property(root, "rate_limit");
             var primary = Window(Property(rateLimit, "primary_window"));
             var secondary = Window(Property(rateLimit, "secondary_window"));
+            var fiveHour = secondary is null ? null : primary;
+            var sevenDay = secondary ?? primary;
             var reset = ResetCredits(Property(root, "rate_limit_reset_credits"));
             if (reset is null || (reset.AvailableCount > 0 && reset.ExpiresAt.Count == 0))
                 reset = await RefreshResetCreditsAsync(identity, cancellationToken) ?? reset;
@@ -62,8 +64,8 @@ public sealed class QuotaService : IDisposable
                 identity.Fingerprint,
                 Plan(root),
                 Balance(root),
-                Stabilize(_last?.FiveHour, primary),
-                Stabilize(_last?.SevenDay, secondary),
+                fiveHour is null && sevenDay is not null ? null : Stabilize(_last?.FiveHour, fiveHour),
+                Stabilize(_last?.SevenDay, sevenDay),
                 reset ?? _last?.ResetCredits,
                 DateTimeOffset.UtcNow,
                 false);

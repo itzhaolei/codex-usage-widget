@@ -4,6 +4,20 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.12 - 2026-09-19
+
+### Added
+
+- Brought the Windows quota window in line with macOS by showing a separate 5-hour quota block above the weekly quota when a 5-hour window is present.
+- Shows the weekly reset date and weekday in the Windows quota window.
+
+### Fixed
+
+- Windows now treats a single quota window as weekly quota instead of a 5-hour quota.
+- Windows clears stale 5-hour quota data when a weekly-only response is received.
+- Windows tray status now prioritizes the 5-hour quota percentage when present.
+- Windows update checks now skip macOS-only releases and use the newest release that includes a Windows setup asset.
+
 ## 3.1.11 - 2026-09-15
 
 ### Fixed

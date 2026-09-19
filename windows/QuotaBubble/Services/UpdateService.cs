@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace QuotaBubble.Services;
 
-public sealed record ReleaseInfo(Version Version, string Tag, string? InstallerUrl);
+public sealed record ReleaseInfo(Version Version, string Tag, string InstallerUrl);
 
 public sealed class UpdateService : IDisposable
 {
@@ -17,30 +17,21 @@ public sealed class UpdateService : IDisposable
     public async Task<ReleaseInfo?> LatestAsync(CancellationToken cancellationToken = default)
     {
         using var response = await _client.GetAsync(
-            "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases/latest", cancellationToken);
+            "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases?per_page=30", cancellationToken);
         response.EnsureSuccessStatusCode();
         using var document = JsonDocument.Parse(await response.Content.ReadAsStreamAsync(cancellationToken));
-        var root = document.RootElement;
-        var tag = root.GetProperty("tag_name").GetString() ?? "";
-        if (!Version.TryParse(tag.TrimStart('v'), out var version)) return null;
-        string? installer = null;
-        if (root.TryGetProperty("assets", out var assets))
+        foreach (var release in document.RootElement.EnumerateArray())
         {
-            foreach (var asset in assets.EnumerateArray())
-            {
-                var name = asset.GetProperty("name").GetString() ?? "";
-                if (!name.Contains("Windows", StringComparison.OrdinalIgnoreCase) ||
-                    !name.EndsWith("Setup.exe", StringComparison.OrdinalIgnoreCase)) continue;
-                installer = asset.GetProperty("browser_download_url").GetString();
-                break;
-            }
+            var tag = release.GetProperty("tag_name").GetString() ?? "";
+            if (!Version.TryParse(tag.TrimStart('v'), out var version)) continue;
+            var installer = WindowsInstallerUrl(release);
+            if (!string.IsNullOrWhiteSpace(installer)) return new ReleaseInfo(version, tag, installer);
         }
-        return new ReleaseInfo(version, tag, installer);
+        return null;
     }
 
     public async Task DownloadAndInstallAsync(ReleaseInfo release, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(release.InstallerUrl)) throw new InvalidOperationException("Windows installer asset not found.");
         var directory = Path.Combine(Path.GetTempPath(), "QuotaBubble", release.Tag);
         Directory.CreateDirectory(directory);
         var path = Path.Combine(directory, $"QuotaBubble-{release.Version}-Windows-Setup.exe");
@@ -52,6 +43,19 @@ public sealed class UpdateService : IDisposable
             await input.CopyToAsync(output, cancellationToken);
         }
         Process.Start(new ProcessStartInfo(path, "/SILENT /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS") { UseShellExecute = true });
+    }
+
+    private static string? WindowsInstallerUrl(JsonElement release)
+    {
+        if (!release.TryGetProperty("assets", out var assets)) return null;
+        foreach (var asset in assets.EnumerateArray())
+        {
+            var name = asset.GetProperty("name").GetString() ?? "";
+            if (!name.Contains("Windows", StringComparison.OrdinalIgnoreCase) ||
+                !name.EndsWith("Setup.exe", StringComparison.OrdinalIgnoreCase)) continue;
+            return asset.GetProperty("browser_download_url").GetString();
+        }
+        return null;
     }
 
     public void Dispose() => _client.Dispose();

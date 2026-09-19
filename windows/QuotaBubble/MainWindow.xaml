@@ -11,15 +11,18 @@
       <Setter Property="Foreground" Value="#DDE6EA"/><Setter Property="FontSize" Value="13"/>
       <Setter Property="Cursor" Value="Hand"/><Setter Property="Focusable" Value="False"/>
     </Style>
-    <VisualBrush x:Key="DotBrush" TileMode="Tile" Viewport="0,0,3,3" ViewportUnits="Absolute">
+    <VisualBrush x:Key="FiveHourDotBrush" TileMode="Tile" Viewport="0,0,3,3" ViewportUnits="Absolute">
+      <VisualBrush.Visual><Ellipse Width="1.1" Height="1.1" Fill="#00F020"/></VisualBrush.Visual>
+    </VisualBrush>
+    <VisualBrush x:Key="WeeklyDotBrush" TileMode="Tile" Viewport="0,0,3,3" ViewportUnits="Absolute">
       <VisualBrush.Visual><Ellipse Width="1.1" Height="1.1" Fill="#00F020"/></VisualBrush.Visual>
     </VisualBrush>
   </Window.Resources>
   <Border x:Name="Root" CornerRadius="12" Background="#EB111D18" BorderBrush="#596A6F70" BorderThickness="1" Padding="12">
     <Grid>
       <Grid.RowDefinitions>
-        <RowDefinition Height="32"/><RowDefinition Height="66"/><RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/><RowDefinition Height="38"/><RowDefinition Height="16"/>
+        <RowDefinition Height="32"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="38"/><RowDefinition Height="16"/>
       </Grid.RowDefinitions>
 
       <Grid Grid.Row="0">
@@ -42,14 +45,39 @@
         </Border>
       </Grid>
 
-      <Grid Grid.Row="1" Margin="0,8,0,0">
+      <Grid x:Name="FiveHourQuotaPanel" Grid.Row="1" Margin="0,8,0,0" Height="66" Visibility="Collapsed">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="5h" FontSize="13" FontWeight="Bold" Foreground="White"/>
+          <TextBlock Text=" | " FontSize="10" Foreground="#AEB9BF"/>
+          <TextBlock x:Name="FiveHourResetText" FontSize="10" Foreground="#AEB9BF" TextTrimming="CharacterEllipsis" MaxWidth="92"/>
+          <TextBlock Text=" | " FontSize="8" Foreground="#84FFFFFF"/>
+          <TextBlock x:Name="FiveHourResetDateText" FontSize="8" Foreground="#84FFFFFF" FontFamily="Consolas"/>
+        </StackPanel>
+        <Grid Margin="0,23,0,0" Width="231" Height="35" HorizontalAlignment="Left" ClipToBounds="True">
+          <Rectangle x:Name="FiveHourProgressPattern" Fill="{StaticResource FiveHourDotBrush}" Opacity="0.78"/>
+          <Rectangle x:Name="FiveHourProgressFill" Width="0" HorizontalAlignment="Left" Fill="#00F020"/>
+          <Canvas IsHitTestVisible="False">
+            <Border Canvas.Left="46" Width="1" Height="35" Background="#71006510"/>
+            <Border Canvas.Left="92" Width="1" Height="35" Background="#71006510"/>
+            <Border Canvas.Left="138" Width="1" Height="35" Background="#71006510"/>
+            <Border Canvas.Left="184" Width="1" Height="35" Background="#71006510"/>
+          </Canvas>
+        </Grid>
+        <TextBlock x:Name="FiveHourPercentText" Margin="243,31,0,0" FontSize="11" FontFamily="Consolas" Foreground="White"/>
+      </Grid>
+
+      <Grid Grid.Row="2" Margin="0,8,0,0" Height="66">
         <StackPanel Orientation="Horizontal">
           <TextBlock x:Name="WeekText" FontSize="13" FontWeight="Bold" Foreground="White"/>
           <TextBlock Text=" | " FontSize="10" Foreground="#AEB9BF"/>
-          <TextBlock x:Name="ResetText" FontSize="10" Foreground="#AEB9BF" TextTrimming="CharacterEllipsis" MaxWidth="238"/>
+          <TextBlock x:Name="ResetText" FontSize="10" Foreground="#AEB9BF" TextTrimming="CharacterEllipsis" MaxWidth="92"/>
+          <TextBlock Text=" | " FontSize="8" Foreground="#84FFFFFF"/>
+          <TextBlock x:Name="ResetDateText" FontSize="8" Foreground="#84FFFFFF" FontFamily="Consolas"/>
+          <TextBlock Text=" | " FontSize="8" Foreground="#84FFFFFF"/>
+          <TextBlock x:Name="ResetWeekdayText" FontSize="8" Foreground="#84FFFFFF" FontFamily="Consolas"/>
         </StackPanel>
         <Grid Margin="0,23,0,0" Width="231" Height="35" HorizontalAlignment="Left" ClipToBounds="True">
-          <Rectangle x:Name="ProgressPattern" Fill="{StaticResource DotBrush}" Opacity="0.78"/>
+          <Rectangle x:Name="ProgressPattern" Fill="{StaticResource WeeklyDotBrush}" Opacity="0.78"/>
           <Rectangle x:Name="ProgressFill" Width="0" HorizontalAlignment="Left" Fill="#00F020"/>
           <Canvas IsHitTestVisible="False">
             <Border Canvas.Left="46" Width="1" Height="35" Background="#71006510"/>
@@ -61,7 +89,7 @@
         <TextBlock x:Name="PercentText" Margin="243,31,0,0" FontSize="11" FontFamily="Consolas" Foreground="White"/>
       </Grid>
 
-      <ItemsControl x:Name="ResetItems" Grid.Row="2" Margin="0,8,0,8">
+      <ItemsControl x:Name="ResetItems" Grid.Row="3" Margin="0,8,0,8">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
             <StackPanel Orientation="Horizontal" Height="18">
@@ -72,7 +100,7 @@
         </ItemsControl.ItemTemplate>
       </ItemsControl>
 
-      <Grid Grid.Row="3" Width="272" HorizontalAlignment="Left">
+      <Grid Grid.Row="4" Width="272" HorizontalAlignment="Left">
         <Grid.ColumnDefinitions><ColumnDefinition Width="131"/><ColumnDefinition Width="10"/><ColumnDefinition Width="131"/></Grid.ColumnDefinitions>
         <Border x:Name="BalanceCard" Grid.Column="0" MinHeight="59" CornerRadius="9" Background="#4A737B7E" BorderBrush="#30FFFFFF" BorderThickness="1" Padding="4,7,4,5">
           <Grid><Grid.RowDefinitions><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
@@ -88,12 +116,12 @@
         </Border>
       </Grid>
 
-      <StackPanel Grid.Row="4" Margin="0,5,0,0">
+      <StackPanel Grid.Row="5" Margin="0,5,0,0">
         <StackPanel Orientation="Horizontal" Height="17"><TextBlock Text="●" FontSize="9" Foreground="#AEB9BF" Width="20"/><TextBlock x:Name="AccountText" FontSize="10" FontFamily="Consolas" Foreground="#AEB9BF" TextTrimming="CharacterEllipsis" MaxWidth="270"/></StackPanel>
         <StackPanel Orientation="Horizontal" Height="17"><TextBlock Text="▣" FontSize="9" Foreground="#AEB9BF" Width="20"/><TextBlock x:Name="SubscriptionText" FontSize="10" FontFamily="Consolas" Foreground="#AEB9BF" TextTrimming="CharacterEllipsis" MaxWidth="270"/></StackPanel>
       </StackPanel>
 
-      <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+      <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
         <Ellipse x:Name="UpdateDot" Width="4" Height="4" Fill="#FF3333" Margin="0,0,4,2" Visibility="Collapsed"/>
         <TextBlock x:Name="VersionText" FontSize="9" FontWeight="Light" FontFamily="Consolas" Foreground="#AEB9BF"/>
       </StackPanel>
