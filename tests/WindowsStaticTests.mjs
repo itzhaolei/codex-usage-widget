@@ -67,6 +67,7 @@ assert.match(updater, /ReadAsync\(buffer\.AsMemory/, "Windows updater streams th
 assert.match(updateProgressWindow, /ProgressBar/, "Windows update dialog contains a progress bar");
 assert.match(updateProgressWindow, /percentage[\s\S]*receivedMb[\s\S]*totalBytes/, "Windows update dialog shows percentage and byte progress");
 assert.match(window, /new Progress<DownloadProgress>\(progressWindow\.Report\)/, "interactive updates connect download progress to the dialog");
+assert.match(updater, /\/SILENT \/CLOSEAPPLICATIONS \/RESTARTAPPLICATIONS/, "in-app updater launches the installer in silent restart mode");
 assert.match(window, /if \(_checkingUpdate\) return;/, "only one update check or progress dialog can run at a time");
 assert.doesNotMatch(window, /MessageBox\.Show\(this, copy\.Updating/, "download no longer uses a blocking information message box");
 assert.match(window, /UpdateService\.OpenReleasesPage/, "interactive update failures open the manual download page");
@@ -76,13 +77,15 @@ assert.match(installer, /UsePreviousAppDir=yes/, "upgrades explicitly reuse the 
 assert.match(installer, /UsePreviousTasks=yes/, "upgrades preserve the existing startup choice");
 assert.match(installer, /\[InstallDelete\][\s\S]*QuotaBubble\.ps1[\s\S]*windows-state\.json[\s\S]*codex-usage-snapshot\.mjs/, "native upgrades remove legacy PowerShell installation files");
 assert.match(installer, /WindowsPowerShell\\v1\.0\\powershell\.exe[\s\S]*EncodedCommand/, "installer terminates a running legacy PowerShell widget");
+assert.match(installer, /Filename: "\{app\}\\QuotaBubble\.exe";[^\n]*Flags: nowait postinstall\s*$/m, "installer starts Quota Bubble after interactive and silent updates");
+assert.doesNotMatch(installer.match(/Filename: "\{app\}\\QuotaBubble\.exe";[^\n]*/)?.[0] ?? "", /skipifsilent/, "silent in-app updates do not suppress automatic restart");
 assert.match(installer, /Name: "\{autodesktop\}\\Quota Bubble"; Filename: "\{app\}\\QuotaBubble\.exe"\s*$/m, "installer always creates a desktop shortcut");
 assert.doesNotMatch(installer, /Name: "desktopicon"/, "desktop shortcut is not optional");
 assert.match(installer, /\[UninstallRun\]/, "installer provides graphical uninstall support");
 assert.match(compatibilityInstaller, /Windows-Setup\.exe/, "legacy updater bridge launches the graphical installer");
 assert.match(workflow, /Windows\.zip/, "release retains an automatic migration path for the previous updater");
 assert.match(workflow, /dotnet publish/, "Windows CI compiles the application");
-assert.match(workflow, /Smoke launch installed application/, "Windows CI launches the installed app");
+assert.match(workflow, /Installed Quota Bubble did not start automatically/, "Windows CI verifies installer auto-start");
 assert.match(workflow, /Desktop shortcut was not created/, "Windows CI verifies the desktop shortcut");
 assert.match(workflow, /Legacy Windows file was not removed/, "Windows CI verifies legacy installation cleanup");
 assert.match(workflow, /Legacy Windows process was not terminated/, "Windows CI verifies the legacy widget process is stopped");

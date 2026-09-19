@@ -132,14 +132,18 @@ jobs:
           }
           $desktopShortcut = Join-Path ([Environment]::GetFolderPath("Desktop")) "Quota Bubble.lnk"
           if (-not (Test-Path $desktopShortcut)) { throw "Desktop shortcut was not created" }
+          Start-Sleep -Seconds 5
+          $installedProcess = Get-Process -Name "QuotaBubble" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($null -eq $installedProcess -or $installedProcess.HasExited) { throw "Installed Quota Bubble did not start automatically" }
+          "INSTALL_PID=$($installedProcess.Id)" | Out-File -FilePath $env:GITHUB_ENV -Append
           "INSTALL_DIR=$installDir" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      - name: Smoke launch installed application
+      - name: Verify automatically launched application
         shell: pwsh
         run: |
-          $process = Start-Process (Join-Path $env:INSTALL_DIR "QuotaBubble.exe") -PassThru
           Start-Sleep -Seconds 5
-          if ($process.HasExited) { throw "Installed Quota Bubble exited during smoke launch" }
+          $process = Get-Process -Id ([int]$env:INSTALL_PID) -ErrorAction SilentlyContinue
+          if ($null -eq $process -or $process.HasExited) { throw "Automatically launched Quota Bubble exited during smoke test" }
           Stop-Process -Id $process.Id -Force
           $uninstaller = Join-Path $env:INSTALL_DIR "unins000.exe"
           $result = Start-Process $uninstaller -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART" -Wait -PassThru

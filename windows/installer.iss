@@ -56,7 +56,7 @@ Name: "{userstartup}\Quota Bubble"; Filename: "{app}\QuotaBubble.exe"; WorkingDi
 
 [Run]
 Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -NonInteractive -EncodedCommand RwBlAHQALQBDAGkAbQBJAG4AcwB0AGEAbgBjAGUAIABXAGkAbgAzADIAXwBQAHIAbwBjAGUAcwBzACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAgACgAJABfAC4ATgBhAG0AZQAgAC0AaQBuACAAQAAoACIAcABvAHcAZQByAHMAaABlAGwAbAAuAGUAeABlACIALAAiAHAAdwBzAGgALgBlAHgAZQAiACkAKQAgAC0AYQBuAGQAIAAkAF8ALgBQAHIAbwBjAGUAcwBzAEkAZAAgAC0AbgBlACAAJABQAEkARAAgAC0AYQBuAGQAIAAkAF8ALgBDAG8AbQBtAGEAbgBkAEwAaQBuAGUAIAAtAGwAaQBrAGUAIAAiACoAUQB1AG8AdABhAEIAdQBiAGIAbABlAC4AcABzADEAKgAiACAAfQAgAHwAIABGAG8AcgBFAGEAYwBoAC0ATwBiAGoAZQBjAHQAIAB7ACAAUwB0AG8AcAAtAFAAcgBvAGMAZQBzAHMAIAAtAEkAZAAgACQAXwAuAFAAcgBvAGMAZQBzAHMASQBkACAALQBGAG8AcgBjAGUAIAAtAEUAcgByAG8AcgBBAGMAdABpAG8AbgAgAFMAaQBsAGUAbgB0AGwAeQBDAG8AbgB0AGkAbgB1AGUAIAB9AA=="; Flags: runhidden waituntilterminated
-Filename: "{app}\QuotaBubble.exe"; Description: "{cm:LaunchProgram,Quota Bubble}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\QuotaBubble.exe"; Description: "{cm:LaunchProgram,Quota Bubble}"; Flags: nowait postinstall
 
 [UninstallRun]
 Filename: "{cmd}"; Parameters: "/C taskkill /IM QuotaBubble.exe /F"; Flags: runhidden; RunOnceId: "StopQuotaBubble"
