@@ -2,7 +2,6 @@ using QuotaBubble.Services;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
-using System.Windows.Media;
 using Controls = System.Windows.Controls;
 
 namespace QuotaBubble;
@@ -51,9 +50,9 @@ public sealed class UpdateProgressWindow : Window
         {
             Text = "0%",
             FontSize = 12,
-            Foreground = Brushes.DimGray,
-            HorizontalAlignment = HorizontalAlignment.Right,
-            VerticalAlignment = VerticalAlignment.Bottom
+            Foreground = System.Windows.Media.Brushes.DimGray,
+            HorizontalAlignment = System.Windows.HorizontalAlignment.Right,
+            VerticalAlignment = System.Windows.VerticalAlignment.Bottom
         };
         Controls.Grid.SetRow(_progressText, 2);
         panel.Children.Add(_progressText);
