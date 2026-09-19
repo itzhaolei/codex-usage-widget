@@ -2,15 +2,15 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-一个支持 macOS 和 Windows 的原生悬浮配额窗口，用来直接查看 Codex 周配额、重置时间、余额、套餐、账号和可用重置次数。
+一个支持 macOS 和 Windows 的原生悬浮配额窗口，用来直接查看 Codex 5 小时配额、周配额、重置时间、余额、套餐、账号和可用重置次数。
 
 ![Quota Bubble 预览](../assets/preview-v3.png)
 
 ## 功能
 
-- 显示 Codex 周配额、包含天数的重置倒计时、整数点数余额、套餐和可用重置次数。
-- 在倒计时后显示精确到秒的本地周重置日期。
-- 在 macOS 顶部菜单栏实时显示周额度剩余百分比。
+- 有 5 小时限制时显示 5 小时配额，同时显示 Codex 周配额、包含天数的重置倒计时、整数点数余额、套餐和可用重置次数。
+- 在倒计时后显示精确到秒的本地周重置日期和对应周几。
+- 在 macOS 顶部菜单栏优先实时显示 5 小时额度剩余百分比，没有 5 小时限制时显示周额度百分比。
 - 在 macOS 上逐条显示重置次数的到期日期，三天内到期显示红点，否则显示绿点。
 - 在 macOS 上显示当前账号和订阅到期时间，账号信息不会写入配额快照。
 - 在实时接口与本地会话日志切换时保持配额数值稳定。

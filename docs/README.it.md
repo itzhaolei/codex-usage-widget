@@ -2,15 +2,15 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Una finestra nativa per macOS e Windows che mostra quota settimanale Codex, reset, saldo, piano, account e ripristini disponibili.
+Una finestra nativa per macOS e Windows che mostra quota Codex di 5 ore, quota settimanale, reset, saldo, piano, account e ripristini disponibili.
 
 ![Quota Bubble preview](../assets/preview-v3.png)
 
 ## Funzionalità
 
-- Mostra quota settimanale Codex, reset, saldo, piano e ripristini disponibili.
-- Mostra dopo il conto alla rovescia la data esatta del reset settimanale in ora locale, con precisione al secondo.
-- Mostra nella barra dei menu macOS la percentuale settimanale sincronizzata in tempo reale.
+- Mostra la quota di 5 ore quando presente, oltre a quota settimanale Codex, reset, saldo, piano e ripristini disponibili.
+- Mostra dopo il conto alla rovescia la data esatta del reset settimanale e il giorno della settimana in ora locale, con precisione al secondo.
+- Mostra nella barra dei menu macOS la percentuale della quota di 5 ore quando presente; altrimenti mostra quella settimanale.
 - Su macOS mostra la scadenza di ogni ripristino, con un punto rosso entro tre giorni e verde negli altri casi.
 - Su macOS mostra localmente l’account corrente e la scadenza dell’abbonamento senza salvare credenziali nello snapshot della quota.
 - Mantiene stabili le quote live e impedisce la visualizzazione dei dati dell’account precedente dopo un cambio account.

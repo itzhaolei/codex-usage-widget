@@ -2,15 +2,15 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Ein natives schwebendes Fenster für Codex-Wochenkontingent, Reset-Zeit, Guthaben, Tarif, Konto und Reset-Credits unter macOS und Windows.
+Ein natives schwebendes Fenster für Codex-5-Stunden-Kontingent, Wochenkontingent, Reset-Zeit, Guthaben, Tarif, Konto und Reset-Credits unter macOS und Windows.
 
 ![Quota Bubble preview](../assets/preview-v3.png)
 
 ## Funktionen
 
-- Zeigt Codex-Wochenkontingent, Reset-Zeit, Guthaben, Tarif und verfügbare Reset-Credits.
-- Zeigt direkt nach dem Countdown den exakten wöchentlichen Reset-Zeitpunkt in lokaler Zeit bis zur Sekunde.
-- Zeigt in der macOS-Menüleiste das live synchronisierte Wochenkontingent in Prozent.
+- Zeigt bei vorhandenem 5-Stunden-Limit auch das 5-Stunden-Kontingent sowie Wochenkontingent, Reset-Zeit, Guthaben, Tarif und verfügbare Reset-Credits.
+- Zeigt direkt nach dem Countdown den exakten wöchentlichen Reset-Zeitpunkt und Wochentag in lokaler Zeit bis zur Sekunde.
+- Zeigt in der macOS-Menüleiste vorrangig das 5-Stunden-Kontingent in Prozent, sonst das Wochenkontingent.
 - Zeigt unter macOS die Ablaufdaten einzelner Reset-Credits mit einem roten Punkt innerhalb von drei Tagen und sonst mit einem grünen Punkt.
 - Zeigt unter macOS das aktuelle Konto und das Ablaufdatum des Abonnements lokal an, ohne Anmeldedaten im Kontingent-Snapshot zu speichern.
 - Hält Kontingentwerte beim Wechsel zwischen Live-Nutzung und lokalem Sitzungsprotokoll stabil.

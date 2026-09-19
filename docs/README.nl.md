@@ -2,15 +2,15 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Een native venster voor macOS en Windows met Codex-weekquota, resettijd, saldo, plan, account en beschikbare resets.
+Een native venster voor macOS en Windows met Codex-5-uursquota, weekquota, resettijd, saldo, plan, account en beschikbare resets.
 
 ![Quota Bubble preview](../assets/preview-v3.png)
 
 ## Functies
 
-- Toont Codex-weekquota, resettijd, saldo, plan en beschikbare resets.
-- Toont direct na het aftellen de exacte wekelijkse resettijd in lokale tijd, tot op de seconde.
-- Toont in de macOS-menubalk het live gesynchroniseerde weekquotum als percentage.
+- Toont het 5-uursquota wanneer dit bestaat, plus Codex-weekquota, resettijd, saldo, plan en beschikbare resets.
+- Toont direct na het aftellen de exacte wekelijkse resettijd en weekdag in lokale tijd, tot op de seconde.
+- Toont in de macOS-menubalk eerst het 5-uursquotum als percentage wanneer dit bestaat, anders het weekquotum.
 - Toont op macOS de vervaldatum van elke reset, met een rode stip binnen drie dagen en anders een groene stip.
 - Toont op macOS lokaal het huidige account en de vervaldatum van het abonnement zonder aanmeldgegevens in de quota-snapshot op te slaan.
 - Houdt quotawaarden stabiel bij het wisselen tussen live gebruik en het lokale sessielogboek.

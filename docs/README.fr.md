@@ -2,15 +2,15 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Une fenêtre native pour macOS et Windows affichant le quota hebdomadaire Codex, le reset, le solde, l’offre, le compte et les réinitialisations disponibles.
+Une fenêtre native pour macOS et Windows affichant le quota 5 heures Codex, le quota hebdomadaire, le reset, le solde, l’offre, le compte et les réinitialisations disponibles.
 
 ![Quota Bubble preview](../assets/preview-v3.png)
 
 ## Fonctionnalités
 
-- Affiche le quota hebdomadaire Codex, le reset, le solde, l’offre et les réinitialisations disponibles.
-- Affiche après le compte à rebours la date exacte du reset hebdomadaire en heure locale, à la seconde près.
-- Affiche dans la barre des menus macOS le pourcentage du quota hebdomadaire synchronisé en direct.
+- Affiche le quota 5 heures lorsqu’il existe, ainsi que le quota hebdomadaire Codex, le reset, le solde, l’offre et les réinitialisations disponibles.
+- Affiche après le compte à rebours la date exacte du reset hebdomadaire et le jour de la semaine en heure locale, à la seconde près.
+- Affiche dans la barre des menus macOS le pourcentage du quota 5 heures lorsqu’il existe, sinon celui du quota hebdomadaire.
 - Affiche sous macOS la date d’expiration de chaque réinitialisation, avec un point rouge à moins de trois jours et vert au-delà.
 - Affiche localement sous macOS le compte actuel et l’expiration de l’abonnement sans enregistrer les identifiants dans l’instantané de quota.
 - Stabilise les quotas en direct et empêche l’affichage des données du compte précédent après un changement de compte.

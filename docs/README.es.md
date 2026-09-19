@@ -2,15 +2,15 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Una ventana nativa para macOS y Windows que muestra la cuota semanal de Codex, reinicio, saldo, plan, cuenta y reinicios disponibles.
+Una ventana nativa para macOS y Windows que muestra la cuota de 5 horas de Codex, la cuota semanal, reinicio, saldo, plan, cuenta y reinicios disponibles.
 
 ![Quota Bubble preview](../assets/preview-v3.png)
 
 ## Funciones
 
-- Muestra la cuota semanal de Codex, el reinicio, el saldo, el plan y los reinicios disponibles.
-- Muestra tras la cuenta atrás la fecha exacta del reinicio semanal en hora local, con precisión de segundos.
-- Muestra en la barra de menús de macOS el porcentaje semanal sincronizado en vivo.
+- Muestra la cuota de 5 horas cuando existe, además de la cuota semanal de Codex, el reinicio, el saldo, el plan y los reinicios disponibles.
+- Muestra tras la cuenta atrás la fecha exacta del reinicio semanal y el día de la semana en hora local, con precisión de segundos.
+- Muestra en la barra de menús de macOS el porcentaje de 5 horas cuando existe; si no, muestra el porcentaje semanal.
 - En macOS muestra la caducidad de cada reinicio, con un punto rojo si vence en tres días y verde en caso contrario.
 - En macOS muestra localmente la cuenta actual y la caducidad de la suscripción sin guardar credenciales en la instantánea de cuota.
 - Mantiene estables los valores al alternar entre el uso en vivo y el registro de sesión local.

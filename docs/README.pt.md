@@ -2,15 +2,15 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Uma janela nativa para macOS e Windows que mostra cota semanal do Codex, redefinição, saldo, plano, conta e redefinições disponíveis.
+Uma janela nativa para macOS e Windows que mostra cota de 5 horas do Codex, cota semanal, redefinição, saldo, plano, conta e redefinições disponíveis.
 
 ![Quota Bubble preview](../assets/preview-v3.png)
 
 ## Recursos
 
-- Mostra cota semanal do Codex, redefinição, saldo, plano e redefinições disponíveis.
-- Mostra após a contagem regressiva a data exata da redefinição semanal no horário local, com precisão de segundos.
-- Mostra na barra de menus do macOS a porcentagem semanal sincronizada ao vivo.
+- Mostra a cota de 5 horas quando existe, além da cota semanal do Codex, redefinição, saldo, plano e redefinições disponíveis.
+- Mostra após a contagem regressiva a data exata da redefinição semanal e o dia da semana no horário local, com precisão de segundos.
+- Mostra na barra de menus do macOS a porcentagem de 5 horas quando existe; caso contrário, mostra a porcentagem semanal.
 - No macOS, mostra a validade de cada redefinição, com ponto vermelho quando expira em até três dias e verde nos demais casos.
 - No macOS, mostra localmente a conta atual e o vencimento da assinatura sem salvar credenciais no snapshot de cota.
 - Mantém os valores estáveis ao alternar entre o uso ao vivo e o log de sessão local.

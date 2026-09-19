@@ -2,15 +2,15 @@
 
 [English](../README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt.md) | [Italiano](README.it.md) | [Nederlands](README.nl.md)
 
-Codex 주간 할당량, 재설정 시간, 잔액, 플랜, 계정 및 재설정 횟수를 보여 주는 macOS 및 Windows 네이티브 플로팅 창입니다.
+Codex 5시간 할당량, 주간 할당량, 재설정 시간, 잔액, 플랜, 계정 및 재설정 횟수를 보여 주는 macOS 및 Windows 네이티브 플로팅 창입니다.
 
 ![Quota Bubble preview](../assets/preview-v3.png)
 
 ## 기능
 
-- Codex 주간 할당량, 재설정 시간, 잔액, 플랜 및 사용 가능한 재설정 횟수 표시.
-- 카운트다운 뒤에 초 단위의 정확한 주간 재설정 날짜를 현지 시간으로 표시합니다.
-- macOS 메뉴 막대에 실시간 주간 할당량 비율을 표시합니다.
+- 5시간 제한이 있으면 5시간 할당량도 표시하고, 주간 할당량, 재설정 시간, 잔액, 플랜 및 사용 가능한 재설정 횟수를 표시합니다.
+- 카운트다운 뒤에 초 단위의 정확한 주간 재설정 날짜와 요일을 현지 시간으로 표시합니다.
+- macOS 메뉴 막대에는 5시간 할당량이 있으면 이를 우선 표시하고, 없으면 주간 할당량 비율을 실시간으로 표시합니다.
 - macOS에서 재설정별 만료일을 표시하며 3일 이내는 빨간 점, 그 외에는 초록 점으로 구분합니다.
 - macOS에서 현재 계정과 구독 만료일을 로컬로 표시하고 인증 정보는 사용량 스냅샷에 저장하지 않습니다.
 - 실시간 사용량과 로컬 세션 로그 간 전환 시에도 할당량 값을 안정적으로 유지합니다.
