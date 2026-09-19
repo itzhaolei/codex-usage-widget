@@ -374,7 +374,7 @@ public partial class MainWindow : Window
         var pixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
         var typeface = new Typeface(BalanceTitle.FontFamily, FontStyles.Normal, FontWeights.Medium, FontStretches.Normal);
         var doubleLine = new[] { BalanceTitle.Text, ResetTitle.Text }.Any(value =>
-            new FormattedText(value, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, typeface, 9, Brushes.Black, pixelsPerDip).Width > 123);
+            new FormattedText(value, CultureInfo.CurrentUICulture, System.Windows.FlowDirection.LeftToRight, typeface, 9, Brushes.Black, pixelsPerDip).Width > 123);
         var height = doubleLine ? 59d : 47d;
         MetricCards.Height = height;
         BalanceCard.Height = height;
