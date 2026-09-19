@@ -118,6 +118,7 @@ public partial class MainWindow : Window
         _refreshing = true;
         try
         {
+            RenderSystemCapacity();
             var snapshot = await _quotaService.RefreshAsync(CancellationToken.None);
             Render(snapshot, _quotaService.CurrentIdentity);
             if (DateTimeOffset.UtcNow - _lastVersionCheck >= TimeSpan.FromMinutes(30))
@@ -164,7 +165,7 @@ public partial class MainWindow : Window
     private void SetProgress(int? remaining, System.Windows.Shapes.Rectangle progressFill, System.Windows.Shapes.Rectangle progressPattern)
     {
         progressFill.Width = remaining is null ? 0 : 231 * remaining.Value / 100d;
-        var color = new SolidColorBrush(remaining is <= 20 ? Color.FromRgb(255, 51, 51) : Color.FromRgb(0, 240, 32));
+        var color = new SolidColorBrush(remaining is <= 20 ? Color.FromRgb(240, 51, 56) : Color.FromRgb(0, 194, 41));
         color.Freeze();
         progressFill.Fill = color;
         if (progressPattern.Fill is VisualBrush brush && brush.Visual is System.Windows.Shapes.Ellipse dot) dot.Fill = color;
@@ -195,18 +196,22 @@ public partial class MainWindow : Window
     private void RenderResets(ResetCredits? credits)
     {
         _resetRows.Clear();
-        if (credits is null || credits.AvailableCount <= 0) return;
-        var foreground = SecondaryBrush();
-        for (var index = 0; index < credits.AvailableCount; index++)
+        if (credits is not null && credits.AvailableCount > 0)
         {
-            if (index < credits.ExpiresAt.Count)
+            var foreground = SecondaryBrush();
+            for (var index = 0; index < credits.AvailableCount; index++)
             {
-                var expiration = credits.ExpiresAt[index];
-                var soon = expiration - DateTimeOffset.Now <= TimeSpan.FromDays(3);
-                _resetRows.Add(new ResetRow(FormatDate(expiration), soon ? Brushes.Red : Brushes.Lime, foreground));
+                if (index < credits.ExpiresAt.Count)
+                {
+                    var expiration = credits.ExpiresAt[index];
+                    var soon = expiration - DateTimeOffset.Now <= TimeSpan.FromDays(3);
+                    _resetRows.Add(new ResetRow(FormatDate(expiration), soon ? Brushes.Red : Brushes.Lime, foreground));
+                }
+                else _resetRows.Add(new ResetRow("—", Brushes.Gray, foreground));
             }
-            else _resetRows.Add(new ResetRow("—", Brushes.Gray, foreground));
         }
+        ResetItems.Visibility = _resetRows.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+        MetricCards.Margin = new Thickness(0, _resetRows.Count == 0 ? 15 : 10, 0, 0);
     }
 
     private void ApplyLocalization()
@@ -214,8 +219,9 @@ public partial class MainWindow : Window
         var copy = Localization.Get(_settings.Language);
         TitleText.Text = copy.Title;
         WeekText.Text = copy.Week;
-        BalanceTitle.Text = $"{copy.Balance} ($)";
-        ResetTitle.Text = $"{copy.Available} ({copy.Times})";
+        BalanceTitle.Text = $"{copy.Balance}（{PointsUnit()}）";
+        ResetTitle.Text = $"{copy.Available}（{copy.Times}）";
+        UpdateMetricCardLayout();
         VersionText.Text = $"v{App.Version}";
         RebuildTrayMenu();
     }
@@ -228,12 +234,18 @@ public partial class MainWindow : Window
         foreach (var text in new[] { TitleText, WeekText, FiveHourPercentText, PercentText, BalanceValue, ResetValue }) text.Foreground = primary;
         foreach (var text in new[] { FiveHourResetText, ResetText, AccountText, SubscriptionText, VersionText, BalanceTitle, ResetTitle }) text.Foreground = secondary;
         foreach (var text in new[] { FiveHourResetDateText, ResetDateText, ResetWeekdayText }) text.Foreground = new SolidColorBrush(_settings.Light ? Color.FromArgb(132, 17, 24, 39) : Color.FromArgb(132, 255, 255, 255));
-        var card = new SolidColorBrush(_settings.Light ? Color.FromArgb(150, 255, 255, 255) : Color.FromArgb(74, 115, 123, 126));
+        var card = new SolidColorBrush(_settings.Light ? Color.FromArgb(31, 255, 255, 255) : Color.FromArgb(18, 255, 255, 255));
         BalanceCard.Background = card;
         ResetCard.Background = card;
-        ThemeButton.Content = _settings.Light ? "☾" : "☀";
+        SunIcon.Visibility = _settings.Light ? Visibility.Collapsed : Visibility.Visible;
+        MoonIcon.Visibility = _settings.Light ? Visibility.Visible : Visibility.Collapsed;
         PinButton.Foreground = _settings.Pinned ? Brushes.LimeGreen : secondary;
+        ThemeButton.Foreground = secondary;
+        CloseButton.Foreground = secondary;
+        AccountIcon.Stroke = secondary;
+        SubscriptionIcon.Stroke = secondary;
         RenderResets(_quotaService.CurrentIdentity is null ? null : _lastRenderedCredits);
+        RenderSystemCapacity();
     }
 
     private ResetCredits? _lastRenderedCredits;
@@ -308,7 +320,68 @@ public partial class MainWindow : Window
 
     private static string FormatBalance(string? raw) =>
         double.TryParse(raw?.TrimStart('$'), NumberStyles.Any, CultureInfo.InvariantCulture, out var value)
-            ? value.ToString("0.00", CultureInfo.InvariantCulture) : string.IsNullOrWhiteSpace(raw) ? "—" : raw;
+            ? Math.Round(value).ToString("0", CultureInfo.InvariantCulture) : string.IsNullOrWhiteSpace(raw) ? "—" : raw;
+
+    private void RenderSystemCapacity()
+    {
+        var storage = SystemCapacityService.SystemDrive();
+        var memory = SystemCapacityService.PhysicalMemory();
+        var language = Localization.ResolveLanguage(_settings.Language);
+        StorageText.Text = CapacityLabel(language, true, storage is null ? "—" : $"{storage.Available / 1_000_000_000d:0.0}G");
+        MemoryText.Text = CapacityLabel(language, false, memory is null ? "—" : $"{memory.Available / 1_073_741_824d:0.0}G / {memory.Total / 1_073_741_824d:0.0}G");
+
+        var storageWarning = storage is not null && storage.Available < 50_000_000_000UL;
+        var memoryWarning = memory is not null && memory.Available > 11UL * 1_073_741_824UL;
+        ApplyCapacityColor(StorageText, StorageIcon, storage is null ? null : storageWarning);
+        ApplyCapacityColor(MemoryText, MemoryIcon, memory is null ? null : memoryWarning);
+    }
+
+    private void ApplyCapacityColor(System.Windows.Controls.TextBlock text, System.Windows.Shapes.Path icon, bool? warning)
+    {
+        var brush = warning is null ? SecondaryBrush() : warning.Value
+            ? new SolidColorBrush(Color.FromRgb(240, 51, 56))
+            : new SolidColorBrush(Color.FromRgb(0, 194, 41));
+        text.Foreground = brush;
+        icon.Stroke = brush;
+    }
+
+    private string PointsUnit() => Localization.ResolveLanguage(_settings.Language) switch
+    {
+        "zh" => "点数", "ja" => "ポイント", "ko" => "포인트", "de" => "Punkte", "fr" => "points",
+        "es" => "puntos", "pt" => "pontos", "it" => "punti", "nl" => "punten", _ => "points"
+    };
+
+    private static string CapacityLabel(string language, bool storage, string value)
+    {
+        var label = (language, storage) switch
+        {
+            ("zh", true) => "C盘可用空间", ("zh", false) => "可用运行内存",
+            ("ja", true) => "Cドライブ空き容量", ("ja", false) => "利用可能メモリ",
+            ("ko", true) => "C 드라이브 여유 공간", ("ko", false) => "사용 가능 메모리",
+            ("de", true) => "Freier Speicher auf C", ("de", false) => "Verfügbarer Arbeitsspeicher",
+            ("fr", true) => "Espace libre sur C", ("fr", false) => "Mémoire disponible",
+            ("es", true) => "Espacio libre en C", ("es", false) => "Memoria disponible",
+            ("pt", true) => "Espaço livre em C", ("pt", false) => "Memória disponível",
+            ("it", true) => "Spazio libero su C", ("it", false) => "Memoria disponibile",
+            ("nl", true) => "Vrije ruimte op C", ("nl", false) => "Beschikbaar geheugen",
+            (_, true) => "C drive available", _ => "Available memory"
+        };
+        return language == "zh" ? $"{label}：{value}" : $"{label}: {value}";
+    }
+
+    private void UpdateMetricCardLayout()
+    {
+        var pixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
+        var typeface = new Typeface(BalanceTitle.FontFamily, FontStyles.Normal, FontWeights.Medium, FontStretches.Normal);
+        var doubleLine = new[] { BalanceTitle.Text, ResetTitle.Text }.Any(value =>
+            new FormattedText(value, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, typeface, 9, Brushes.Black, pixelsPerDip).Width > 123);
+        var height = doubleLine ? 59d : 47d;
+        MetricCards.Height = height;
+        BalanceCard.Height = height;
+        ResetCard.Height = height;
+        BalanceTitle.Height = doubleLine ? 22 : 11;
+        ResetTitle.Height = doubleLine ? 22 : 11;
+    }
 
     private static string FormatDuration(long? epoch)
     {
