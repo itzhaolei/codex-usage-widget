@@ -1664,6 +1664,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
+        applyBundledApplicationIcon()
+    }
+
+    private func applyBundledApplicationIcon() {
+        guard let configuredName = Bundle.main.object(forInfoDictionaryKey: "CFBundleIconFile") as? String else { return }
+        let resourceName = (configuredName as NSString).deletingPathExtension
+        let configuredExtension = (configuredName as NSString).pathExtension
+        let resourceExtension = configuredExtension.isEmpty ? "icns" : configuredExtension
+        guard let path = Bundle.main.path(forResource: resourceName, ofType: resourceExtension),
+              let icon = NSImage(contentsOfFile: path) else { return }
+        NSApp.applicationIconImage = icon
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }

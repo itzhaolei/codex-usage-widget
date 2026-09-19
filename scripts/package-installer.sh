@@ -17,6 +17,7 @@ ZIP_PATH="$DIST_DIR/QuotaBubble-$VERSION-macOS-Installer.zip"
 SWIFT_TARGET="${QUOTA_BUBBLE_SWIFT_TARGET:-}"
 UNIVERSAL="${QUOTA_BUBBLE_UNIVERSAL:-0}"
 REQUIRE_LIQUID_GLASS="${QUOTA_BUBBLE_REQUIRE_LIQUID_GLASS:-0}"
+ICON_BASENAME="AppIcon-$VERSION"
 
 rm -rf "$BUILD_DIR" "$ZIP_PATH"
 mkdir -p "$INSTALLER_APP/Contents/MacOS" "$PAYLOAD/scripts" "$QUOTA_APP/Contents/MacOS" "$QUOTA_APP/Contents/Resources" "$DIST_DIR"
@@ -39,8 +40,8 @@ if [ "$REQUIRE_LIQUID_GLASS" = "1" ]; then
     exit 1
   fi
 fi
-cp "$PLUGIN_DIR/assets/AppIcon.icns" "$QUOTA_APP/Contents/Resources/AppIcon.icns"
-cp "$PLUGIN_DIR/assets/AppIcon.icns" "$INSTALLER_APP/Contents/Resources/AppIcon.icns"
+cp "$PLUGIN_DIR/assets/AppIcon.icns" "$QUOTA_APP/Contents/Resources/$ICON_BASENAME.icns"
+cp "$PLUGIN_DIR/assets/AppIcon.icns" "$INSTALLER_APP/Contents/Resources/$ICON_BASENAME.icns"
 
 cat > "$QUOTA_APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -50,8 +51,7 @@ cat > "$QUOTA_APP/Contents/Info.plist" <<PLIST
 <key>CFBundleIdentifier</key><string>local.codex.quota-bubble</string>
 <key>CFBundleName</key><string>Quota Bubble</string>
 <key>CFBundleDisplayName</key><string>Quota Bubble</string>
-<key>CFBundleIconFile</key><string>AppIcon</string>
-<key>CFBundleIconName</key><string>AppIcon</string>
+<key>CFBundleIconFile</key><string>$ICON_BASENAME.icns</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>$VERSION</string>
 <key>CFBundleVersion</key><string>$VERSION</string>
@@ -67,8 +67,7 @@ cat > "$INSTALLER_APP/Contents/Info.plist" <<PLIST
 <key>CFBundleExecutable</key><string>$APP_NAME</string>
 <key>CFBundleIdentifier</key><string>local.codex.quota-bubble.installer</string>
 <key>CFBundleName</key><string>$APP_NAME</string>
-<key>CFBundleIconFile</key><string>AppIcon</string>
-<key>CFBundleIconName</key><string>AppIcon</string>
+<key>CFBundleIconFile</key><string>$ICON_BASENAME.icns</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>$VERSION</string>
 <key>CFBundleVersion</key><string>$VERSION</string>

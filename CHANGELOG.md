@@ -4,6 +4,12 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.24 - 2026-09-19
+
+### Fixed
+
+- macOS now gives each release a versioned icon resource name and explicitly applies the bundled icon at launch, preventing Dock icon caches from retaining an older design after an in-app update.
+
 ## 3.1.23 - 2026-09-19
 
 ### Fixed

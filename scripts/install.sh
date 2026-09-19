@@ -14,6 +14,7 @@ import json, sys
 print(json.load(open(sys.argv[1], encoding="utf-8"))["version"])
 PY
 )"
+ICON_BASENAME="AppIcon-$VERSION"
 
 dedupe_dock_app() {
     /usr/bin/python3 - "$APP_DIR" <<'PY'
@@ -77,7 +78,7 @@ swiftc -parse-as-library -o "$APP_EXE" \
 chmod +x "$APP_EXE"
 
 if [ -f "$PLUGIN_DIR/assets/AppIcon.icns" ]; then
-    cp "$PLUGIN_DIR/assets/AppIcon.icns" "$APP_DIR/Contents/Resources/AppIcon.icns"
+    cp "$PLUGIN_DIR/assets/AppIcon.icns" "$APP_DIR/Contents/Resources/$ICON_BASENAME.icns"
 else
     cp "$PLUGIN_DIR/assets/icon.png" "$INSTALL_DIR/icon.png"
     ICONSET="$INSTALL_DIR/AppIcon.iconset"
@@ -86,7 +87,7 @@ else
         sips -z "$size" "$size" "$INSTALL_DIR/icon.png" --out "$ICONSET/icon_${size}x${size}.png" >/dev/null
         double=$((size * 2)); sips -z "$double" "$double" "$INSTALL_DIR/icon.png" --out "$ICONSET/icon_${size}x${size}@2x.png" >/dev/null
     done
-    iconutil -c icns "$ICONSET" -o "$APP_DIR/Contents/Resources/AppIcon.icns"
+    iconutil -c icns "$ICONSET" -o "$APP_DIR/Contents/Resources/$ICON_BASENAME.icns"
 fi
 
 cat > "$APP_DIR/Contents/Info.plist" <<PLIST
@@ -97,8 +98,7 @@ cat > "$APP_DIR/Contents/Info.plist" <<PLIST
 <key>CFBundleIdentifier</key><string>local.codex.quota-bubble</string>
 <key>CFBundleName</key><string>Quota Bubble</string>
 <key>CFBundleDisplayName</key><string>Quota Bubble</string>
-<key>CFBundleIconFile</key><string>AppIcon</string>
-<key>CFBundleIconName</key><string>AppIcon</string>
+<key>CFBundleIconFile</key><string>$ICON_BASENAME.icns</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>$VERSION</string>
 <key>CFBundleVersion</key><string>$VERSION</string>
