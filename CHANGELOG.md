@@ -4,6 +4,8 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.19 - 2026-09-19
+
 ### Added
 
 - Windows update downloads now display a live progress bar with percentage and downloaded size before launching the installer.
