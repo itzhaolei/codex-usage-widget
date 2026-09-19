@@ -4,6 +4,13 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.26 - 2026-09-20
+
+### Changed
+
+- Hidden or minimized quota windows pause countdown and detail rendering while menu-bar or tray quota updates continue. Showing the window immediately restores the latest locally available data.
+- macOS also pauses window animations and detail refreshes when the quota window is fully occluded; background account changes still update the menu-bar percentage without repainting the window.
+
 ## 3.1.25 - 2026-09-19
 
 ### Fixed

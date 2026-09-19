@@ -223,20 +223,28 @@ private struct QuotaBubbleRoot: View {
     @SceneStorage("QuotaBubble.windowID") private var windowID = UUID().uuidString
 
     var body: some View {
-        QuotaBubbleView(
-            store: store,
-            windowState: windowState,
-            onPinnedChange: { isPinned in
-                appDelegate.applyPinnedState(isPinned, to: windowState.window)
-            },
-            onClose: {
-                appDelegate.close(window: windowState.window)
+        Group {
+            if store.isWindowVisible {
+                QuotaBubbleView(
+                    store: store,
+                    windowState: windowState,
+                    onPinnedChange: { isPinned in
+                        appDelegate.applyPinnedState(isPinned, to: windowState.window)
+                    },
+                    onClose: {
+                        appDelegate.close(window: windowState.window)
+                    }
+                )
+            } else {
+                // Remove timeline-driven content while retaining the window's geometry.
+                Color.clear.frame(width: widgetWidth, height: widgetHeight(for: store))
             }
-        )
-            .background(WindowAccessor { window in
-                windowState.window = window
-                appDelegate.attach(window: window, store: store, windowState: windowState, windowID: windowID)
-            })
+        }
+        .onAppear { store.start() }
+        .background(WindowAccessor { window in
+            windowState.window = window
+            appDelegate.attach(window: window, store: store, windowState: windowState, windowID: windowID)
+        })
     }
 }
 
@@ -290,7 +298,6 @@ private struct QuotaBubbleView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(windowStroke, lineWidth: 1))
         .environment(\.colorScheme, windowState.isLightMode ? .light : .dark)
-        .onAppear { store.start() }
     }
 
     @ViewBuilder
@@ -1682,6 +1689,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         (activeWindow ?? windows.values.first)?.makeKeyAndOrderFront(nil)
         sender.activate(ignoringOtherApps: true)
+        updateWindowVisibility()
         return true
     }
 
@@ -1747,6 +1755,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             guard let self, let window else { return }
             self.resizeWindow(window, store: store, force: true)
             self.applyPinnedState(windowState.isPinned, to: window)
+            self.updateWindowVisibility()
         }
     }
 
@@ -1756,11 +1765,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         storeCancellables.removeAll()
         configureStatusItem()
         updateStatusItem(percentage: store.statusPercentage)
-        store.$snapshot
-            .map { snapshot in
-                let fiveHour = snapshot?.seven_day == nil ? nil : snapshot?.five_hour
-                return remainingPercent(fromUsedPercent: (fiveHour ?? weeklyUsageWindow(from: snapshot))?.used_percentage)
-            }
+        store.statusPercentagePublisher
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] in self?.updateStatusItem(percentage: $0) }
@@ -1793,6 +1798,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let target = activeWindow ?? windows.values.first
         target?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+        updateWindowVisibility()
     }
 
     func applyPinnedState(_ isPinned: Bool, to window: NSWindow?) {
@@ -1804,6 +1810,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         guard let target = window ?? NSApp.keyWindow ?? activeWindow else { return }
         saveFrame(target)
         target.orderOut(nil)
+        updateWindowVisibility()
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
@@ -1811,6 +1818,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         close(window: sender)
         return false
     }
+
+    private func updateWindowVisibility() {
+        let visible = !NSApp.isHidden && windows.values.contains {
+            $0.isVisible && !$0.isMiniaturized && $0.occlusionState.contains(.visible)
+        }
+        store?.setWindowVisible(visible)
+    }
+
+    func windowDidChangeOcclusionState(_ notification: Notification) { updateWindowVisibility() }
+    func windowDidMiniaturize(_ notification: Notification) { updateWindowVisibility() }
+    func windowDidDeminiaturize(_ notification: Notification) { updateWindowVisibility() }
+    func applicationDidHide(_ notification: Notification) { updateWindowVisibility() }
+    func applicationDidUnhide(_ notification: Notification) { updateWindowVisibility() }
 
     func windowDidBecomeKey(_ notification: Notification) {
         activeWindow = notification.object as? NSWindow
@@ -1868,6 +1888,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         windowFrameKeys.removeValue(forKey: identifier)
         windowPreferenceIndexes.removeValue(forKey: identifier)
         if activeWindow === window { activeWindow = windows.values.first }
+        updateWindowVisibility()
     }
 
     private func saveFrame(_ window: NSWindow) {

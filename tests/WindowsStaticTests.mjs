@@ -36,6 +36,11 @@ assert.match(window, /CloseButton\.Click \+= \(_, _\) => HideWindow\(\)/, "windo
 assert.match(window, /e\.Cancel = true;\s*HideWindow\(\)/, "system window close is converted to hide");
 assert.match(window, /exit\.Click \+= \(_, _\) => ExitApplication\(\)/, "tray exit remains an explicit application exit");
 assert.doesNotMatch(window.match(/private void HideWindow\(\)[\s\S]*?\n    }/)?.[0] ?? "", /_timer\.Stop|Shutdown|Dispose/, "hiding keeps background refresh and tray status alive");
+assert.match(window, /CanRenderWindow => IsVisible && WindowState != WindowState.Minimized/, "hidden and minimized windows suspend rendering");
+assert.match(window, /IsVisibleChanged \+= \(_, _\) => RefreshVisibleWindow\(\)/, "showing the window immediately restores cached data");
+assert.match(window, /StateChanged \+= \(_, _\) => RefreshVisibleWindow\(\)/, "restoring a minimized window refreshes its contents");
+const visibleRefresh = window.match(/private void RefreshVisibleWindow\(\)[\s\S]*?\n    }/)?.[0] ?? "";
+assert.match(visibleRefresh, /if \(!CanRenderWindow \|\| _closing\) return;[\s\S]*RenderSystemCapacity\(\);[\s\S]*Render\(_latestSnapshot, _latestIdentity\)/, "capacity and window rendering are both gated by visibility");
 assert.match(windowXaml, /FiveHourQuotaPanel/, "Windows UI contains separate five-hour quota block");
 assert.match(windowXaml, /StorageText/, "Windows UI contains the C drive capacity row");
 assert.match(windowXaml, /MemoryText/, "Windows UI contains the physical memory row");

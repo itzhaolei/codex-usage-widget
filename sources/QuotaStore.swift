@@ -5,6 +5,12 @@ import Foundation
 
 @MainActor
 final class QuotaStore: ObservableObject {
+    @Published private(set) var isWindowVisible = true
+    let statusPercentagePublisher = CurrentValueSubject<Int?, Never>(nil)
+    private var latestSnapshot: UsageSnapshot?
+    private var latestAuth = AuthDisplayInfo()
+    private var latestHasUpdate = false
+
     @Published private(set) var snapshot: UsageSnapshot?
     @Published private(set) var auth = AuthDisplayInfo()
     @Published private(set) var resetRows: [ResetExpirationRow] = []
@@ -45,7 +51,7 @@ final class QuotaStore: ObservableObject {
     var copy: AppCopy { localizedCopy(languageCode) }
     var fiveHourWindow: UsageWindow? { snapshot?.seven_day == nil ? nil : snapshot?.five_hour }
     var remainingPercentage: Int? { remainingPercent(fromUsedPercent: weeklyUsageWindow(from: snapshot)?.used_percentage) }
-    var statusPercentage: Int? { remainingPercent(fromUsedPercent: (fiveHourWindow ?? weeklyUsageWindow(from: snapshot))?.used_percentage) }
+    var statusPercentage: Int? { statusPercentagePublisher.value }
     var resetText: String { compactDuration(until: weeklyUsageWindow(from: snapshot)?.resets_at, copy: copy) }
     var resetDateText: String { formattedResetDate(weeklyUsageWindow(from: snapshot)?.resets_at) }
     var planText: String { planBadgeText(snapshot?.plan_type) }
@@ -63,7 +69,7 @@ final class QuotaStore: ObservableObject {
 
     func start() {
         guard timer == nil else { return }
-        refreshSystemCapacity()
+        if isWindowVisible { refreshSystemCapacity() }
         readLocalState()
         refreshSnapshot(force: true)
         checkVersion(force: true)
@@ -77,12 +83,28 @@ final class QuotaStore: ObservableObject {
     }
 
     func tick() {
-        let currentLanguage = effectiveLanguageCode()
-        if currentLanguage != languageCode { languageCode = currentLanguage }
-        refreshSystemCapacity()
+        if isWindowVisible {
+            let currentLanguage = effectiveLanguageCode()
+            if currentLanguage != languageCode { languageCode = currentLanguage }
+            refreshSystemCapacity()
+        }
         readLocalState()
         refreshSnapshot()
         checkVersion()
+    }
+
+    func setWindowVisible(_ visible: Bool) {
+        guard isWindowVisible != visible else { return }
+        isWindowVisible = visible
+        // Hidden changes must not replay a recharge animation on reopening.
+        rechargeAnimationEvent = nil
+        if visible {
+            languageCode = effectiveLanguageCode()
+            refreshSystemCapacity()
+            readLocalState(animate: false)
+            hasUpdate = latestHasUpdate
+            refreshSnapshot(force: true)
+        }
     }
 
     @objc private func timerDidFire() { tick() }
@@ -93,7 +115,7 @@ final class QuotaStore: ObservableObject {
         rebuildDerivedState()
     }
 
-    func markUpdateInstalled() { hasUpdate = false }
+    func markUpdateInstalled() { latestHasUpdate = false; hasUpdate = false }
 
     private func refreshSystemCapacity() {
         let storage = systemStorageCapacity()
@@ -120,8 +142,8 @@ final class QuotaStore: ObservableObject {
         )
     }
 
-    private func readLocalState() {
-        let previousSnapshot = snapshot
+    private func readLocalState(animate: Bool = true) {
+        let previousSnapshot = latestSnapshot
         let currentAuth: AuthDisplayInfo
         if let decodedAuth = readAuthInfo() {
             authReadFailureSince = nil
@@ -129,30 +151,36 @@ final class QuotaStore: ObservableObject {
         } else if FileManager.default.fileExists(atPath: authPath) {
             let failureSince = authReadFailureSince ?? Date()
             authReadFailureSince = failureSince
-            currentAuth = Date().timeIntervalSince(failureSince) < 3 ? auth : AuthDisplayInfo()
+            currentAuth = Date().timeIntervalSince(failureSince) < 3 ? latestAuth : AuthDisplayInfo()
         } else {
             authReadFailureSince = nil
             currentAuth = AuthDisplayInfo()
         }
-        if snapshot?.account_fingerprint != currentAuth.accountFingerprint {
-            snapshot = nil
+        if latestSnapshot?.account_fingerprint != currentAuth.accountFingerprint {
+            latestSnapshot = nil
         }
         if let data = try? Data(contentsOf: URL(fileURLWithPath: snapshotPath)),
            let decoded = try? JSONDecoder().decode(UsageSnapshot.self, from: data) {
             let snapshotFingerprint = decoded.account_fingerprint
             let authFingerprint = currentAuth.accountFingerprint
             if snapshotFingerprint == authFingerprint && snapshotFingerprint != nil {
-                snapshot = decoded
+                latestSnapshot = decoded
             } else if snapshotFingerprint == nil && authFingerprint == nil {
-                snapshot = decoded
+                latestSnapshot = decoded
             } else {
-                snapshot = nil
+                latestSnapshot = nil
             }
         }
-        if let transition = quotaRechargeTransition(previous: previousSnapshot, next: snapshot) {
+        latestAuth = currentAuth
+        let fiveHour = latestSnapshot?.seven_day == nil ? nil : latestSnapshot?.five_hour
+        let percentage = remainingPercent(fromUsedPercent: (fiveHour ?? weeklyUsageWindow(from: latestSnapshot))?.used_percentage)
+        if statusPercentagePublisher.value != percentage { statusPercentagePublisher.send(percentage) }
+        guard isWindowVisible else { return }
+        if animate, let transition = quotaRechargeTransition(previous: previousSnapshot, next: latestSnapshot) {
             publishRechargeAnimation(from: transition.fromPercentage, to: transition.toPercentage)
         }
-        auth = currentAuth
+        snapshot = latestSnapshot
+        auth = latestAuth
         rebuildDerivedState()
     }
 
@@ -163,7 +191,7 @@ final class QuotaStore: ObservableObject {
     private func refreshSnapshot(force: Bool = false) {
         guard !refreshInFlight, let snapshotService else { return }
         refreshInFlight = true
-        let existing = snapshot
+        let existing = latestSnapshot
         Task { [weak self] in
             guard let self else { return }
             _ = await snapshotService.refresh(existing: existing)
@@ -234,7 +262,11 @@ final class QuotaStore: ObservableObject {
     private func checkVersion(force: Bool = false) {
         guard force || Date().timeIntervalSince(lastVersionCheck) >= 1_800 else { return }
         lastVersionCheck = Date()
-        let completion: @MainActor @Sendable (Bool) -> Void = { [weak self] hasUpdate in self?.hasUpdate = hasUpdate }
+        let completion: @MainActor @Sendable (Bool) -> Void = { [weak self] hasUpdate in
+            guard let self else { return }
+            self.latestHasUpdate = hasUpdate
+            if self.isWindowVisible { self.hasUpdate = hasUpdate }
+        }
         DispatchQueue.global(qos: .utility).async {
             guard let url = URL(string: "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases/latest"),
                   let data = try? Data(contentsOf: url),

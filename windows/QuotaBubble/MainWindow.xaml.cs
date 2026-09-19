@@ -38,6 +38,9 @@ public partial class MainWindow : Window
     private readonly ObservableCollection<ResetRow> _resetRows = [];
     private readonly AppSettings _settings;
     private Forms.NotifyIcon? _tray;
+    private QuotaSnapshot? _latestSnapshot;
+    private AuthIdentity? _latestIdentity;
+    private bool CanRenderWindow => IsVisible && WindowState != WindowState.Minimized;
     private bool _refreshing;
     private bool _checkingUpdate;
     private bool _closing;
@@ -83,6 +86,8 @@ public partial class MainWindow : Window
         PaletteButton3.Click += (_, _) => SelectProgressColor(3);
         PaletteButton4.Click += (_, _) => SelectProgressColor(4);
         Closing += HandleClosing;
+        IsVisibleChanged += (_, _) => RefreshVisibleWindow();
+        StateChanged += (_, _) => RefreshVisibleWindow();
     }
 
     private static bool IsInsideButton(DependencyObject? source)
@@ -146,13 +151,24 @@ public partial class MainWindow : Window
         _refreshing = true;
         try
         {
-            RenderSystemCapacity();
             var snapshot = await _quotaService.RefreshAsync(CancellationToken.None);
-            Render(snapshot, _quotaService.CurrentIdentity);
+            _latestSnapshot = snapshot;
+            _latestIdentity = _quotaService.CurrentIdentity;
+            var fiveHour = snapshot?.SevenDay is null ? null : snapshot?.FiveHour;
+            var weekly = snapshot?.SevenDay ?? snapshot?.FiveHour;
+            UpdateTrayStatus(Remaining(fiveHour ?? weekly));
+            RefreshVisibleWindow();
             if (DateTimeOffset.UtcNow - _lastVersionCheck >= TimeSpan.FromMinutes(30))
                 await CheckVersionAsync(false);
         }
         finally { _refreshing = false; }
+    }
+
+    private void RefreshVisibleWindow()
+    {
+        if (!CanRenderWindow || _closing) return;
+        RenderSystemCapacity();
+        Render(_latestSnapshot, _latestIdentity);
     }
 
     private void Render(QuotaSnapshot? snapshot, AuthIdentity? identity)
@@ -165,7 +181,6 @@ public partial class MainWindow : Window
         FiveHourQuotaPanel.Visibility = fiveHour is null ? Visibility.Collapsed : Visibility.Visible;
         RenderQuota(fiveHour, FiveHourResetText, FiveHourResetDateText, null, FiveHourPercentText, FiveHourProgressFill, FiveHourProgressPattern);
         RenderQuota(weekly, ResetText, ResetDateText, ResetWeekdayText, PercentText, ProgressFill, ProgressPattern);
-        UpdateTrayStatus(Remaining(fiveHour ?? weekly));
         SetPlan(snapshot?.PlanType);
 
         BalanceValue.Text = FormatBalance(snapshot?.BalanceUsd);
@@ -204,7 +219,8 @@ public partial class MainWindow : Window
     private void UpdateTrayStatus(int? remaining)
     {
         if (_tray is null) return;
-        _tray.Text = remaining is null ? "Quota Bubble" : $"Quota Bubble {remaining}%";
+        var text = remaining is null ? "Quota Bubble" : $"Quota Bubble {remaining}%";
+        if (_tray.Text != text) _tray.Text = text;
     }
 
     private void SetPlan(string? raw)

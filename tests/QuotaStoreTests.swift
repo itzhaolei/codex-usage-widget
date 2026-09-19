@@ -1,3 +1,4 @@
+import Combine
 import CryptoKit
 import Foundation
 
@@ -59,6 +60,33 @@ enum QuotaStoreTests {
         expect(store.fiveHourWindow == nil, "removed five-hour limit hides quota")
         expect(store.statusPercentage == 37, "status item returns to weekly quota")
         expect(store.desiredHeight == weeklyHeight, "weekly-only layout restores original height")
+
+        store.setWindowVisible(false)
+        var windowChanges = 0
+        let observation = store.objectWillChange.sink { windowChanges += 1 }
+        var statusChanges: [Int?] = []
+        let statusObservation = store.statusPercentagePublisher.dropFirst().sink { statusChanges.append($0) }
+        try writeSnapshot(accountID: "account-b", used: 82, fiveHourUsed: 42, root: root)
+        store.tick()
+        expect(store.statusPercentage == 58, "hidden status item receives fresh five-hour quota")
+        expect(store.remainingPercentage == 37, "hidden window keeps its last displayed values")
+        expect(windowChanges == 0, "hidden refresh does not invalidate window or sample capacity")
+        store.tick()
+        expect(statusChanges.count == 1, "unchanged percentage does not republish status")
+
+        try writeAuth(accountID: "account-c", email: "c@example.test", root: root)
+        store.tick()
+        expect(store.statusPercentage == nil, "hidden account switch clears old status")
+        expect(windowChanges == 0, "hidden account switch does not render the window")
+        try writeSnapshot(accountID: "account-c", used: 10, root: root)
+        store.tick()
+        expect(store.statusPercentage == 90, "hidden new account refreshes status")
+        store.setWindowVisible(true)
+        expect(store.remainingPercentage == 90, "reopening immediately displays latest quota")
+        expect(store.accountText == "c@example.test", "reopening displays latest account")
+        expect(store.rechargeAnimationEvent == nil, "reopening does not replay hidden recharge")
+        expect(windowChanges > 0, "visible window resumes updates")
+        withExtendedLifetime((observation, statusObservation)) {}
 
         print("Quota store tests passed.")
     }
