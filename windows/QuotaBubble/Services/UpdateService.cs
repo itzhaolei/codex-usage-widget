@@ -13,6 +13,7 @@ public sealed class UpdateService : IDisposable
 {
     public const string ReleasesUrl = "https://github.com/itzhaolei/codex-usage-widget/releases";
     private const string LatestReleaseUrl = ReleasesUrl + "/latest";
+    private const string CdnManifestUrl = "https://cdn.jsdelivr.net/gh/itzhaolei/codex-usage-widget@main/public/update.json";
     private readonly HttpClient _client;
 
     public UpdateService()
@@ -49,13 +50,26 @@ public sealed class UpdateService : IDisposable
             apiFailure = error;
         }
 
+        Exception? cdnFailure = null;
+        try
+        {
+            var manifest = await LatestFromCdnManifestAsync(cancellationToken);
+            if (manifest is not null) return manifest;
+        }
+        catch (Exception error) when (error is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            cdnFailure = error;
+        }
+
         try
         {
             return await LatestFromReleaseRedirectAsync(cancellationToken);
         }
         catch (Exception error) when (error is HttpRequestException or TaskCanceledException)
         {
-            throw new HttpRequestException("Unable to connect to the update server.", new AggregateException(apiFailure ?? error, error));
+            throw new HttpRequestException(
+                "Unable to connect to the update server.",
+                new AggregateException(new[] { apiFailure, cdnFailure, error }.OfType<Exception>()));
         }
     }
 
@@ -98,9 +112,19 @@ public sealed class UpdateService : IDisposable
         if (string.IsNullOrWhiteSpace(tag) || !Version.TryParse(tag.TrimStart('v'), out var version)) return null;
 
         var installerUrl = $"{ReleasesUrl}/download/{Uri.EscapeDataString(tag)}/QuotaBubble-{version}-Windows-Setup.exe";
-        using var installerRequest = new HttpRequestMessage(HttpMethod.Head, installerUrl);
-        using var installerResponse = await _client.SendAsync(installerRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-        installerResponse.EnsureSuccessStatusCode();
+        return new ReleaseInfo(version, tag, installerUrl);
+    }
+
+    private async Task<ReleaseInfo?> LatestFromCdnManifestAsync(CancellationToken cancellationToken)
+    {
+        var cacheKey = DateTimeOffset.UtcNow.ToString("yyyyMMddHH");
+        using var response = await _client.GetAsync($"{CdnManifestUrl}?v={cacheKey}", cancellationToken);
+        response.EnsureSuccessStatusCode();
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStreamAsync(cancellationToken));
+        var root = document.RootElement;
+        var tag = root.GetProperty("tag").GetString() ?? "";
+        var installerUrl = root.GetProperty("windows_installer_url").GetString() ?? "";
+        if (!Version.TryParse(tag.TrimStart('v'), out var version) || string.IsNullOrWhiteSpace(installerUrl)) return null;
         return new ReleaseInfo(version, tag, installerUrl);
     }
 

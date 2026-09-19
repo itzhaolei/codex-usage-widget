@@ -4,6 +4,13 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.17 - 2026-09-19
+
+### Fixed
+
+- Windows update checks no longer probe the installer download host before comparing versions, preventing a blocked release-asset domain from turning a successful version lookup into a connection error.
+- Added a lightweight jsDelivr update manifest as an independent fallback when GitHub API access is unavailable.
+
 ## 3.1.16 - 2026-09-19
 
 ### Fixed
