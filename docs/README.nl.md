@@ -19,7 +19,7 @@ Een native venster voor macOS en Windows met Codex-5-uursquota, weekquota, reset
 - Draait zelfstandig en leest lokale Codex-quotagegevens.
 - Onthoudt positie, thema en vastzetstatus.
 - Eén SwiftUI-app beheert de HUD, het Dock-pictogram, menu's en de levenscyclus.
-- Opent meerdere gesynchroniseerde vensters via het appmenu of `Command-N`. Elk venster deelt dezelfde live quota en bewaart zijn eigen positie.
+- Beperkt de app tot één instantie en één quotavenster, dat na verbergen via de menubalk of het systeemvak kan worden hersteld.
 - Biedt menuacties voor bijwerken, verwijderen en taal wisselen.
 - Toont een kleine rode stip naast de versie wanneer er een nieuwere GitHub-release beschikbaar is.
 - Ondersteunt donker en licht thema.

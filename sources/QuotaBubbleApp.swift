@@ -173,7 +173,7 @@ struct QuotaBubbleApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        WindowGroup("Quota Bubble", id: "main") {
+        Window("Quota Bubble", id: "main") {
             QuotaBubbleRoot(store: store, appDelegate: appDelegate)
         }
         .windowStyle(.hiddenTitleBar)
@@ -181,8 +181,6 @@ struct QuotaBubbleApp: App {
         .commands {
             CommandGroup(replacing: .newItem) {}
             CommandGroup(after: .appInfo) {
-                Divider()
-                NewQuotaWindowButton(languageMenu: languageMenu)
                 Divider()
                 Menu(languageMenu.copy.language) {
                     Button {
@@ -215,18 +213,6 @@ struct QuotaBubbleApp: App {
             }
         }
 
-    }
-}
-
-private struct NewQuotaWindowButton: View {
-    @ObservedObject var languageMenu: LanguageMenuState
-    @Environment(\.openWindow) private var openWindow
-
-    var body: some View {
-        Button(localizedNewWindowLabel(languageMenu.languageCode)) {
-            openWindow(id: "main")
-        }
-        .keyboardShortcut("n", modifiers: .command)
     }
 }
 

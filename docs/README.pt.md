@@ -19,7 +19,7 @@ Uma janela nativa para macOS e Windows que mostra cota de 5 horas do Codex, cota
 - Roda de forma independente e lê dados locais de cota do Codex.
 - Lembra posição, tema e estado fixado.
 - Um único app SwiftUI gerencia o HUD, o ícone do Dock, os menus e o ciclo de vida.
-- Abre várias janelas sincronizadas pelo menu do app ou com `Command-N`. Todas compartilham a mesma cota ao vivo e salvam a posição separadamente.
+- Limita o app a uma instância e uma janela de cota, que pode ser restaurada pela barra de menus ou bandeja do sistema depois de ocultada.
 - Adiciona ações de menu para atualizar, desinstalar e trocar idioma.
 - Mostra um pequeno ponto vermelho ao lado da versão quando há uma versão mais recente no GitHub.
 - Suporta tema claro e escuro.

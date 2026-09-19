@@ -27,6 +27,11 @@ swiftc -parse-as-library -o "$BUILD_DIR/QuotaBubble" \
     -framework Cocoa -framework SwiftUI -framework Combine
 
 grep -q 'applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }' "$ROOT/sources/QuotaBubbleApp.swift"
+grep -q 'Window("Quota Bubble", id: "main")' "$ROOT/sources/QuotaBubbleApp.swift"
+if grep -Eq 'WindowGroup\(|\\.openWindow|openWindow\(' "$ROOT/sources/QuotaBubbleApp.swift"; then
+    echo "macOS must remain a strict single-window application." >&2
+    exit 1
+fi
 grep -A5 'func close(window: NSWindow?)' "$ROOT/sources/QuotaBubbleApp.swift" | grep -q 'target.orderOut(nil)'
 if grep -A5 'func close(window: NSWindow?)' "$ROOT/sources/QuotaBubbleApp.swift" | grep -q 'NSApp.terminate'; then
     echo "macOS close control must hide the window without terminating the app." >&2

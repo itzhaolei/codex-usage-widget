@@ -19,7 +19,7 @@ Una finestra nativa per macOS e Windows che mostra quota Codex di 5 ore, quota s
 - Funziona in modo indipendente e legge i dati locali della quota Codex.
 - Ricorda posizione, tema e stato fissato.
 - Un'unica app SwiftUI gestisce HUD, icona Dock, menu e ciclo di vita.
-- Apre più finestre sincronizzate dal menu dell’app o con `Command-N`. Tutte condividono la stessa quota live e salvano separatamente la posizione.
+- Limita l’app a una sola istanza e una sola finestra quota, ripristinabile dalla barra dei menu o dall’area di notifica dopo essere stata nascosta.
 - Aggiunge azioni di menu per aggiornare, disinstallare e cambiare lingua.
 - Mostra un piccolo punto rosso accanto alla versione quando è disponibile una release GitHub più recente.
 - Supporta tema chiaro e scuro.

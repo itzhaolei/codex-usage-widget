@@ -35,7 +35,7 @@ Website source lives in `public/` and is ready for Cloudflare Pages. Recommended
 - Runs independently while reading local Codex quota data.
 - Remembers position, theme, and pinned state.
 - Runs as one native SwiftUI macOS app: the HUD, Dock icon, menus, and lifecycle share one process.
-- Opens multiple synchronized macOS windows from the app menu or with `Command-N`; every window shares the same live quota data while keeping its own position.
+- Enforces one application instance and one quota window, which can be restored from the menu bar or system tray after it is hidden.
 - Keeps a single Quota Bubble instance running and preserves the floating window position, theme, and pin state.
 - Adds menu-bar actions for updates, uninstall, and language switching.
 - Shows a small red dot next to the version label when a newer GitHub release is available.

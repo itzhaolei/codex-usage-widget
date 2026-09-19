@@ -8,9 +8,7 @@ enum QuotaModelsTests {
         expect(planBadgeText("chatgpt_pro_5x") == "Pro5x", "Pro5x badge")
         expect(planBadgeText("free") == "Free", "Free badge")
         expect(localizedCopy("zh").website == "官网", "Chinese website menu")
-        expect(localizedNewWindowLabel("zh") == "新建窗口", "Chinese new-window menu")
         for language in supportedLanguages {
-            expect(!localizedNewWindowLabel(language.code).isEmpty, "new-window label for \(language.code)")
             expect(!localizedPointsUnit(language.code).isEmpty, "points unit for \(language.code)")
         }
     expect(URL(string: officialWebsiteURLString)?.host == "htmlpreview.github.io", "official website URL")
