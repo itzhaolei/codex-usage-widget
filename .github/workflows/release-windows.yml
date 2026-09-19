@@ -121,7 +121,8 @@ jobs:
           Start-Sleep -Milliseconds 500
           if ($legacyProcess.HasExited) { throw "Legacy Windows process did not start" }
           $arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=`"$installDir`" /MERGETASKS=`"!startup`""
-          $process = Start-Process $installer -ArgumentList $arguments -Wait -PassThru
+          $process = Start-Process $installer -ArgumentList $arguments -PassThru
+          $process.WaitForExit()
           if ($process.ExitCode -ne 0) { throw "Installer exited with $($process.ExitCode)" }
           if (-not (Test-Path (Join-Path $installDir "QuotaBubble.exe"))) { throw "Installed application is missing" }
           $legacyFiles | ForEach-Object { if (Test-Path $_) { throw "Legacy Windows file was not removed: $_" } }
