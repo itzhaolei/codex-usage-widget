@@ -11,6 +11,7 @@ All notable changes to Quota Bubble are documented here.
 ### Fixed
 
 - Windows installation now stops a running legacy PowerShell widget and removes its files so an old script-based copy cannot remain beside the native application.
+- Windows color swatches now respond to clicks, update both quota bars, show the selected state, and persist the choice.
 
 ## 3.1.19 - 2026-09-19
 

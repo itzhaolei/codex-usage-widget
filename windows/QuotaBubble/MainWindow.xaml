@@ -107,11 +107,11 @@
             <TextBlock x:Name="PercentText" Margin="243,28,0,0" Width="38" FontSize="11" FontFamily="Consolas" Foreground="White"/>
           </Grid>
           <StackPanel Orientation="Horizontal" Height="15" Margin="0,4,0,0">
-            <Border Width="15" Height="15"><Border Width="12" Height="12" CornerRadius="3" Background="#00C229" BorderBrush="#F2FFFFFF" BorderThickness="1.5"/></Border>
-            <Border Width="15" Height="15" Margin="4,0,0,0"><Border Width="12" Height="12" CornerRadius="3" Background="#00A396" BorderBrush="#2EFFFFFF" BorderThickness="0.6"/></Border>
-            <Border Width="15" Height="15" Margin="4,0,0,0"><Border Width="12" Height="12" CornerRadius="3" Background="#1F85FF" BorderBrush="#2EFFFFFF" BorderThickness="0.6"/></Border>
-            <Border Width="15" Height="15" Margin="4,0,0,0"><Border Width="12" Height="12" CornerRadius="3" Background="#9E57FF" BorderBrush="#2EFFFFFF" BorderThickness="0.6"/></Border>
-            <Border Width="15" Height="15" Margin="4,0,0,0"><Border Width="12" Height="12" CornerRadius="3" Background="#C7A359" BorderBrush="#2EFFFFFF" BorderThickness="0.6"/></Border>
+            <Button x:Name="PaletteButton0" Width="15" Height="15" Style="{StaticResource ControlButton}" ToolTip="Green"><Border x:Name="PaletteSwatch0" Width="12" Height="12" CornerRadius="3" Background="#00C229"/></Button>
+            <Button x:Name="PaletteButton1" Width="15" Height="15" Margin="4,0,0,0" Style="{StaticResource ControlButton}" ToolTip="Teal"><Border x:Name="PaletteSwatch1" Width="12" Height="12" CornerRadius="3" Background="#00A396"/></Button>
+            <Button x:Name="PaletteButton2" Width="15" Height="15" Margin="4,0,0,0" Style="{StaticResource ControlButton}" ToolTip="Blue"><Border x:Name="PaletteSwatch2" Width="12" Height="12" CornerRadius="3" Background="#1F85FF"/></Button>
+            <Button x:Name="PaletteButton3" Width="15" Height="15" Margin="4,0,0,0" Style="{StaticResource ControlButton}" ToolTip="Purple"><Border x:Name="PaletteSwatch3" Width="12" Height="12" CornerRadius="3" Background="#9E57FF"/></Button>
+            <Button x:Name="PaletteButton4" Width="15" Height="15" Margin="4,0,0,0" Style="{StaticResource ControlButton}" ToolTip="Gold"><Border x:Name="PaletteSwatch4" Width="12" Height="12" CornerRadius="3" Background="#C7A359"/></Button>
           </StackPanel>
         </StackPanel>
 

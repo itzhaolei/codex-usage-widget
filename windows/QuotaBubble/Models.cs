@@ -25,4 +25,5 @@ public sealed class AppSettings
     [JsonPropertyName("language")] public string? Language { get; set; }
     [JsonPropertyName("left")] public double? Left { get; set; }
     [JsonPropertyName("top")] public double? Top { get; set; }
+    [JsonPropertyName("progressColorIndex")] public int ProgressColorIndex { get; set; }
 }

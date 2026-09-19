@@ -43,10 +43,10 @@ Name: "startup"; Description: "Start Quota Bubble when I sign in"; GroupDescript
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [InstallDelete]
-Type: files; Name: "{userprofile}\.codex\usage-widget\QuotaBubble.ps1"
-Type: files; Name: "{userprofile}\.codex\usage-widget\VERSION"
-Type: files; Name: "{userprofile}\.codex\usage-widget\windows-state.json"
-Type: files; Name: "{userprofile}\.codex\scripts\codex-usage-snapshot.mjs"
+Type: files; Name: "{%USERPROFILE}\.codex\usage-widget\QuotaBubble.ps1"
+Type: files; Name: "{%USERPROFILE}\.codex\usage-widget\VERSION"
+Type: files; Name: "{%USERPROFILE}\.codex\usage-widget\windows-state.json"
+Type: files; Name: "{%USERPROFILE}\.codex\scripts\codex-usage-snapshot.mjs"
 
 [Icons]
 Name: "{group}\Quota Bubble"; Filename: "{app}\QuotaBubble.exe"

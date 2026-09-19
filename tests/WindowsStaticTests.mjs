@@ -7,6 +7,7 @@ const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 const project = read("windows/QuotaBubble/QuotaBubble.csproj");
 const app = read("windows/QuotaBubble/App.xaml.cs");
 const window = read("windows/QuotaBubble/MainWindow.xaml.cs");
+const models = read("windows/QuotaBubble/Models.cs");
 const quota = read("windows/QuotaBubble/Services/QuotaService.cs");
 const auth = read("windows/QuotaBubble/Services/AuthService.cs");
 const updater = read("windows/QuotaBubble/Services/UpdateService.cs");
@@ -43,6 +44,10 @@ assert.doesNotMatch(windowXaml, /Content="[●▣☀☾×]"/, "controls and info
 assert.match(windowXaml, /MetricCards[\s\S]*Height="47"/, "single-line metric cards match the compact macOS height");
 assert.match(windowXaml, /x:Name="ResetText"[^>]*MaxWidth="118"/, "weekly reset countdown can extend beyond the progress bar width");
 assert.match(windowXaml, /Background="#00C229"/, "Windows exposes the macOS progress color palette");
+assert.match(windowXaml, /x:Name="PaletteButton0"/, "Windows color palette entries are clickable buttons");
+assert.match(window, /PaletteButton4\.Click \+= \(_, _\) => SelectProgressColor\(4\)/, "all Windows palette buttons select a progress color");
+assert.match(window, /SelectedProgressColor\(\)/, "Windows progress bars use the selected palette color");
+assert.match(models, /progressColorIndex/, "Windows persists the selected progress color");
 for (const color of windowXaml.match(/#[0-9A-Fa-f]+/g) ?? []) {
   assert.ok(color.length === 7 || color.length === 9, `XAML color ${color} uses RGB or ARGB syntax`);
 }

@@ -22,6 +22,15 @@ public sealed record ResetRow(string Text, System.Windows.Media.Brush Brush, Sys
 
 public partial class MainWindow : Window
 {
+    private static readonly Color[] ProgressPalette =
+    [
+        Color.FromRgb(0, 194, 41),
+        Color.FromRgb(0, 163, 150),
+        Color.FromRgb(31, 133, 255),
+        Color.FromRgb(158, 87, 255),
+        Color.FromRgb(199, 163, 89)
+    ];
+
     private readonly SettingsService _settingsService = new();
     private readonly QuotaService _quotaService = new();
     private readonly UpdateService _updateService = new();
@@ -32,6 +41,8 @@ public partial class MainWindow : Window
     private bool _refreshing;
     private bool _checkingUpdate;
     private bool _closing;
+    private int? _lastFiveHourRemaining;
+    private int? _lastWeeklyRemaining;
     private DateTimeOffset _lastVersionCheck = DateTimeOffset.MinValue;
 
     public MainWindow()
@@ -58,7 +69,7 @@ public partial class MainWindow : Window
     {
         MouseLeftButtonDown += (_, e) =>
         {
-            if (e.ButtonState != MouseButtonState.Pressed || e.OriginalSource is System.Windows.Controls.Button) return;
+            if (e.ButtonState != MouseButtonState.Pressed || IsInsideButton(e.OriginalSource as DependencyObject)) return;
             try { DragMove(); } catch { }
             SaveSettings();
         };
@@ -66,7 +77,22 @@ public partial class MainWindow : Window
         ThemeButton.Click += (_, _) => { _settings.Light = !_settings.Light; ApplyTheme(); SaveSettings(); };
         PinButton.Click += (_, _) => { _settings.Pinned = !_settings.Pinned; Topmost = _settings.Pinned; ApplyTheme(); SaveSettings(); };
         CloseButton.Click += (_, _) => HideWindow();
+        PaletteButton0.Click += (_, _) => SelectProgressColor(0);
+        PaletteButton1.Click += (_, _) => SelectProgressColor(1);
+        PaletteButton2.Click += (_, _) => SelectProgressColor(2);
+        PaletteButton3.Click += (_, _) => SelectProgressColor(3);
+        PaletteButton4.Click += (_, _) => SelectProgressColor(4);
         Closing += HandleClosing;
+    }
+
+    private static bool IsInsideButton(DependencyObject? source)
+    {
+        while (source is not null)
+        {
+            if (source is System.Windows.Controls.Button) return true;
+            source = VisualTreeHelper.GetParent(source);
+        }
+        return false;
     }
 
     private void ConfigureTray()
@@ -134,6 +160,8 @@ public partial class MainWindow : Window
         _lastRenderedCredits = snapshot?.ResetCredits;
         var fiveHour = snapshot?.SevenDay is null ? null : snapshot?.FiveHour;
         var weekly = snapshot?.SevenDay ?? snapshot?.FiveHour;
+        _lastFiveHourRemaining = Remaining(fiveHour);
+        _lastWeeklyRemaining = Remaining(weekly);
         FiveHourQuotaPanel.Visibility = fiveHour is null ? Visibility.Collapsed : Visibility.Visible;
         RenderQuota(fiveHour, FiveHourResetText, FiveHourResetDateText, null, FiveHourPercentText, FiveHourProgressFill, FiveHourProgressPattern);
         RenderQuota(weekly, ResetText, ResetDateText, ResetWeekdayText, PercentText, ProgressFill, ProgressPattern);
@@ -167,7 +195,7 @@ public partial class MainWindow : Window
     private void SetProgress(int? remaining, System.Windows.Shapes.Rectangle progressFill, System.Windows.Shapes.Rectangle progressPattern)
     {
         progressFill.Width = remaining is null ? 0 : 231 * remaining.Value / 100d;
-        var color = new SolidColorBrush(remaining is <= 20 ? Color.FromRgb(240, 51, 56) : Color.FromRgb(0, 194, 41));
+        var color = new SolidColorBrush(remaining is <= 20 ? Color.FromRgb(240, 51, 56) : SelectedProgressColor());
         color.Freeze();
         progressFill.Fill = color;
         if (progressPattern.Fill is VisualBrush brush && brush.Visual is System.Windows.Shapes.Ellipse dot) dot.Fill = color;
@@ -244,10 +272,38 @@ public partial class MainWindow : Window
         PinButton.Foreground = _settings.Pinned ? Brushes.LimeGreen : secondary;
         ThemeButton.Foreground = secondary;
         CloseButton.Foreground = secondary;
+        ApplyPaletteSelection(primary);
         AccountIcon.Stroke = secondary;
         SubscriptionIcon.Stroke = secondary;
         RenderResets(_quotaService.CurrentIdentity is null ? null : _lastRenderedCredits);
         RenderSystemCapacity();
+    }
+
+    private Color SelectedProgressColor()
+    {
+        var index = Math.Clamp(_settings.ProgressColorIndex, 0, ProgressPalette.Length - 1);
+        return ProgressPalette[index];
+    }
+
+    private void SelectProgressColor(int index)
+    {
+        if (index < 0 || index >= ProgressPalette.Length) return;
+        _settings.ProgressColorIndex = index;
+        ApplyPaletteSelection(new SolidColorBrush(_settings.Light ? Color.FromRgb(17, 24, 39) : Colors.White));
+        SetProgress(_lastFiveHourRemaining, FiveHourProgressFill, FiveHourProgressPattern);
+        SetProgress(_lastWeeklyRemaining, ProgressFill, ProgressPattern);
+        SaveSettings();
+    }
+
+    private void ApplyPaletteSelection(System.Windows.Media.Brush primary)
+    {
+        var swatches = new[] { PaletteSwatch0, PaletteSwatch1, PaletteSwatch2, PaletteSwatch3, PaletteSwatch4 };
+        var selected = Math.Clamp(_settings.ProgressColorIndex, 0, swatches.Length - 1);
+        for (var index = 0; index < swatches.Length; index++)
+        {
+            swatches[index].BorderBrush = index == selected ? primary : new SolidColorBrush(Color.FromArgb(46, 255, 255, 255));
+            swatches[index].BorderThickness = new Thickness(index == selected ? 1.5 : 0.6);
+        }
     }
 
     private ResetCredits? _lastRenderedCredits;
