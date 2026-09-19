@@ -13,6 +13,7 @@ Een native venster voor macOS en Windows met Codex-5-uursquota, weekquota, reset
 - Toont in de macOS-menubalk eerst het 5-uursquotum als percentage wanneer dit bestaat, anders het weekquotum.
 - Toont op macOS de vervaldatum van elke reset, met een rode stip binnen drie dagen en anders een groene stip.
 - Toont op macOS lokaal het huidige account en de vervaldatum van het abonnement zonder aanmeldgegevens in de quota-snapshot op te slaan.
+- Toont beschikbare systeemopslag en fysiek geheugen; op Windows wordt de vrije ruimte op de C-schijf weergegeven.
 - Houdt quotawaarden stabiel bij het wisselen tussen live gebruik en het lokale sessielogboek.
 - Draait zelfstandig en leest lokale Codex-quotagegevens.
 - Onthoudt positie, thema en vastzetstatus.

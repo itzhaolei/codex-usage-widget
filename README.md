@@ -29,6 +29,7 @@ Website source lives in `public/` and is ready for Cloudflare Pages. Recommended
 - Shows the live 5-hour quota percentage in the macOS menu bar when present, otherwise the weekly quota percentage.
 - Lists reset-credit expiration dates with red and green urgency indicators on macOS.
 - Shows the current account and subscription expiration locally on macOS without copying credentials into the quota snapshot.
+- Shows available system storage and physical memory; Windows reports available C-drive space.
 - Stabilizes live quota values and prevents data from a previous account appearing after an account switch.
 - Runs independently while reading local Codex quota data.
 - Remembers position, theme, and pinned state.

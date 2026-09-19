@@ -4,6 +4,20 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.15 - 2026-09-19
+
+### Added
+
+- Windows now shows available C-drive space and available physical memory with the same status-color behavior as macOS.
+- Added reliable vector icons for the Windows title controls and account-information rows.
+- Added the five-color palette row to the Windows weekly quota section.
+
+### Changed
+
+- Realigned Windows spacing, quota rows, percentages, reset-credit rows, metric cards, account details, and version label to match the macOS layout.
+- Windows metric cards now use compact 47-point or two-line 59-point heights and integer point balances like macOS.
+- Reduced the Windows card opacity for a lighter glass appearance.
+
 ## 3.1.14 - 2026-09-19
 
 ### Fixed

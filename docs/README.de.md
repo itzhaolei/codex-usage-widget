@@ -13,6 +13,7 @@ Ein natives schwebendes Fenster für Codex-5-Stunden-Kontingent, Wochenkontingen
 - Zeigt in der macOS-Menüleiste vorrangig das 5-Stunden-Kontingent in Prozent, sonst das Wochenkontingent.
 - Zeigt unter macOS die Ablaufdaten einzelner Reset-Credits mit einem roten Punkt innerhalb von drei Tagen und sonst mit einem grünen Punkt.
 - Zeigt unter macOS das aktuelle Konto und das Ablaufdatum des Abonnements lokal an, ohne Anmeldedaten im Kontingent-Snapshot zu speichern.
+- Zeigt verfügbaren Systemspeicher und physischen Arbeitsspeicher; unter Windows wird der freie Speicher auf Laufwerk C angezeigt.
 - Hält Kontingentwerte beim Wechsel zwischen Live-Nutzung und lokalem Sitzungsprotokoll stabil.
 - Läuft unabhängig und liest lokale Codex-Kontingentdaten.
 - Speichert Fensterposition, Theme und Anheftstatus.

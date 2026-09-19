@@ -13,6 +13,7 @@ Una finestra nativa per macOS e Windows che mostra quota Codex di 5 ore, quota s
 - Mostra nella barra dei menu macOS la percentuale della quota di 5 ore quando presente; altrimenti mostra quella settimanale.
 - Su macOS mostra la scadenza di ogni ripristino, con un punto rosso entro tre giorni e verde negli altri casi.
 - Su macOS mostra localmente l’account corrente e la scadenza dell’abbonamento senza salvare credenziali nello snapshot della quota.
+- Mostra lo spazio di sistema e la memoria fisica disponibili; su Windows indica lo spazio libero dell’unità C.
 - Mantiene stabili le quote live e impedisce la visualizzazione dei dati dell’account precedente dopo un cambio account.
 - Funziona in modo indipendente e legge i dati locali della quota Codex.
 - Ricorda posizione, tema e stato fissato.

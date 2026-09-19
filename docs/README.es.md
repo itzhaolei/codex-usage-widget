@@ -13,6 +13,7 @@ Una ventana nativa para macOS y Windows que muestra la cuota de 5 horas de Codex
 - Muestra en la barra de menús de macOS el porcentaje de 5 horas cuando existe; si no, muestra el porcentaje semanal.
 - En macOS muestra la caducidad de cada reinicio, con un punto rojo si vence en tres días y verde en caso contrario.
 - En macOS muestra localmente la cuenta actual y la caducidad de la suscripción sin guardar credenciales en la instantánea de cuota.
+- Muestra el almacenamiento del sistema y la memoria física disponibles; en Windows indica el espacio libre de la unidad C.
 - Mantiene estables los valores al alternar entre el uso en vivo y el registro de sesión local.
 - Se ejecuta de forma independiente y lee datos locales de cuota de Codex.
 - Recuerda posición, tema y estado fijado.
