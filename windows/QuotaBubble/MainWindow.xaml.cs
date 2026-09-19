@@ -2,6 +2,7 @@ using QuotaBubble.Services;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;

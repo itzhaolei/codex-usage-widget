@@ -4,6 +4,12 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.14 - 2026-09-19
+
+### Fixed
+
+- Corrected the Windows build for the updater SSL and proxy fallback introduced in 3.1.13.
+
 ## 3.1.13 - 2026-09-19
 
 ### Fixed
