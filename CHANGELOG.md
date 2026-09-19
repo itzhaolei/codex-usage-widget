@@ -10,7 +10,7 @@ All notable changes to Quota Bubble are documented here.
 
 ### Fixed
 
-- Windows installation now removes legacy PowerShell widget files so an old script-based copy cannot remain beside the native application.
+- Windows installation now stops a running legacy PowerShell widget and removes its files so an old script-based copy cannot remain beside the native application.
 
 ## 3.1.19 - 2026-09-19
 

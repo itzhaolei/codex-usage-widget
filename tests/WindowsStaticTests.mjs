@@ -70,6 +70,7 @@ assert.match(installer, /PrivilegesRequired=lowest/, "installer supports non-adm
 assert.match(installer, /UsePreviousAppDir=yes/, "upgrades explicitly reuse the existing installation directory");
 assert.match(installer, /UsePreviousTasks=yes/, "upgrades preserve the existing startup choice");
 assert.match(installer, /\[InstallDelete\][\s\S]*QuotaBubble\.ps1[\s\S]*windows-state\.json[\s\S]*codex-usage-snapshot\.mjs/, "native upgrades remove legacy PowerShell installation files");
+assert.match(installer, /WindowsPowerShell\\v1\.0\\powershell\.exe[\s\S]*EncodedCommand/, "installer terminates a running legacy PowerShell widget");
 assert.match(installer, /Name: "\{autodesktop\}\\Quota Bubble"; Filename: "\{app\}\\QuotaBubble\.exe"\s*$/m, "installer always creates a desktop shortcut");
 assert.doesNotMatch(installer, /Name: "desktopicon"/, "desktop shortcut is not optional");
 assert.match(installer, /\[UninstallRun\]/, "installer provides graphical uninstall support");
@@ -79,6 +80,7 @@ assert.match(workflow, /dotnet publish/, "Windows CI compiles the application");
 assert.match(workflow, /Smoke launch installed application/, "Windows CI launches the installed app");
 assert.match(workflow, /Desktop shortcut was not created/, "Windows CI verifies the desktop shortcut");
 assert.match(workflow, /Legacy Windows file was not removed/, "Windows CI verifies legacy installation cleanup");
+assert.match(workflow, /Legacy Windows process was not terminated/, "Windows CI verifies the legacy widget process is stopped");
 for (const code of ["en", "zh", "ja", "ko", "de", "fr", "es", "pt", "it", "nl"]) {
   assert.match(read("windows/QuotaBubble/Localization.cs"), new RegExp(`\\["${code}"\\]`), `${code} localization exists`);
 }
