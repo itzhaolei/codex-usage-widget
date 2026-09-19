@@ -30,6 +30,7 @@ public partial class MainWindow : Window
     private readonly AppSettings _settings;
     private Forms.NotifyIcon? _tray;
     private bool _refreshing;
+    private bool _checkingUpdate;
     private bool _closing;
     private DateTimeOffset _lastVersionCheck = DateTimeOffset.MinValue;
 
@@ -263,6 +264,9 @@ public partial class MainWindow : Window
 
     private async Task CheckVersionAsync(bool interactive)
     {
+        if (_checkingUpdate) return;
+        _checkingUpdate = true;
+        UpdateProgressWindow? progressWindow = null;
         try
         {
             _lastVersionCheck = DateTimeOffset.UtcNow;
@@ -281,8 +285,13 @@ public partial class MainWindow : Window
                 MessageBox.Show(this, copy.Latest, "Quota Bubble", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
-            MessageBox.Show(this, copy.Updating, "Quota Bubble", MessageBoxButton.OK, MessageBoxImage.Information);
-            await _updateService.DownloadAndInstallAsync(release);
+            progressWindow = new UpdateProgressWindow(copy.Updating) { Owner = this };
+            progressWindow.Show();
+            progressWindow.Activate();
+            var progress = new Progress<DownloadProgress>(progressWindow.Report);
+            await _updateService.DownloadAndInstallAsync(release, progress);
+            progressWindow.CloseAfterDownload();
+            progressWindow = null;
             ExitApplication();
         }
         catch (Exception error)
@@ -299,6 +308,11 @@ public partial class MainWindow : Window
                 return;
             }
             MessageBox.Show(this, $"{copy.UpdateFailed}: {InnermostMessage(error)}", "Quota Bubble", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            progressWindow?.CloseAfterDownload();
+            _checkingUpdate = false;
         }
     }
 

@@ -8,6 +8,12 @@ using System.Text.Json;
 namespace QuotaBubble.Services;
 
 public sealed record ReleaseInfo(Version Version, string Tag, string InstallerUrl);
+public sealed record DownloadProgress(long BytesReceived, long? TotalBytes)
+{
+    public int? Percentage => TotalBytes is > 0
+        ? (int)Math.Clamp(BytesReceived * 100 / TotalBytes.Value, 0, 100)
+        : null;
+}
 
 public sealed class UpdateService : IDisposable
 {
@@ -75,7 +81,10 @@ public sealed class UpdateService : IDisposable
 
     public static void OpenReleasesPage() => Process.Start(new ProcessStartInfo(ReleasesUrl) { UseShellExecute = true });
 
-    public async Task DownloadAndInstallAsync(ReleaseInfo release, CancellationToken cancellationToken = default)
+    public async Task DownloadAndInstallAsync(
+        ReleaseInfo release,
+        IProgress<DownloadProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
         var directory = Path.Combine(Path.GetTempPath(), "QuotaBubble", release.Tag);
         Directory.CreateDirectory(directory);
@@ -85,7 +94,18 @@ public sealed class UpdateService : IDisposable
             response.EnsureSuccessStatusCode();
             await using var input = await response.Content.ReadAsStreamAsync(cancellationToken);
             await using var output = File.Create(path);
-            await input.CopyToAsync(output, cancellationToken);
+            var totalBytes = response.Content.Headers.ContentLength;
+            var bytesReceived = 0L;
+            var buffer = new byte[81_920];
+            progress?.Report(new DownloadProgress(bytesReceived, totalBytes));
+            while (true)
+            {
+                var count = await input.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken);
+                if (count == 0) break;
+                await output.WriteAsync(buffer.AsMemory(0, count), cancellationToken);
+                bytesReceived += count;
+                progress?.Report(new DownloadProgress(bytesReceived, totalBytes));
+            }
         }
         Process.Start(new ProcessStartInfo(path, "/SILENT /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS") { UseShellExecute = true });
     }
