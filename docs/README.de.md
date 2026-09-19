@@ -35,7 +35,7 @@ macOS 13 oder neuer. Entpacken Sie `macOS-Installer.zip` und öffnen Sie `Instal
 
 ### Windows
 
-Windows 10 oder neuer. Öffnen Sie `Windows-Setup.exe` und folgen Sie dem grafischen Assistenten. PowerShell, Node.js, Terminalbefehle und eine separate .NET-Laufzeit sind nicht erforderlich.
+Windows 10 oder neuer. Öffnen Sie `Windows-Setup.exe` und folgen Sie dem grafischen Assistenten. Nach der Installation wird automatisch eine Quota-Bubble-Verknüpfung auf dem Desktop erstellt. PowerShell, Node.js, Terminalbefehle und eine separate .NET-Laufzeit sind nicht erforderlich.
 
 ## Deinstallation
 

@@ -35,7 +35,7 @@ macOS 13 以降。`macOS-Installer.zip` を解凍し、`Install Quota Bubble.app
 
 ### Windows
 
-Windows 10 以降。`Windows-Setup.exe` を開いて GUI ウィザードに従います。PowerShell、Node.js、ターミナル操作、別途の .NET ランタイムは不要です。
+Windows 10 以降。`Windows-Setup.exe` を開いて GUI ウィザードに従います。インストール後、デスクトップに Quota Bubble の起動ショートカットが自動作成されます。PowerShell、Node.js、ターミナル操作、別途の .NET ランタイムは不要です。
 
 ## アンインストール
 

@@ -35,7 +35,7 @@ macOS 13 ou ultérieur. Décompressez `macOS-Installer.zip`, puis ouvrez `Instal
 
 ### Windows
 
-Windows 10 ou ultérieur. Ouvrez `Windows-Setup.exe` et suivez l’assistant graphique. PowerShell, Node.js, terminal et runtime .NET séparé ne sont pas requis.
+Windows 10 ou ultérieur. Ouvrez `Windows-Setup.exe` et suivez l’assistant graphique. Après l’installation, un raccourci Quota Bubble est créé automatiquement sur le bureau. PowerShell, Node.js, terminal et runtime .NET séparé ne sont pas requis.
 
 ## Désinstallation
 

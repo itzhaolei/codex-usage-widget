@@ -35,7 +35,7 @@ macOS 13 o successivo. Estrai `macOS-Installer.zip` e apri `Install Quota Bubble
 
 ### Windows
 
-Windows 10 o successivo. Apri `Windows-Setup.exe` e segui la procedura grafica. Non servono PowerShell, Node.js, terminale o un runtime .NET separato.
+Windows 10 o successivo. Apri `Windows-Setup.exe` e segui la procedura grafica. Dopo l’installazione viene creato automaticamente un collegamento Quota Bubble sul desktop. Non servono PowerShell, Node.js, terminale o un runtime .NET separato.
 
 ## Disinstallazione
 

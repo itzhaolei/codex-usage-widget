@@ -54,7 +54,7 @@ Quota Bubble fetches data natively in Swift. End users do not need Node.js, npm,
 
 ### Windows
 
-Requires Windows 10 or later. Open the downloaded `Windows-Setup.exe` and follow the graphical setup wizard. It installs the self-contained desktop app, creates shortcuts, can enable launch at sign-in, and opens Quota Bubble. PowerShell, Node.js, a terminal, a separate .NET runtime, and manual commands are not required.
+Requires Windows 10 or later. Open the downloaded `Windows-Setup.exe` and follow the graphical setup wizard. It installs the self-contained desktop app, always creates a desktop launch shortcut, can enable launch at sign-in, and opens Quota Bubble. PowerShell, Node.js, a terminal, a separate .NET runtime, and manual commands are not required.
 
 ## Uninstall
 

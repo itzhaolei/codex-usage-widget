@@ -35,7 +35,7 @@ macOS 13 of nieuwer. Pak `macOS-Installer.zip` uit en open `Install Quota Bubble
 
 ### Windows
 
-Windows 10 of nieuwer. Open `Windows-Setup.exe` en volg de grafische wizard. PowerShell, Node.js, terminalopdrachten en een aparte .NET-runtime zijn niet nodig.
+Windows 10 of nieuwer. Open `Windows-Setup.exe` en volg de grafische wizard. Na de installatie wordt automatisch een Quota Bubble-snelkoppeling op het bureaublad gemaakt. PowerShell, Node.js, terminalopdrachten en een aparte .NET-runtime zijn niet nodig.
 
 ## Verwijderen
 

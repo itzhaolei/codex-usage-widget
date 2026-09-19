@@ -59,11 +59,14 @@ assert.doesNotMatch(updater, /HttpMethod\.Head/, "release lookup does not fail w
 assert.match(window, /UpdateService\.OpenReleasesPage/, "interactive update failures open the manual download page");
 assert.doesNotMatch(window, /Windows installer asset not found/, "Windows update action does not show missing asset errors for macOS-only releases");
 assert.match(installer, /PrivilegesRequired=lowest/, "installer supports non-admin per-user installation");
+assert.match(installer, /Name: "\{autodesktop\}\\Quota Bubble"; Filename: "\{app\}\\QuotaBubble\.exe"\s*$/m, "installer always creates a desktop shortcut");
+assert.doesNotMatch(installer, /Name: "desktopicon"/, "desktop shortcut is not optional");
 assert.match(installer, /\[UninstallRun\]/, "installer provides graphical uninstall support");
 assert.match(compatibilityInstaller, /Windows-Setup\.exe/, "legacy updater bridge launches the graphical installer");
 assert.match(workflow, /Windows\.zip/, "release retains an automatic migration path for the previous updater");
 assert.match(workflow, /dotnet publish/, "Windows CI compiles the application");
 assert.match(workflow, /Smoke launch installed application/, "Windows CI launches the installed app");
+assert.match(workflow, /Desktop shortcut was not created/, "Windows CI verifies the desktop shortcut");
 for (const code of ["en", "zh", "ja", "ko", "de", "fr", "es", "pt", "it", "nl"]) {
   assert.match(read("windows/QuotaBubble/Localization.cs"), new RegExp(`\\["${code}"\\]`), `${code} localization exists`);
 }

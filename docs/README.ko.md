@@ -35,7 +35,7 @@ macOS 13 이상. `macOS-Installer.zip`의 압축을 풀고 `Install Quota Bubble
 
 ### Windows
 
-Windows 10 이상. `Windows-Setup.exe`를 열고 GUI 설치 마법사를 따르세요. PowerShell, Node.js, 터미널 명령 또는 별도 .NET 런타임이 필요 없습니다.
+Windows 10 이상. `Windows-Setup.exe`를 열고 GUI 설치 마법사를 따르세요. 설치 후 바탕 화면에 Quota Bubble 실행 바로 가기가 자동으로 생성됩니다. PowerShell, Node.js, 터미널 명령 또는 별도 .NET 런타임이 필요 없습니다.
 
 ## 제거
 

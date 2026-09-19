@@ -34,7 +34,6 @@ ArchitecturesInstallIn64BitMode=x64compatible
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "startup"; Description: "Start Quota Bubble when I sign in"; GroupDescription: "Startup"; Flags: checkedonce
 
 [Files]
@@ -43,7 +42,7 @@ Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 [Icons]
 Name: "{group}\Quota Bubble"; Filename: "{app}\QuotaBubble.exe"
 Name: "{group}\Uninstall Quota Bubble"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\Quota Bubble"; Filename: "{app}\QuotaBubble.exe"; Tasks: desktopicon
+Name: "{autodesktop}\Quota Bubble"; Filename: "{app}\QuotaBubble.exe"
 Name: "{userstartup}\Quota Bubble"; Filename: "{app}\QuotaBubble.exe"; WorkingDir: "{app}"; Tasks: startup
 
 [Run]

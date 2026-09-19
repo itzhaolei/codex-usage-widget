@@ -37,7 +37,7 @@
 
 ### Windows
 
-需要 Windows 10 或更高版本。打开下载的 `Windows-Setup.exe`，按图形安装向导完成安装。用户不需要 PowerShell、Node.js、终端命令或额外安装 .NET 运行时。
+需要 Windows 10 或更高版本。打开下载的 `Windows-Setup.exe`，按图形安装向导完成安装；安装后桌面会自动创建 Quota Bubble 启动图标。用户不需要 PowerShell、Node.js、终端命令或额外安装 .NET 运行时。
 
 ## 卸载
 

@@ -35,7 +35,7 @@ macOS 13 ou posterior. Descompacte `macOS-Installer.zip` e abra `Install Quota B
 
 ### Windows
 
-Windows 10 ou posterior. Abra `Windows-Setup.exe` e siga o assistente gráfico. Não exige PowerShell, Node.js, terminal ou runtime .NET separado.
+Windows 10 ou posterior. Abra `Windows-Setup.exe` e siga o assistente gráfico. Após a instalação, um atalho do Quota Bubble é criado automaticamente na área de trabalho. Não exige PowerShell, Node.js, terminal ou runtime .NET separado.
 
 ## Desinstalar
 
