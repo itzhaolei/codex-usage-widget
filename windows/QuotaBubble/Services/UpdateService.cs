@@ -20,7 +20,11 @@ public sealed class UpdateService : IDisposable
     public const string ReleasesUrl = "https://github.com/itzhaolei/codex-usage-widget/releases";
     private const string LatestReleaseUrl = ReleasesUrl + "/latest";
     private const string CdnManifestUrl = "https://cdn.jsdelivr.net/gh/itzhaolei/codex-usage-widget@main/public/update.json";
+    private static readonly TimeSpan[] LookupRetryDelays = [TimeSpan.Zero, TimeSpan.FromMilliseconds(600), TimeSpan.FromMilliseconds(1_600)];
+    private static readonly TimeSpan[] DownloadRetryDelays = [TimeSpan.Zero, TimeSpan.FromMilliseconds(800), TimeSpan.FromSeconds(2)];
+    private static readonly TimeSpan LookupTimeout = TimeSpan.FromSeconds(8);
     private readonly HttpClient _client;
+    private ReleaseInfo? _lastKnownRelease;
 
     public UpdateService()
     {
@@ -35,47 +39,55 @@ public sealed class UpdateService : IDisposable
 
     public async Task<ReleaseInfo?> LatestAsync(CancellationToken cancellationToken = default)
     {
-        Exception? apiFailure = null;
-        try
+        var failures = new List<Exception>();
+        foreach (var delay in LookupRetryDelays)
         {
-            using var response = await _client.GetAsync(
-                "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases?per_page=30", cancellationToken);
-            response.EnsureSuccessStatusCode();
-            using var document = JsonDocument.Parse(await response.Content.ReadAsStreamAsync(cancellationToken));
-            foreach (var release in document.RootElement.EnumerateArray())
+            if (delay > TimeSpan.Zero) await Task.Delay(delay, cancellationToken);
+            var release = await LatestOnceAsync(failures, cancellationToken);
+            if (release is not null)
             {
-                var tag = release.GetProperty("tag_name").GetString() ?? "";
-                if (!Version.TryParse(tag.TrimStart('v'), out var version)) continue;
-                var installer = WindowsInstallerUrl(release);
-                if (!string.IsNullOrWhiteSpace(installer)) return new ReleaseInfo(version, tag, installer);
+                _lastKnownRelease = release;
+                return release;
             }
-            return null;
-        }
-        catch (Exception error) when (error is HttpRequestException or TaskCanceledException)
-        {
-            apiFailure = error;
         }
 
-        Exception? cdnFailure = null;
+        if (_lastKnownRelease is not null) return _lastKnownRelease;
+        if (failures.Count == 0) return null;
+        throw new HttpRequestException(
+            "Unable to connect to the update server after automatic retries.",
+            new AggregateException(failures));
+    }
+
+    private async Task<ReleaseInfo?> LatestOnceAsync(List<Exception> failures, CancellationToken cancellationToken)
+    {
         try
         {
-            var manifest = await LatestFromCdnManifestAsync(cancellationToken);
-            if (manifest is not null) return manifest;
+            var release = await LatestFromGitHubApiAsync(cancellationToken);
+            if (release is not null) return release;
         }
-        catch (Exception error) when (error is HttpRequestException or TaskCanceledException or JsonException)
+        catch (Exception error) when (!cancellationToken.IsCancellationRequested && error is HttpRequestException or TaskCanceledException or JsonException)
         {
-            cdnFailure = error;
+            failures.Add(error);
+        }
+
+        try
+        {
+            var release = await LatestFromCdnManifestAsync(cancellationToken);
+            if (release is not null) return release;
+        }
+        catch (Exception error) when (!cancellationToken.IsCancellationRequested && error is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            failures.Add(error);
         }
 
         try
         {
             return await LatestFromReleaseRedirectAsync(cancellationToken);
         }
-        catch (Exception error) when (error is HttpRequestException or TaskCanceledException)
+        catch (Exception error) when (!cancellationToken.IsCancellationRequested && error is HttpRequestException or TaskCanceledException)
         {
-            throw new HttpRequestException(
-                "Unable to connect to the update server.",
-                new AggregateException(new[] { apiFailure, cdnFailure, error }.OfType<Exception>()));
+            failures.Add(error);
+            return null;
         }
     }
 
@@ -89,25 +101,53 @@ public sealed class UpdateService : IDisposable
         var directory = Path.Combine(Path.GetTempPath(), "QuotaBubble", release.Tag);
         Directory.CreateDirectory(directory);
         var path = Path.Combine(directory, $"QuotaBubble-{release.Version}-Windows-Setup.exe");
-        using (var response = await _client.GetAsync(release.InstallerUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
+        Exception? lastFailure = null;
+        var downloaded = false;
+        foreach (var delay in DownloadRetryDelays)
         {
-            response.EnsureSuccessStatusCode();
-            await using var input = await response.Content.ReadAsStreamAsync(cancellationToken);
-            await using var output = File.Create(path);
-            var totalBytes = response.Content.Headers.ContentLength;
-            var bytesReceived = 0L;
-            var buffer = new byte[81_920];
-            progress?.Report(new DownloadProgress(bytesReceived, totalBytes));
-            while (true)
+            if (delay > TimeSpan.Zero) await Task.Delay(delay, cancellationToken);
+            try
             {
-                var count = await input.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken);
-                if (count == 0) break;
-                await output.WriteAsync(buffer.AsMemory(0, count), cancellationToken);
-                bytesReceived += count;
-                progress?.Report(new DownloadProgress(bytesReceived, totalBytes));
+                await DownloadInstallerOnceAsync(release.InstallerUrl, path, progress, cancellationToken);
+                downloaded = true;
+                break;
+            }
+            catch (Exception error) when (!cancellationToken.IsCancellationRequested && error is HttpRequestException or TaskCanceledException or IOException)
+            {
+                lastFailure = error;
+                try { File.Delete(path); } catch { }
             }
         }
+
+        if (!downloaded)
+            throw new HttpRequestException("Unable to download the update after automatic retries.", lastFailure);
         Process.Start(new ProcessStartInfo(path, "/SILENT /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS") { UseShellExecute = true });
+    }
+
+    private async Task DownloadInstallerOnceAsync(
+        string installerUrl,
+        string path,
+        IProgress<DownloadProgress>? progress,
+        CancellationToken cancellationToken)
+    {
+        using var response = await _client.GetAsync(installerUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        await using var input = await response.Content.ReadAsStreamAsync(cancellationToken);
+        await using var output = File.Create(path);
+        var totalBytes = response.Content.Headers.ContentLength;
+        var bytesReceived = 0L;
+        var buffer = new byte[81_920];
+        progress?.Report(new DownloadProgress(bytesReceived, totalBytes));
+        while (true)
+        {
+            var count = await input.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken);
+            if (count == 0) break;
+            await output.WriteAsync(buffer.AsMemory(0, count), cancellationToken);
+            bytesReceived += count;
+            progress?.Report(new DownloadProgress(bytesReceived, totalBytes));
+        }
+        if (totalBytes is > 0 && bytesReceived != totalBytes.Value)
+            throw new IOException($"The update download ended early ({bytesReceived} of {totalBytes.Value} bytes).");
     }
 
     private static string? WindowsInstallerUrl(JsonElement release)
@@ -125,7 +165,7 @@ public sealed class UpdateService : IDisposable
 
     private async Task<ReleaseInfo?> LatestFromReleaseRedirectAsync(CancellationToken cancellationToken)
     {
-        using var response = await _client.GetAsync(LatestReleaseUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        using var response = await GetLookupAsync(LatestReleaseUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         response.EnsureSuccessStatusCode();
         var finalUri = response.RequestMessage?.RequestUri;
         var tag = finalUri?.Segments.LastOrDefault()?.Trim('/');
@@ -138,7 +178,7 @@ public sealed class UpdateService : IDisposable
     private async Task<ReleaseInfo?> LatestFromCdnManifestAsync(CancellationToken cancellationToken)
     {
         var cacheKey = DateTimeOffset.UtcNow.ToString("yyyyMMddHH");
-        using var response = await _client.GetAsync($"{CdnManifestUrl}?v={cacheKey}", cancellationToken);
+        using var response = await GetLookupAsync($"{CdnManifestUrl}?v={cacheKey}", HttpCompletionOption.ResponseContentRead, cancellationToken);
         response.EnsureSuccessStatusCode();
         using var document = JsonDocument.Parse(await response.Content.ReadAsStreamAsync(cancellationToken));
         var root = document.RootElement;
@@ -146,6 +186,34 @@ public sealed class UpdateService : IDisposable
         var installerUrl = root.GetProperty("windows_installer_url").GetString() ?? "";
         if (!Version.TryParse(tag.TrimStart('v'), out var version) || string.IsNullOrWhiteSpace(installerUrl)) return null;
         return new ReleaseInfo(version, tag, installerUrl);
+    }
+
+    private async Task<ReleaseInfo?> LatestFromGitHubApiAsync(CancellationToken cancellationToken)
+    {
+        using var response = await GetLookupAsync(
+            "https://api.github.com/repos/itzhaolei/codex-usage-widget/releases?per_page=30",
+            HttpCompletionOption.ResponseContentRead,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStreamAsync(cancellationToken));
+        foreach (var release in document.RootElement.EnumerateArray())
+        {
+            var tag = release.GetProperty("tag_name").GetString() ?? "";
+            if (!Version.TryParse(tag.TrimStart('v'), out var version)) continue;
+            var installer = WindowsInstallerUrl(release);
+            if (!string.IsNullOrWhiteSpace(installer)) return new ReleaseInfo(version, tag, installer);
+        }
+        return null;
+    }
+
+    private async Task<HttpResponseMessage> GetLookupAsync(
+        string url,
+        HttpCompletionOption completionOption,
+        CancellationToken cancellationToken)
+    {
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(LookupTimeout);
+        return await _client.GetAsync(url, completionOption, timeout.Token);
     }
 
     public void Dispose() => _client.Dispose();

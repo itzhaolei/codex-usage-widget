@@ -4,6 +4,10 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+### Fixed
+
+- Windows update checks and installer downloads now retry transient network, proxy, and TLS failures with short backoff delays, use a bounded timeout for each lookup, and reuse the last successful release result before showing an error.
+
 ## 3.1.24 - 2026-09-19
 
 ### Fixed

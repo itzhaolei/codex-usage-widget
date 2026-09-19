@@ -61,6 +61,10 @@ assert.doesNotMatch(updater, /api\.github\.com\/repos\/[^\s"]+\/releases\/latest
 assert.match(updater, /DefaultProxyCredentials = CredentialCache\.DefaultCredentials/, "Windows updater uses the signed-in user's system proxy credentials");
 assert.match(updater, /cdn\.jsdelivr\.net/, "Windows updater has a CDN-hosted manifest fallback");
 assert.match(updater, /LatestFromReleaseRedirectAsync/, "Windows updater falls back to the GitHub releases redirect when the API is unavailable");
+assert.match(updater, /LookupRetryDelays[\s\S]*TimeSpan\.FromMilliseconds\(600\)[\s\S]*TimeSpan\.FromMilliseconds\(1_600\)/, "version checks retry transient failures with backoff");
+assert.match(updater, /DownloadRetryDelays[\s\S]*TimeSpan\.FromMilliseconds\(800\)[\s\S]*TimeSpan\.FromSeconds\(2\)/, "installer downloads retry transient failures with backoff");
+assert.match(updater, /_lastKnownRelease/, "version checks retain the last successful release as an in-session fallback");
+assert.match(updater, /GetLookupAsync[\s\S]*CancelAfter\(LookupTimeout\)/, "each update lookup has a bounded timeout");
 assert.doesNotMatch(updater, /HttpMethod\.Head/, "release lookup does not fail while probing the installer download host");
 assert.match(updater, /IProgress<DownloadProgress>/, "Windows updater reports download progress");
 assert.match(updater, /ReadAsync\(buffer\.AsMemory/, "Windows updater streams the installer in measurable chunks");
