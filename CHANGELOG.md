@@ -4,6 +4,8 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.18 - 2026-09-19
+
 ### Changed
 
 - Closing the main window now hides it on macOS and Windows while menu-bar or system-tray quota updates continue in the background.
