@@ -4,6 +4,8 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.20 - 2026-09-19
+
 ### Changed
 
 - Windows upgrades now explicitly reuse the existing installation directory and preserve the current startup preference.
