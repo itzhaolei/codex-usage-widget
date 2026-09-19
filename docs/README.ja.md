@@ -4,7 +4,7 @@
 
 Codex の 5 時間クォータ、週間クォータ、リセット時刻、残高、プラン、アカウント、リセット回数を表示する macOS / Windows 対応のネイティブウィンドウです。
 
-![Quota Bubble preview](../assets/preview-v3.png)
+![Quota Bubble preview](../assets/preview-v3.png?raw=1&v=20260919-3)
 
 ## 機能
 
@@ -27,7 +27,7 @@ Codex の 5 時間クォータ、週間クォータ、リセット時刻、残�
 
 ## インストール
 
-[Quota Bubble 公式サイト](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1)のメインボタンをクリックしてください。macOS / Windows を自動判定し、Release ページを経由せず最新の GUI インストーラーを直接ダウンロードします。
+[Quota Bubble 公式サイト](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-3)のメインボタンをクリックしてください。macOS / Windows を自動判定し、Release ページを経由せず最新の GUI インストーラーを直接ダウンロードします。
 
 ### macOS
 

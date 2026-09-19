@@ -4,7 +4,7 @@
 
 Een native venster voor macOS en Windows met Codex-5-uursquota, weekquota, resettijd, saldo, plan, account en beschikbare resets.
 
-![Quota Bubble preview](../assets/preview-v3.png)
+![Quota Bubble preview](../assets/preview-v3.png?raw=1&v=20260919-3)
 
 ## Functies
 
@@ -27,7 +27,7 @@ Een native venster voor macOS en Windows met Codex-5-uursquota, weekquota, reset
 
 ## Installatie
 
-Open de [officiële Quota Bubble-website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1) en klik op de hoofdknop. De site detecteert macOS of Windows en downloadt de nieuwste grafische installer direct zonder de Release-pagina te openen.
+Open de [officiële Quota Bubble-website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-3) en klik op de hoofdknop. De site detecteert macOS of Windows en downloadt de nieuwste grafische installer direct zonder de Release-pagina te openen.
 
 ### macOS
 

@@ -4,7 +4,7 @@
 
 一个支持 macOS 和 Windows 的原生悬浮配额窗口，用来直接查看 Codex 5 小时配额、周配额、重置时间、余额、套餐、账号和可用重置次数。
 
-![Quota Bubble 预览](../assets/preview-v3.png)
+![Quota Bubble 预览](../assets/preview-v3.png?raw=1&v=20260919-3)
 
 ## 功能
 
@@ -27,7 +27,7 @@
 
 ## 安装
 
-打开 [Quota Bubble 官网](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1)，点击主下载按钮。官网会自动识别 macOS 或 Windows，并直接下载对应的最新图形安装器，不再跳转 GitHub Release 页面。
+打开 [Quota Bubble 官网](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-3)，点击主下载按钮。官网会自动识别 macOS 或 Windows，并直接下载对应的最新图形安装器，不再跳转 GitHub Release 页面。
 
 ### macOS
 

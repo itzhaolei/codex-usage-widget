@@ -17,7 +17,7 @@ PY
 
 dedupe_dock_app() {
     /usr/bin/python3 - "$APP_DIR" <<'PY'
-import plistlib, subprocess, sys
+import plistlib, sys
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 from urllib.request import url2pathname
@@ -49,7 +49,6 @@ if new != apps:
     data["persistent-apps"] = new
     plist.parent.mkdir(parents=True, exist_ok=True)
     plistlib.dump(data, plist.open("wb"))
-    subprocess.run(["killall", "Dock"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 PY
 }
 
@@ -125,6 +124,7 @@ touch "$APP_DIR"
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP_DIR"
 launchctl bootstrap "gui/$(id -u)" "$LAUNCH_AGENT"
 dedupe_dock_app
+/usr/bin/killall Dock >/dev/null 2>&1 || true
 if [ "${QUOTA_BUBBLE_SKIP_LAUNCH:-0}" != "1" ]; then open -g "$APP_DIR"; fi
 
 echo "Quota Bubble installed: $APP_DIR"

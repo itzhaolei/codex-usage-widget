@@ -1951,7 +1951,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private func restartAfterUpdate() {
         let currentPID = ProcessInfo.processInfo.processIdentifier
         let installedApp = "/Applications/Quota Bubble.app"
-        let command = "while /bin/kill -0 \(currentPID) >/dev/null 2>&1; do /bin/sleep 0.1; done; /usr/bin/open -g \(shellQuote(installedApp))"
+        let launchServices = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+        let command = "while /bin/kill -0 \(currentPID) >/dev/null 2>&1; do /bin/sleep 0.1; done; /usr/bin/touch \(shellQuote(installedApp)); \(shellQuote(launchServices)) -f \(shellQuote(installedApp)); /usr/bin/killall Dock >/dev/null 2>&1 || true; /usr/bin/open -g \(shellQuote(installedApp))"
         let helper = Process()
         helper.executableURL = URL(fileURLWithPath: "/bin/zsh")
         helper.arguments = ["-lc", command]

@@ -4,7 +4,7 @@
 
 Codex 5시간 할당량, 주간 할당량, 재설정 시간, 잔액, 플랜, 계정 및 재설정 횟수를 보여 주는 macOS 및 Windows 네이티브 플로팅 창입니다.
 
-![Quota Bubble preview](../assets/preview-v3.png)
+![Quota Bubble preview](../assets/preview-v3.png?raw=1&v=20260919-3)
 
 ## 기능
 
@@ -27,7 +27,7 @@ Codex 5시간 할당량, 주간 할당량, 재설정 시간, 잔액, 플랜, 계
 
 ## 설치
 
-[Quota Bubble 공식 웹사이트](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1)의 기본 다운로드 버튼을 클릭하세요. macOS 또는 Windows를 감지해 Release 페이지를 거치지 않고 최신 GUI 설치 프로그램을 바로 다운로드합니다.
+[Quota Bubble 공식 웹사이트](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-3)의 기본 다운로드 버튼을 클릭하세요. macOS 또는 Windows를 감지해 Release 페이지를 거치지 않고 최신 GUI 설치 프로그램을 바로 다운로드합니다.
 
 ### macOS
 

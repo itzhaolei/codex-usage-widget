@@ -37,5 +37,9 @@ if grep -A5 'func close(window: NSWindow?)' "$ROOT/sources/QuotaBubbleApp.swift"
     echo "macOS close control must hide the window without terminating the app." >&2
     exit 1
 fi
+grep -A8 'private func restartAfterUpdate()' "$ROOT/sources/QuotaBubbleApp.swift" | grep -q 'lsregister'
+grep -A8 'private func restartAfterUpdate()' "$ROOT/sources/QuotaBubbleApp.swift" | grep -q 'killall Dock'
+grep -q 'if \[ "${QUOTA_BUBBLE_SKIP_DOCK:-0}" != "1" \]; then' "$ROOT/scripts/package-installer.sh"
+grep -A2 'if \[ "${QUOTA_BUBBLE_SKIP_DOCK:-0}" != "1" \]; then' "$ROOT/scripts/package-installer.sh" | grep -q 'killall Dock'
 
 echo "macOS SwiftUI build tests passed."

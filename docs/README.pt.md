@@ -4,7 +4,7 @@
 
 Uma janela nativa para macOS e Windows que mostra cota de 5 horas do Codex, cota semanal, redefinição, saldo, plano, conta e redefinições disponíveis.
 
-![Quota Bubble preview](../assets/preview-v3.png)
+![Quota Bubble preview](../assets/preview-v3.png?raw=1&v=20260919-3)
 
 ## Recursos
 
@@ -27,7 +27,7 @@ Uma janela nativa para macOS e Windows que mostra cota de 5 horas do Codex, cota
 
 ## Instalação
 
-Abra o [site oficial do Quota Bubble](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1) e clique no botão principal. O site detecta macOS ou Windows e baixa diretamente o instalador gráfico mais recente sem abrir a página Releases.
+Abra o [site oficial do Quota Bubble](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-3) e clique no botão principal. O site detecta macOS ou Windows e baixa diretamente o instalador gráfico mais recente sem abrir a página Releases.
 
 ### macOS
 

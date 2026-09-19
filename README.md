@@ -3,12 +3,12 @@
 <table>
   <tr>
     <td width="72">
-      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-2"><img src="assets/app-icon.png?raw=1" width="56" alt="Quota Bubble app icon"></a>
+      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-3"><img src="assets/app-icon.png?raw=1" width="56" alt="Quota Bubble app icon"></a>
     </td>
     <td>
       <strong>Official Website</strong><br>
       Detect your operating system and download the latest graphical installer directly.<br>
-      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-2"><strong>Open official website →</strong></a>
+      <a href="https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-3"><strong>Open official website →</strong></a>
     </td>
   </tr>
 </table>
@@ -19,7 +19,7 @@ A local floating widget for watching Codex usage limits on macOS and Windows wit
 
 Website source lives in `public/` and is ready for Cloudflare Pages. Recommended Pages settings: project name `quota-bubble`, production branch `main`, build command `exit 0`, output directory `public`. Suggested free domain: `quotabubble.dpdns.org` after dpdns approval.
 
-![Quota Bubble preview](assets/preview-v3.png?raw=1)
+![Quota Bubble dark-mode preview](assets/preview-v3.png?raw=1&v=20260919-3)
 
 ## Features
 
@@ -44,7 +44,7 @@ Website source lives in `public/` and is ready for Cloudflare Pages. Recommended
 
 ## Install
 
-[Open the official website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1) and click the main download button. The website detects macOS or Windows and downloads the latest matching graphical installer directly, without opening the GitHub Release page.
+[Open the official website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-3) and click the main download button. The website detects macOS or Windows and downloads the latest matching graphical installer directly, without opening the GitHub Release page.
 
 ### macOS
 

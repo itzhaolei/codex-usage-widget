@@ -4,7 +4,7 @@
 
 Una finestra nativa per macOS e Windows che mostra quota Codex di 5 ore, quota settimanale, reset, saldo, piano, account e ripristini disponibili.
 
-![Quota Bubble preview](../assets/preview-v3.png)
+![Quota Bubble preview](../assets/preview-v3.png?raw=1&v=20260919-3)
 
 ## Funzionalità
 
@@ -27,7 +27,7 @@ Una finestra nativa per macOS e Windows che mostra quota Codex di 5 ore, quota s
 
 ## Installazione
 
-Apri il [sito ufficiale Quota Bubble](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1) e premi il pulsante principale. Il sito rileva macOS o Windows e scarica direttamente l’ultimo installer grafico senza aprire la pagina Releases.
+Apri il [sito ufficiale Quota Bubble](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-3) e premi il pulsante principale. Il sito rileva macOS o Windows e scarica direttamente l’ultimo installer grafico senza aprire la pagina Releases.
 
 ### macOS
 

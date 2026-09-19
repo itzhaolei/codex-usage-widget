@@ -4,7 +4,7 @@
 
 Ein natives schwebendes Fenster für Codex-5-Stunden-Kontingent, Wochenkontingent, Reset-Zeit, Guthaben, Tarif, Konto und Reset-Credits unter macOS und Windows.
 
-![Quota Bubble preview](../assets/preview-v3.png)
+![Quota Bubble preview](../assets/preview-v3.png?raw=1&v=20260919-3)
 
 ## Funktionen
 
@@ -27,7 +27,7 @@ Ein natives schwebendes Fenster für Codex-5-Stunden-Kontingent, Wochenkontingen
 
 ## Installation
 
-Öffnen Sie die [Quota Bubble-Website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260719-1) und klicken Sie auf den Hauptdownload. Die Website erkennt macOS oder Windows und lädt den passenden aktuellen grafischen Installer direkt, ohne Umweg über die Release-Seite.
+Öffnen Sie die [Quota Bubble-Website](https://htmlpreview.github.io/?https://github.com/itzhaolei/codex-usage-widget/blob/main/public/index.html?v=20260919-3) und klicken Sie auf den Hauptdownload. Die Website erkennt macOS oder Windows und lädt den passenden aktuellen grafischen Installer direkt, ohne Umweg über die Release-Seite.
 
 ### macOS
 

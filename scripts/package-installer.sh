@@ -132,7 +132,7 @@ launchctl bootstrap "gui/$(id -u)" "$LAUNCH_AGENT"
 
 if [ "${QUOTA_BUBBLE_SKIP_DOCK:-0}" != "1" ] && [ -x /usr/bin/python3 ]; then
     /usr/bin/python3 - "$APP" <<'PY'
-import plistlib, subprocess, sys
+import plistlib, sys
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 from urllib.request import url2pathname
@@ -149,13 +149,16 @@ for item in apps:
     else: new.append(item)
 if not added: new.append(entry)
 if new != apps:
-    data["persistent-apps"]=new; plistlib.dump(data,p.open("wb")); subprocess.run(["killall","Dock"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    data["persistent-apps"]=new; plistlib.dump(data,p.open("wb"))
 PY
 elif [ "${QUOTA_BUBBLE_SKIP_DOCK:-0}" != "1" ]; then
     if ! /usr/bin/defaults read com.apple.dock persistent-apps 2>/dev/null | /usr/bin/grep -Eq 'Quota(%20| )Bubble\.app'; then
         /usr/bin/defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>file:///Applications/Quota%20Bubble.app/</string><key>_CFURLStringType</key><integer>15</integer></dict><key>file-label</key><string>Quota Bubble</string></dict><key>tile-type</key><string>file-tile</string></dict>'
-        /usr/bin/killall Dock >/dev/null 2>&1 || true
     fi
+fi
+
+if [ "${QUOTA_BUBBLE_SKIP_DOCK:-0}" != "1" ]; then
+    /usr/bin/killall Dock >/dev/null 2>&1 || true
 fi
 
 if [ "${QUOTA_BUBBLE_SKIP_LAUNCH:-0}" != "1" ]; then open -g "$APP"; fi

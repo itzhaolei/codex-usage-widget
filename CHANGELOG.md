@@ -4,6 +4,13 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.23 - 2026-09-19
+
+### Fixed
+
+- macOS in-app updates now refresh Launch Services and the Dock icon cache before reopening the updated application, so icon changes appear immediately.
+- Website and README previews now use an opaque dark-mode render so the widget stays legible on white pages.
+
 ## 3.1.22 - 2026-09-19
 
 ### Changed
