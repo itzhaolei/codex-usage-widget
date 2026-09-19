@@ -11,6 +11,7 @@ Una finestra nativa per macOS e Windows che mostra quota Codex di 5 ore, quota s
 - Mostra la quota di 5 ore quando presente, oltre a quota settimanale Codex, reset, saldo, piano e ripristini disponibili.
 - Mostra dopo il conto alla rovescia la data esatta del reset settimanale e il giorno della settimana in ora locale, con precisione al secondo.
 - Mostra nella barra dei menu macOS la percentuale della quota di 5 ore quando presente; altrimenti mostra quella settimanale.
+- Chiudendo si nasconde solo la finestra; la quota continua ad aggiornarsi nella barra dei menu o nell’area di notifica. Per uscire usa il menu dell’app o dell’area di notifica.
 - Su macOS mostra la scadenza di ogni ripristino, con un punto rosso entro tre giorni e verde negli altri casi.
 - Su macOS mostra localmente l’account corrente e la scadenza dell’abbonamento senza salvare credenziali nello snapshot della quota.
 - Mostra lo spazio di sistema e la memoria fisica disponibili; su Windows indica lo spazio libero dell’unità C.

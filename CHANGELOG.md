@@ -4,6 +4,11 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+### Changed
+
+- Closing the main window now hides it on macOS and Windows while menu-bar or system-tray quota updates continue in the background.
+- Quota Bubble now exits only through the application or system-tray exit command.
+
 ## 3.1.17 - 2026-09-19
 
 ### Fixed

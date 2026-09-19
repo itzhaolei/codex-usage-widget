@@ -26,4 +26,11 @@ swiftc -parse-as-library -o "$BUILD_DIR/QuotaBubble" \
     "$ROOT/sources/QuotaModels.swift" "$ROOT/sources/QuotaSnapshotService.swift" "$ROOT/sources/QuotaStore.swift" "$ROOT/sources/QuotaBubbleApp.swift" \
     -framework Cocoa -framework SwiftUI -framework Combine
 
+grep -q 'applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }' "$ROOT/sources/QuotaBubbleApp.swift"
+grep -A5 'func close(window: NSWindow?)' "$ROOT/sources/QuotaBubbleApp.swift" | grep -q 'target.orderOut(nil)'
+if grep -A5 'func close(window: NSWindow?)' "$ROOT/sources/QuotaBubbleApp.swift" | grep -q 'NSApp.terminate'; then
+    echo "macOS close control must hide the window without terminating the app." >&2
+    exit 1
+fi
+
 echo "macOS SwiftUI build tests passed."

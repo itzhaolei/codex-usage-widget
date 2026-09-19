@@ -27,6 +27,7 @@ Website source lives in `public/` and is ready for Cloudflare Pages. Recommended
 - Shows the 5-hour quota when present, weekly quota, reset timing, integer point balance, plan, and available reset credits.
 - Shows the exact weekly reset date and weekday in local time down to the second.
 - Shows the live 5-hour quota percentage in the macOS menu bar when present, otherwise the weekly quota percentage.
+- Closing the window hides it while menu-bar or system-tray quota updates continue; use the app or tray menu to quit.
 - Lists reset-credit expiration dates with red and green urgency indicators on macOS.
 - Shows the current account and subscription expiration locally on macOS without copying credentials into the quota snapshot.
 - Shows available system storage and physical memory; Windows reports available C-drive space.

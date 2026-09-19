@@ -30,6 +30,10 @@ assert.match(window, /DispatcherTimer/, "one-second UI refresh timer is present"
 assert.match(window, /Forms\.NotifyIcon/, "native tray integration is present");
 assert.match(window, /snapshot\?\.SevenDay is null \? null : snapshot\?\.FiveHour/, "five-hour block is shown only when weekly quota also exists");
 assert.match(window, /UpdateTrayStatus\(Remaining\(fiveHour \?\? weekly\)\)/, "tray status prioritizes five-hour quota when present");
+assert.match(window, /CloseButton\.Click \+= \(_, _\) => HideWindow\(\)/, "window close button hides the window");
+assert.match(window, /e\.Cancel = true;\s*HideWindow\(\)/, "system window close is converted to hide");
+assert.match(window, /exit\.Click \+= \(_, _\) => ExitApplication\(\)/, "tray exit remains an explicit application exit");
+assert.doesNotMatch(window.match(/private void HideWindow\(\)[\s\S]*?\n    }/)?.[0] ?? "", /_timer\.Stop|Shutdown|Dispose/, "hiding keeps background refresh and tray status alive");
 assert.match(windowXaml, /FiveHourQuotaPanel/, "Windows UI contains separate five-hour quota block");
 assert.match(windowXaml, /StorageText/, "Windows UI contains the C drive capacity row");
 assert.match(windowXaml, /MemoryText/, "Windows UI contains the physical memory row");

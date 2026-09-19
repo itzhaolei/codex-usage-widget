@@ -1,5 +1,6 @@
 using QuotaBubble.Services;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Net.Http;
@@ -63,8 +64,8 @@ public partial class MainWindow : Window
         LocationChanged += (_, _) => SaveSettings();
         ThemeButton.Click += (_, _) => { _settings.Light = !_settings.Light; ApplyTheme(); SaveSettings(); };
         PinButton.Click += (_, _) => { _settings.Pinned = !_settings.Pinned; Topmost = _settings.Pinned; ApplyTheme(); SaveSettings(); };
-        CloseButton.Click += (_, _) => Close();
-        Closing += (_, _) => Cleanup();
+        CloseButton.Click += (_, _) => HideWindow();
+        Closing += HandleClosing;
     }
 
     private void ConfigureTray()
@@ -106,7 +107,7 @@ public partial class MainWindow : Window
         menu.Items.Add(new Forms.ToolStripSeparator());
         var exit = menu.Items.Add(copy.Exit);
         exit.ForeColor = Drawing.Color.Firebrick;
-        exit.Click += (_, _) => Close();
+        exit.Click += (_, _) => ExitApplication();
         var previous = _tray.ContextMenuStrip;
         _tray.ContextMenuStrip = menu;
         previous?.Dispose();
@@ -282,8 +283,7 @@ public partial class MainWindow : Window
             }
             MessageBox.Show(this, copy.Updating, "Quota Bubble", MessageBoxButton.OK, MessageBoxImage.Information);
             await _updateService.DownloadAndInstallAsync(release);
-            _closing = true;
-            System.Windows.Application.Current.Shutdown();
+            ExitApplication();
         }
         catch (Exception error)
         {
@@ -429,6 +429,19 @@ public partial class MainWindow : Window
         Activate();
     }
 
+    private void HideWindow()
+    {
+        SaveSettings();
+        Hide();
+    }
+
+    private void HandleClosing(object? sender, CancelEventArgs e)
+    {
+        if (_closing) return;
+        e.Cancel = true;
+        HideWindow();
+    }
+
     private void RestorePosition()
     {
         if (_settings.Left is not double left || _settings.Top is not double top) return;
@@ -445,7 +458,7 @@ public partial class MainWindow : Window
         _settingsService.Save(_settings);
     }
 
-    private void Cleanup()
+    private void ExitApplication()
     {
         if (_closing) return;
         _closing = true;

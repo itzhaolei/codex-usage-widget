@@ -1680,7 +1680,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         NSApp.setActivationPolicy(.regular)
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         (activeWindow ?? windows.values.first)?.makeKeyAndOrderFront(nil)
@@ -1807,12 +1807,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         guard let target = window ?? NSApp.keyWindow ?? activeWindow else { return }
         saveFrame(target)
         target.orderOut(nil)
-        unregisterWindow(target)
-        guard windows.values.allSatisfy({ !$0.isVisible }) else { return }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            Darwin.exit(EXIT_SUCCESS)
-        }
-        NSApp.terminate(nil)
+    }
+
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        guard windows[ObjectIdentifier(sender)] != nil else { return true }
+        close(window: sender)
+        return false
     }
 
     func windowDidBecomeKey(_ notification: Notification) {

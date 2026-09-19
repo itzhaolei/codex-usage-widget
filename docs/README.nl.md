@@ -11,6 +11,7 @@ Een native venster voor macOS en Windows met Codex-5-uursquota, weekquota, reset
 - Toont het 5-uursquota wanneer dit bestaat, plus Codex-weekquota, resettijd, saldo, plan en beschikbare resets.
 - Toont direct na het aftellen de exacte wekelijkse resettijd en weekdag in lokale tijd, tot op de seconde.
 - Toont in de macOS-menubalk eerst het 5-uursquotum als percentage wanneer dit bestaat, anders het weekquotum.
+- Sluiten verbergt alleen het venster; het quotum blijft bijgewerkt in de menubalk of het systeemvak. Sluit de app af via het app- of systeemvakmenu.
 - Toont op macOS de vervaldatum van elke reset, met een rode stip binnen drie dagen en anders een groene stip.
 - Toont op macOS lokaal het huidige account en de vervaldatum van het abonnement zonder aanmeldgegevens in de quota-snapshot op te slaan.
 - Toont beschikbare systeemopslag en fysiek geheugen; op Windows wordt de vrije ruimte op de C-schijf weergegeven.

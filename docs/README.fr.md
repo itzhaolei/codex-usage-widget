@@ -11,6 +11,7 @@ Une fenêtre native pour macOS et Windows affichant le quota 5 heures Codex, le 
 - Affiche le quota 5 heures lorsqu’il existe, ainsi que le quota hebdomadaire Codex, le reset, le solde, l’offre et les réinitialisations disponibles.
 - Affiche après le compte à rebours la date exacte du reset hebdomadaire et le jour de la semaine en heure locale, à la seconde près.
 - Affiche dans la barre des menus macOS le pourcentage du quota 5 heures lorsqu’il existe, sinon celui du quota hebdomadaire.
+- Fermer masque uniquement la fenêtre ; le quota continue de s’actualiser dans la barre des menus ou la zone de notification. Utilisez le menu de l’application ou de la zone de notification pour quitter.
 - Affiche sous macOS la date d’expiration de chaque réinitialisation, avec un point rouge à moins de trois jours et vert au-delà.
 - Affiche localement sous macOS le compte actuel et l’expiration de l’abonnement sans enregistrer les identifiants dans l’instantané de quota.
 - Affiche le stockage système et la mémoire physique disponibles ; sous Windows, l’espace libre du lecteur C est indiqué.

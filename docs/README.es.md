@@ -11,6 +11,7 @@ Una ventana nativa para macOS y Windows que muestra la cuota de 5 horas de Codex
 - Muestra la cuota de 5 horas cuando existe, además de la cuota semanal de Codex, el reinicio, el saldo, el plan y los reinicios disponibles.
 - Muestra tras la cuenta atrás la fecha exacta del reinicio semanal y el día de la semana en hora local, con precisión de segundos.
 - Muestra en la barra de menús de macOS el porcentaje de 5 horas cuando existe; si no, muestra el porcentaje semanal.
+- Cerrar solo oculta la ventana; la cuota sigue actualizándose en la barra de menús o la bandeja del sistema. Usa el menú de la aplicación o de la bandeja para salir.
 - En macOS muestra la caducidad de cada reinicio, con un punto rojo si vence en tres días y verde en caso contrario.
 - En macOS muestra localmente la cuenta actual y la caducidad de la suscripción sin guardar credenciales en la instantánea de cuota.
 - Muestra el almacenamiento del sistema y la memoria física disponibles; en Windows indica el espacio libre de la unidad C.

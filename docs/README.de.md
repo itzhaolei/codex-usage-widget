@@ -11,6 +11,7 @@ Ein natives schwebendes Fenster für Codex-5-Stunden-Kontingent, Wochenkontingen
 - Zeigt bei vorhandenem 5-Stunden-Limit auch das 5-Stunden-Kontingent sowie Wochenkontingent, Reset-Zeit, Guthaben, Tarif und verfügbare Reset-Credits.
 - Zeigt direkt nach dem Countdown den exakten wöchentlichen Reset-Zeitpunkt und Wochentag in lokaler Zeit bis zur Sekunde.
 - Zeigt in der macOS-Menüleiste vorrangig das 5-Stunden-Kontingent in Prozent, sonst das Wochenkontingent.
+- Beim Schließen wird nur das Fenster ausgeblendet; die Kontingentanzeige in Menüleiste oder Infobereich wird weiter aktualisiert. Beenden erfolgt über das App- oder Tray-Menü.
 - Zeigt unter macOS die Ablaufdaten einzelner Reset-Credits mit einem roten Punkt innerhalb von drei Tagen und sonst mit einem grünen Punkt.
 - Zeigt unter macOS das aktuelle Konto und das Ablaufdatum des Abonnements lokal an, ohne Anmeldedaten im Kontingent-Snapshot zu speichern.
 - Zeigt verfügbaren Systemspeicher und physischen Arbeitsspeicher; unter Windows wird der freie Speicher auf Laufwerk C angezeigt.

@@ -11,6 +11,7 @@ Uma janela nativa para macOS e Windows que mostra cota de 5 horas do Codex, cota
 - Mostra a cota de 5 horas quando existe, além da cota semanal do Codex, redefinição, saldo, plano e redefinições disponíveis.
 - Mostra após a contagem regressiva a data exata da redefinição semanal e o dia da semana no horário local, com precisão de segundos.
 - Mostra na barra de menus do macOS a porcentagem de 5 horas quando existe; caso contrário, mostra a porcentagem semanal.
+- Fechar apenas oculta a janela; a cota continua sendo atualizada na barra de menus ou na bandeja do sistema. Use o menu do app ou da bandeja para sair.
 - No macOS, mostra a validade de cada redefinição, com ponto vermelho quando expira em até três dias e verde nos demais casos.
 - No macOS, mostra localmente a conta atual e o vencimento da assinatura sem salvar credenciais no snapshot de cota.
 - Mostra o armazenamento do sistema e a memória física disponíveis; no Windows, exibe o espaço livre da unidade C.
