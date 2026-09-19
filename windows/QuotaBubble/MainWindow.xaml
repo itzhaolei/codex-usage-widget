@@ -90,7 +90,7 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
               <TextBlock x:Name="WeekText" FontSize="13" FontFamily="Consolas" FontWeight="Bold" Foreground="White"/>
               <TextBlock Text="|" Margin="7,0" FontSize="8" FontFamily="Consolas" FontWeight="Bold" Foreground="#AEB9BF" VerticalAlignment="Center"/>
-              <TextBlock x:Name="ResetText" FontSize="10" FontFamily="Consolas" Foreground="#AEB9BF" TextTrimming="CharacterEllipsis" MaxWidth="93" VerticalAlignment="Center"/>
+              <TextBlock x:Name="ResetText" FontSize="10" FontFamily="Consolas" Foreground="#AEB9BF" TextTrimming="CharacterEllipsis" MaxWidth="118" VerticalAlignment="Center"/>
               <TextBlock Text="|" Margin="7,0" FontSize="8" FontFamily="Consolas" Foreground="#84FFFFFF" VerticalAlignment="Center"/>
               <TextBlock x:Name="ResetDateText" FontSize="8" Foreground="#84FFFFFF" FontFamily="Consolas" VerticalAlignment="Center"/>
               <TextBlock Text="|" Margin="7,0" FontSize="8" FontFamily="Consolas" Foreground="#84FFFFFF" VerticalAlignment="Center"/>

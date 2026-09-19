@@ -36,6 +36,7 @@ assert.match(windowXaml, /MemoryText/, "Windows UI contains the physical memory 
 assert.match(windowXaml, /AccountIcon[\s\S]*SubscriptionIcon[\s\S]*StorageIcon[\s\S]*MemoryIcon/, "information rows use deterministic vector icons");
 assert.doesNotMatch(windowXaml, /Content="[●▣☀☾×]"/, "controls and information rows do not depend on font glyph icons");
 assert.match(windowXaml, /MetricCards[\s\S]*Height="47"/, "single-line metric cards match the compact macOS height");
+assert.match(windowXaml, /x:Name="ResetText"[^>]*MaxWidth="118"/, "weekly reset countdown can extend beyond the progress bar width");
 assert.match(windowXaml, /Background="#00C229"/, "Windows exposes the macOS progress color palette");
 for (const color of windowXaml.match(/#[0-9A-Fa-f]+/g) ?? []) {
   assert.ok(color.length === 7 || color.length === 9, `XAML color ${color} uses RGB or ARGB syntax`);

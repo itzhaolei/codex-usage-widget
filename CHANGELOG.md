@@ -4,6 +4,12 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.16 - 2026-09-19
+
+### Fixed
+
+- Expanded the Windows weekly reset countdown into the space to the right of the progress bar so the full duration remains visible alongside the reset date and weekday.
+
 ## 3.1.15 - 2026-09-19
 
 ### Added
