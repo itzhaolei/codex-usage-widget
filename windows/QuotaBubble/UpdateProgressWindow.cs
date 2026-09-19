@@ -2,15 +2,15 @@ using QuotaBubble.Services;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
+using Controls = System.Windows.Controls;
 
 namespace QuotaBubble;
 
 public sealed class UpdateProgressWindow : Window
 {
-    private readonly ProgressBar _progressBar;
-    private readonly TextBlock _progressText;
+    private readonly Controls.ProgressBar _progressBar;
+    private readonly Controls.TextBlock _progressText;
     private bool _allowClose;
 
     public UpdateProgressWindow(string message)
@@ -22,32 +22,32 @@ public sealed class UpdateProgressWindow : Window
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         ShowInTaskbar = false;
 
-        var panel = new Grid { Margin = new Thickness(24, 20, 24, 20) };
-        panel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        panel.RowDefinitions.Add(new RowDefinition { Height = new GridLength(18) });
-        panel.RowDefinitions.Add(new RowDefinition { Height = new GridLength(22) });
+        var panel = new Controls.Grid { Margin = new Thickness(24, 20, 24, 20) };
+        panel.RowDefinitions.Add(new Controls.RowDefinition { Height = GridLength.Auto });
+        panel.RowDefinitions.Add(new Controls.RowDefinition { Height = new GridLength(18) });
+        panel.RowDefinitions.Add(new Controls.RowDefinition { Height = new GridLength(22) });
 
-        var label = new TextBlock
+        var label = new Controls.TextBlock
         {
             Text = message,
             FontSize = 14,
             FontWeight = FontWeights.SemiBold,
             Margin = new Thickness(0, 0, 0, 14)
         };
-        Grid.SetRow(label, 0);
+        Controls.Grid.SetRow(label, 0);
         panel.Children.Add(label);
 
-        _progressBar = new ProgressBar
+        _progressBar = new Controls.ProgressBar
         {
             Minimum = 0,
             Maximum = 100,
             Height = 14,
             IsIndeterminate = true
         };
-        Grid.SetRow(_progressBar, 1);
+        Controls.Grid.SetRow(_progressBar, 1);
         panel.Children.Add(_progressBar);
 
-        _progressText = new TextBlock
+        _progressText = new Controls.TextBlock
         {
             Text = "0%",
             FontSize = 12,
@@ -55,7 +55,7 @@ public sealed class UpdateProgressWindow : Window
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Bottom
         };
-        Grid.SetRow(_progressText, 2);
+        Controls.Grid.SetRow(_progressText, 2);
         panel.Children.Add(_progressText);
         Content = panel;
         Closing += PreventEarlyClose;
