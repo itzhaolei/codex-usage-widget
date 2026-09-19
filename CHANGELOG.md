@@ -4,6 +4,14 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.13 - 2026-09-19
+
+### Fixed
+
+- Windows update checks now use the signed-in user's system proxy credentials.
+- Added a GitHub Releases fallback when the GitHub API cannot establish an SSL connection.
+- Interactive update failures now open the official download page and show a clear network, proxy, or certificate message instead of the raw .NET SSL exception.
+
 ## 3.1.12 - 2026-09-19
 
 ### Added

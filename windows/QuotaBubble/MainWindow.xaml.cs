@@ -274,8 +274,25 @@ public partial class MainWindow : Window
         }
         catch (Exception error)
         {
-            if (interactive) MessageBox.Show(this, $"{Localization.Get(_settings.Language).UpdateFailed}: {error.Message}", "Quota Bubble", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (!interactive) return;
+            var copy = Localization.Get(_settings.Language);
+            if (error is HttpRequestException)
+            {
+                try { UpdateService.OpenReleasesPage(); } catch { }
+                var message = Localization.ResolveLanguage(_settings.Language) == "zh"
+                    ? "无法连接更新服务器。已在浏览器中打开官方下载页，请检查网络、代理或系统证书后重试。"
+                    : "Could not connect to the update server. The download page was opened in your browser. Check your network, proxy, or system certificates and try again.";
+                MessageBox.Show(this, message, "Quota Bubble", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            MessageBox.Show(this, $"{copy.UpdateFailed}: {InnermostMessage(error)}", "Quota Bubble", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+
+    private static string InnermostMessage(Exception error)
+    {
+        while (error.InnerException is not null) error = error.InnerException;
+        return error.Message;
     }
 
     private static string NormalizePlan(string? raw)

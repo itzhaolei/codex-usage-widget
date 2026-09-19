@@ -31,7 +31,10 @@ assert.match(window, /UpdateTrayStatus\(Remaining\(fiveHour \?\? weekly\)\)/, "t
 assert.match(read("windows/QuotaBubble/MainWindow.xaml"), /FiveHourQuotaPanel/, "Windows UI contains separate five-hour quota block");
 assert.match(updater, /Windows-Setup\.exe/, "updater downloads the graphical installer");
 assert.match(updater, /releases\?per_page=30/, "Windows updater scans releases for the newest Windows asset");
-assert.doesNotMatch(updater, /releases\/latest/, "Windows updater does not assume the latest release contains a Windows asset");
+assert.doesNotMatch(updater, /api\.github\.com\/repos\/[^\s"]+\/releases\/latest/, "Windows updater does not rely on the API's latest release only");
+assert.match(updater, /DefaultProxyCredentials = CredentialCache\.DefaultCredentials/, "Windows updater uses the signed-in user's system proxy credentials");
+assert.match(updater, /LatestFromReleaseRedirectAsync/, "Windows updater falls back to the GitHub releases redirect when the API is unavailable");
+assert.match(window, /UpdateService\.OpenReleasesPage/, "interactive update failures open the manual download page");
 assert.doesNotMatch(window, /Windows installer asset not found/, "Windows update action does not show missing asset errors for macOS-only releases");
 assert.match(installer, /PrivilegesRequired=lowest/, "installer supports non-admin per-user installation");
 assert.match(installer, /\[UninstallRun\]/, "installer provides graphical uninstall support");
