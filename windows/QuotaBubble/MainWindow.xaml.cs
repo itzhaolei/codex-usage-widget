@@ -240,7 +240,7 @@ public partial class MainWindow : Window
     {
         if (normalized == "business5x") return new LinearGradientBrush
         {
-            StartPoint = new Point(0, 0.5), EndPoint = new Point(1, 0.5),
+            StartPoint = new System.Windows.Point(0, 0.5), EndPoint = new System.Windows.Point(1, 0.5),
             GradientStops = new GradientStopCollection
             {
                 new(Color.FromRgb(41, 117, 245), 0.0),
@@ -251,7 +251,7 @@ public partial class MainWindow : Window
         };
         if (normalized == "business20x") return new LinearGradientBrush
         {
-            StartPoint = new Point(0, 0.5), EndPoint = new Point(1, 0.5),
+            StartPoint = new System.Windows.Point(0, 0.5), EndPoint = new System.Windows.Point(1, 0.5),
             GradientStops = new GradientStopCollection
             {
                 new(Color.FromRgb(41, 117, 245), 0.0),

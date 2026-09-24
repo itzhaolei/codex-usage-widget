@@ -4,6 +4,12 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.29 - 2026-09-25
+
+### Fixed
+
+- Fixed the remaining Windows release build ambiguity for gradient brush points.
+
 ## 3.1.28 - 2026-09-25
 
 ### Fixed
