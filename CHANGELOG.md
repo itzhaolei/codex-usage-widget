@@ -4,6 +4,12 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.28 - 2026-09-25
+
+### Fixed
+
+- Fixed the Windows release build by disambiguating the WPF brush type used by the Business badge gradients.
+
 ## 3.1.27 - 2026-09-25
 
 ### Changed

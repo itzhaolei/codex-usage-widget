@@ -236,7 +236,7 @@ public partial class MainWindow : Window
         PlanBadge.Background = PlanBadgeBrush(normalized);
     }
 
-    private static Brush PlanBadgeBrush(string normalized)
+    private static System.Windows.Media.Brush PlanBadgeBrush(string normalized)
     {
         if (normalized == "business5x") return new LinearGradientBrush
         {
