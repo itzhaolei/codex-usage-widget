@@ -4,9 +4,16 @@ import Foundation
 enum QuotaModelsTests {
     static func main() throws {
         expect(normalizedPlanType("pro_20x") == "pro20x", "Pro20x normalization")
-        expect(planBadgeText("pro") == "Pro20x", "generic Pro badge")
-        expect(planBadgeText("chatgpt_pro_5x") == "Pro5x", "Pro5x badge")
+        expect(planBadgeText("pro") == "Pro 20x", "generic Pro badge")
+        expect(planBadgeText("chatgpt_pro_5x") == "Pro 5x", "Pro 5x badge")
+        expect(planBadgeText("pro_20x") == "Pro 20x", "Pro 20x badge")
         expect(planBadgeText("free") == "Free", "Free badge")
+        expect(normalizedPlanType("self_serve_business_prolite") == "business5x", "Business Pro Lite normalization")
+        expect(planBadgeText("self_serve_business_prolite") == "Business 5x", "Business 5x badge")
+        expect(normalizedPlanType("business_premium_5x") == "business5x", "Business Premium 5x normalization")
+        expect(planBadgeText("business_premium_5x") == "Business 5x", "Business 5x badge")
+        expect(normalizedPlanType("business_premium_20x") == "business20x", "Business Premium 20x normalization")
+        expect(planBadgeText("business_premium_20x") == "Business 20x", "Business 20x badge")
         expect(localizedCopy("zh").website == "官网", "Chinese website menu")
         for language in supportedLanguages {
             expect(!localizedPointsUnit(language.code).isEmpty, "points unit for \(language.code)")

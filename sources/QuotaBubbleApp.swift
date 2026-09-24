@@ -345,23 +345,66 @@ private struct QuotaBubbleView: View {
     }
 
     private var planBadge: some View {
-        Text(store.planText)
-            .font(.system(size: 11, weight: .semibold))
-            .foregroundStyle(Color.white)
-            .padding(.horizontal, 7)
-            .frame(height: 16)
-            .background(planColor)
-            .clipShape(RoundedRectangle(cornerRadius: 2))
-            .fixedSize(horizontal: true, vertical: false)
-            .alignmentGuide(VerticalAlignment.center) { $0[VerticalAlignment.center] }
-            .layoutPriority(2)
+        ZStack {
+            Text(store.planText)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(Color.white)
+                .padding(.horizontal, 4)
+                .frame(height: 16)
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+            LinearGradient(
+                colors: [.white.opacity(0.22), .clear, .white.opacity(0.08)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .blendMode(.screen)
+            .allowsHitTesting(false)
+        }
+        .background(planBadgeBackground)
+        .frame(height: 16)
+        .clipShape(RoundedRectangle(cornerRadius: 2, style: .continuous))
+        .fixedSize(horizontal: true, vertical: false)
+        .alignmentGuide(VerticalAlignment.center) { $0[VerticalAlignment.center] }
+        .layoutPriority(2)
     }
 
     private var planColor: Color {
-        switch normalizedPlanType(store.snapshot?.plan_type) {
+        switch normalizedPlanType(store.snapshot?.plan_type ?? store.auth.planType) {
         case "plus": return Color(red: 0, green: 0.72, blue: 0.08)
         case "pro", "pro5x", "pro20x": return .orange
+        case "business", "business5x", "business20x", "enterprise", "edu": return .blue
         default: return .gray
+        }
+    }
+
+    @ViewBuilder
+    private var planBadgeBackground: some View {
+        switch normalizedPlanType(store.snapshot?.plan_type ?? store.auth.planType) {
+        case "business5x":
+            LinearGradient(
+                stops: [
+                    .init(color: Color(red: 0.16, green: 0.46, blue: 0.96), location: 0),
+                    .init(color: Color(red: 0.20, green: 0.68, blue: 1.0), location: 0.28),
+                    .init(color: Color(red: 0.53, green: 0.33, blue: 0.95), location: 0.58),
+                    .init(color: Color(red: 1.0, green: 0.43, blue: 0.20), location: 1)
+                ],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        case "business20x":
+            LinearGradient(
+                stops: [
+                    .init(color: Color(red: 0.16, green: 0.46, blue: 0.96), location: 0),
+                    .init(color: Color(red: 0.25, green: 0.58, blue: 1.0), location: 0.25),
+                    .init(color: Color(red: 0.54, green: 0.31, blue: 0.96), location: 0.62),
+                    .init(color: Color(red: 0.84, green: 0.25, blue: 0.86), location: 1)
+                ],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        default:
+            planColor
         }
     }
 

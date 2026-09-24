@@ -24,31 +24,32 @@ public sealed class AuthService
             if (string.IsNullOrWhiteSpace(accessToken)) return null;
             var accountId = String(tokens, "account_id");
             var fingerprint = Fingerprint(accountId is null ? "token" : "account", accountId ?? accessToken);
-            var (email, expiration) = ReadClaims(String(tokens, "id_token"));
-            return new AuthIdentity(fingerprint, accessToken, email, expiration);
+            var (email, planType, expiration) = ReadClaims(String(tokens, "id_token"));
+            return new AuthIdentity(fingerprint, accessToken, email, planType, expiration);
         }
         catch { return null; }
     }
 
-    private static (string? Email, DateTimeOffset? Expiration) ReadClaims(string? idToken)
+    private static (string? Email, string? PlanType, DateTimeOffset? Expiration) ReadClaims(string? idToken)
     {
         try
         {
             var parts = idToken?.Split('.');
-            if (parts is null || parts.Length < 2) return (null, null);
+            if (parts is null || parts.Length < 2) return (null, null, null);
             var value = parts[1].Replace('-', '+').Replace('_', '/');
             value += new string('=', (4 - value.Length % 4) % 4);
             using var claims = JsonDocument.Parse(Convert.FromBase64String(value));
             var email = String(claims.RootElement, "email");
+            string? planType = null;
             DateTimeOffset? expiration = null;
-            if (claims.RootElement.TryGetProperty("https://api.openai.com/auth", out var auth) &&
-                auth.TryGetProperty("chatgpt_subscription_active_until", out var raw))
+            if (claims.RootElement.TryGetProperty("https://api.openai.com/auth", out var auth))
             {
-                expiration = ParseDate(raw);
+                if (auth.TryGetProperty("chatgpt_plan_type", out _)) planType = String(auth, "chatgpt_plan_type");
+                if (auth.TryGetProperty("chatgpt_subscription_active_until", out var raw)) expiration = ParseDate(raw);
             }
-            return (email, expiration);
+            return (email, planType, expiration);
         }
-        catch { return (null, null); }
+        catch { return (null, null, null); }
     }
 
     private static DateTimeOffset? ParseDate(JsonElement value)

@@ -4,6 +4,14 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 3.1.27 - 2026-09-25
+
+### Changed
+
+- Added Business 5x and Business 20x subscription badges with refined gradient backgrounds.
+- Mapped `self_serve_business_prolite` to Business 5x on macOS and Windows.
+- Updated Pro badge labels to `Pro 5x` and `Pro 20x` and preserved the full Business badge text.
+
 ## 3.1.26 - 2026-09-20
 
 ### Changed

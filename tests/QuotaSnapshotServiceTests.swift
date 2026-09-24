@@ -11,6 +11,10 @@ enum QuotaSnapshotServiceTests {
         expect(usage.balanceUsd == "1.50", "balance")
         expect(usage.resetCredits?.available_count == 2, "reset count")
 
+        let businessJSON = #"{"plan_type":"self_serve_business_prolite","rate_limit":{"primary_window":{"used_percent":12,"reset_at":1784644006}}}"#.data(using: .utf8)!
+        let business = try require(NativeQuotaParser.usage(from: businessJSON), "business usage payload")
+        expect(business.planType == "business5x", "Business 5x plan is retained")
+
         let weeklyOnlyJSON = #"{"rate_limit":{"primary_window":{"used_percent":98,"reset_at":1784950166}}}"#.data(using: .utf8)!
         let weeklyOnly = try require(NativeQuotaParser.usage(from: weeklyOnlyJSON), "weekly-only payload")
         expect(weeklyOnly.fiveHour == nil, "single window is not treated as five-hour quota")

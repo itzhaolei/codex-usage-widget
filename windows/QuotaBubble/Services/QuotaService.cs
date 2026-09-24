@@ -166,7 +166,10 @@ public sealed class QuotaService : IDisposable
             NestedText(root, "account", "plan"), NestedText(root, "account", "plan_type"), NestedText(root, "account", "plan_id"), NestedText(root, "account", "tier")
         };
         var normalized = values.Select(NormalizePlan).Where(value => value is not null).ToArray();
-        return normalized.FirstOrDefault(value => value == "pro20x") ?? normalized.FirstOrDefault(value => value == "pro5x")
+        return normalized.FirstOrDefault(value => value == "business20x") ?? normalized.FirstOrDefault(value => value == "business5x")
+            ?? normalized.FirstOrDefault(value => value == "pro20x") ?? normalized.FirstOrDefault(value => value == "pro5x")
+            ?? normalized.FirstOrDefault(value => value == "business") ?? normalized.FirstOrDefault(value => value == "enterprise")
+            ?? normalized.FirstOrDefault(value => value == "edu")
             ?? normalized.FirstOrDefault(value => value == "plus") ?? normalized.FirstOrDefault(value => value == "free")
             ?? normalized.FirstOrDefault(value => value == "pro");
     }
@@ -175,9 +178,18 @@ public sealed class QuotaService : IDisposable
     {
         if (string.IsNullOrWhiteSpace(raw)) return null;
         var value = new string(raw.ToLowerInvariant().Where(char.IsLetterOrDigit).ToArray());
+        if (value.Contains("business") || value.Contains("team"))
+        {
+            if (value.Contains("20x")) return "business20x";
+            if (value.Contains("5x")) return "business5x";
+            if (value.Contains("prolite")) return "business5x";
+            return "business";
+        }
         if (value.Contains("20x") || value.Contains("pro20")) return "pro20x";
         if (value.Contains("5x") || value.Contains("pro5")) return "pro5x";
         if (value == "pro") return "pro20x";
+        if (value.Contains("enterprise")) return "enterprise";
+        if (value.Contains("edu") || value.Contains("education")) return "edu";
         return value is "free" or "plus" ? value : null;
     }
 

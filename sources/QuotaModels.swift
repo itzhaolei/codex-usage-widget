@@ -28,6 +28,7 @@ struct ResetExpirationRow: Identifiable, Equatable {
 
 struct AuthDisplayInfo: Equatable {
     var email: String?
+    var planType: String?
     var subscriptionExpiresAt: String?
     var accountFingerprint: String?
 }
@@ -211,9 +212,17 @@ func localizedCopy(_ code: String = effectiveLanguageCode()) -> AppCopy {
 func normalizedPlanType(_ rawValue: String?) -> String? {
     guard let raw = rawValue?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !raw.isEmpty else { return nil }
     let value = raw.replacingOccurrences(of: #"[\s_-]+"#, with: "", options: .regularExpression)
+    if value.contains("business") || value.contains("team") {
+        if value.contains("20x") { return "business20x" }
+        if value.contains("5x") { return "business5x" }
+        if value.contains("prolite") { return "business5x" }
+        return "business"
+    }
     if value.contains("20x") || value.contains("pro20") { return "pro20x" }
     if value.contains("5x") || value.contains("pro5") { return "pro5x" }
     if value == "pro" { return "pro20x" }
+    if value.contains("enterprise") { return "enterprise" }
+    if value.contains("edu") || value.contains("education") { return "edu" }
     return ["free", "plus"].contains(value) ? value : nil
 }
 
@@ -221,8 +230,13 @@ func planBadgeText(_ raw: String?) -> String {
     switch normalizedPlanType(raw) {
     case "free": return "Free"
     case "plus": return "Plus"
-    case "pro5x": return "Pro5x"
-    case "pro20x": return "Pro20x"
+    case "pro5x": return "Pro 5x"
+    case "pro20x": return "Pro 20x"
+    case "business5x": return "Business 5x"
+    case "business20x": return "Business 20x"
+    case "business": return "Business"
+    case "enterprise": return "Enterprise"
+    case "edu": return "Edu"
     default: return ""
     }
 }

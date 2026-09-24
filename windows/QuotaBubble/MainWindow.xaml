@@ -36,8 +36,8 @@
           <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,7,0">
             <TextBlock x:Name="TitleText" FontSize="15" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-            <Border x:Name="PlanBadge" CornerRadius="2" Margin="5,0,0,0" Padding="7,0" Height="16" VerticalAlignment="Center" Visibility="Collapsed">
-              <TextBlock x:Name="PlanText" FontSize="11" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center"/>
+            <Border x:Name="PlanBadge" CornerRadius="2" Margin="5,0,0,0" Padding="4,0" Height="16" MinHeight="16" VerticalAlignment="Center" Visibility="Collapsed">
+              <TextBlock x:Name="PlanText" FontSize="10" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" TextTrimming="None"/>
             </Border>
           </StackPanel>
           <Border x:Name="Capsule" Grid.Column="1" Width="111" Height="28" CornerRadius="14" BorderBrush="#587282" BorderThickness="1" Background="#263D4A">

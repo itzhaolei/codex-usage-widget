@@ -84,7 +84,7 @@ enum NativeQuotaParser {
             account?["plan"], account?["plan_type"], account?["plan_id"], account?["tier"],
         ]
         let values = candidates.compactMap { normalizedPlanType($0 as? String) }
-        return ["pro20x", "pro5x", "plus", "free"].first(where: values.contains)
+        return ["business20x", "business5x", "pro20x", "pro5x", "business", "enterprise", "edu", "plus", "free"].first(where: values.contains)
     }
 
     private static func balance(_ value: Any?) -> String? {

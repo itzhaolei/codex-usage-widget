@@ -181,7 +181,7 @@ public partial class MainWindow : Window
         FiveHourQuotaPanel.Visibility = fiveHour is null ? Visibility.Collapsed : Visibility.Visible;
         RenderQuota(fiveHour, FiveHourResetText, FiveHourResetDateText, null, FiveHourPercentText, FiveHourProgressFill, FiveHourProgressPattern);
         RenderQuota(weekly, ResetText, ResetDateText, ResetWeekdayText, PercentText, ProgressFill, ProgressPattern);
-        SetPlan(snapshot?.PlanType);
+        SetPlan(snapshot?.PlanType ?? identity?.PlanType);
 
         BalanceValue.Text = FormatBalance(snapshot?.BalanceUsd);
         ResetValue.Text = snapshot?.ResetCredits?.AvailableCount.ToString(CultureInfo.InvariantCulture) ?? "—";
@@ -228,13 +228,43 @@ public partial class MainWindow : Window
         var normalized = NormalizePlan(raw);
         PlanText.Text = normalized switch
         {
-            "free" => "Free", "plus" => "Plus", "pro" => "Pro", "pro5x" => "Pro5x", "pro20x" => "Pro20x", _ => ""
+            "free" => "Free", "plus" => "Plus", "pro" => "Pro", "pro5x" => "Pro 5x", "pro20x" => "Pro 20x",
+            "business5x" => "Business 5x", "business20x" => "Business 20x",
+            "business" => "Business", "enterprise" => "Enterprise", "edu" => "Edu", _ => ""
         };
         PlanBadge.Visibility = PlanText.Text.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
-        PlanBadge.Background = new SolidColorBrush(normalized switch
+        PlanBadge.Background = PlanBadgeBrush(normalized);
+    }
+
+    private static Brush PlanBadgeBrush(string normalized)
+    {
+        if (normalized == "business5x") return new LinearGradientBrush
+        {
+            StartPoint = new Point(0, 0.5), EndPoint = new Point(1, 0.5),
+            GradientStops = new GradientStopCollection
+            {
+                new(Color.FromRgb(41, 117, 245), 0.0),
+                new(Color.FromRgb(51, 174, 255), 0.28),
+                new(Color.FromRgb(135, 84, 242), 0.58),
+                new(Color.FromRgb(255, 110, 51), 1.0)
+            }
+        };
+        if (normalized == "business20x") return new LinearGradientBrush
+        {
+            StartPoint = new Point(0, 0.5), EndPoint = new Point(1, 0.5),
+            GradientStops = new GradientStopCollection
+            {
+                new(Color.FromRgb(41, 117, 245), 0.0),
+                new(Color.FromRgb(64, 148, 255), 0.25),
+                new(Color.FromRgb(138, 79, 245), 0.62),
+                new(Color.FromRgb(214, 64, 220), 1.0)
+            }
+        };
+        return new SolidColorBrush(normalized switch
         {
             "plus" => Color.FromRgb(0, 184, 23),
             "pro" or "pro5x" or "pro20x" => Color.FromRgb(242, 140, 40),
+            "business" or "enterprise" or "edu" => Color.FromRgb(56, 139, 253),
             _ => Color.FromRgb(115, 122, 128)
         });
     }
@@ -398,9 +428,18 @@ public partial class MainWindow : Window
     {
         if (string.IsNullOrWhiteSpace(raw)) return "";
         var value = new string(raw.ToLowerInvariant().Where(char.IsLetterOrDigit).ToArray());
+        if (value.Contains("business") || value.Contains("team"))
+        {
+            if (value.Contains("20x")) return "business20x";
+            if (value.Contains("5x")) return "business5x";
+            if (value.Contains("prolite")) return "business5x";
+            return "business";
+        }
         if (value.Contains("20x") || value.Contains("pro20")) return "pro20x";
         if (value.Contains("5x") || value.Contains("pro5")) return "pro5x";
         if (value == "pro") return "pro20x";
+        if (value.Contains("enterprise")) return "enterprise";
+        if (value.Contains("edu") || value.Contains("education")) return "edu";
         return value is "free" or "plus" ? value : "";
     }
 

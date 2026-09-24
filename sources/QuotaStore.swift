@@ -54,7 +54,7 @@ final class QuotaStore: ObservableObject {
     var statusPercentage: Int? { statusPercentagePublisher.value }
     var resetText: String { compactDuration(until: weeklyUsageWindow(from: snapshot)?.resets_at, copy: copy) }
     var resetDateText: String { formattedResetDate(weeklyUsageWindow(from: snapshot)?.resets_at) }
-    var planText: String { planBadgeText(snapshot?.plan_type) }
+    var planText: String { planBadgeText(snapshot?.plan_type ?? auth.planType) }
     var balanceText: String { formattedBalance(snapshot?.balance_usd) }
     var resetCountText: String { snapshot?.reset_credits?.available_count.map(String.init) ?? "—" }
     var accountText: String { auth.email?.nonEmpty ?? "—" }
@@ -218,6 +218,7 @@ final class QuotaStore: ObservableObject {
             ?? accessToken.map { accountFingerprint(kind: "token", value: $0) }
         return AuthDisplayInfo(
             email: claims["email"] as? String,
+            planType: authClaims?["chatgpt_plan_type"] as? String,
             subscriptionExpiresAt: authClaims?["chatgpt_subscription_active_until"] as? String,
             accountFingerprint: fingerprint
         )

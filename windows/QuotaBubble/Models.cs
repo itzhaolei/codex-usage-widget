@@ -6,7 +6,7 @@ public sealed record UsageWindow(int UsedPercentage, long? ResetsAt);
 
 public sealed record ResetCredits(int AvailableCount, IReadOnlyList<DateTimeOffset> ExpiresAt);
 
-public sealed record AuthIdentity(string Fingerprint, string AccessToken, string? Email, DateTimeOffset? SubscriptionExpiresAt);
+public sealed record AuthIdentity(string Fingerprint, string AccessToken, string? Email, string? PlanType, DateTimeOffset? SubscriptionExpiresAt);
 
 public sealed record QuotaSnapshot(
     string? AccountFingerprint,
