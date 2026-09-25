@@ -188,6 +188,7 @@ known_names = {
     "Quota Bubble.app",
     "QuotaBubble.app",
     "quota_bubble.app",
+    "Install Quota Bubble.app",
     "Codex Usage Widget.app",
     "UsageWidget.app",
 }
@@ -199,11 +200,22 @@ def item_path(item):
         return str(Path(url2pathname(unquote(parsed.path))).resolve())
     return str(Path(unquote(value).replace("file://", "")).resolve()) if value else ""
 
+def bundle_identifier(path):
+    if not path:
+        return ""
+    info = Path(path) / "Contents" / "Info.plist"
+    try:
+        with info.open("rb") as handle:
+            return plistlib.load(handle).get("CFBundleIdentifier", "")
+    except (FileNotFoundError, OSError, plistlib.InvalidFileException, EOFError):
+        return ""
+
 def is_quota_item(item):
     tile = item.get("tile-data", {})
     if tile.get("bundle-identifier") in known_ids:
         return True
-    return Path(item_path(item)).name in known_names
+    path = item_path(item)
+    return Path(path).name in known_names or bundle_identifier(path) in known_ids
 
 try:
     with plist_path.open("rb") as handle:
@@ -242,8 +254,11 @@ for item in apps:
 if not inserted:
     new_apps.append(canonical)
 
-if new_apps != apps or not plist_path.exists():
+recent = data.get("recent-apps", [])
+new_recent = [item for item in recent if not is_quota_item(item)]
+if new_apps != apps or new_recent != recent or not plist_path.exists():
     data["persistent-apps"] = new_apps
+    data["recent-apps"] = new_recent
     plist_path.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary = tempfile.mkstemp(prefix="com.apple.dock.", suffix=".plist", dir=plist_path.parent)
     os.close(fd)

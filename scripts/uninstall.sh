@@ -44,15 +44,28 @@ if p.exists():
         "Quota Bubble.app",
         "QuotaBubble.app",
         "quota_bubble.app",
+        "Install Quota Bubble.app",
         "Codex Usage Widget.app",
         "UsageWidget.app",
     }
+    def bundle_id(app_path):
+        info = Path(app_path) / "Contents" / "Info.plist"
+        try:
+            return plistlib.load(info.open("rb")).get("CFBundleIdentifier", "")
+        except (FileNotFoundError, OSError, plistlib.InvalidFileException, EOFError):
+            return ""
     def is_quota(item):
         tile = item.get("tile-data", {})
-        return tile.get("bundle-identifier") in legacy_ids or Path(path(item)).name in legacy_names
+        app_path = path(item)
+        return (tile.get("bundle-identifier") in legacy_ids or
+                Path(app_path).name in legacy_names or
+                bundle_id(app_path) in legacy_ids)
     new = [item for item in apps if not is_quota(item)]
-    if new != apps:
+    recent = data.get("recent-apps", [])
+    new_recent = [item for item in recent if not is_quota(item)]
+    if new != apps or new_recent != recent:
         data["persistent-apps"] = new
+        data["recent-apps"] = new_recent
         plistlib.dump(data, p.open("wb"))
         subprocess.run(["killall", "Dock"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 PY

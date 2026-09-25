@@ -547,7 +547,7 @@ class UpdateService extends ChangeNotifier {
     final script = File('$resources/install-packaged.sh');
     final unpackedPath = await unpacked.resolveSymbolicLinks();
     if (!await script.exists() ||
-        !(await script.resolveSymbolicLinks()).startsWith('$unpackedPath/')) {
+        !_isPathWithin(await script.resolveSymbolicLinks(), unpackedPath)) {
       throw const UpdateException(
         'The installer script is missing or invalid.',
       );
@@ -686,4 +686,26 @@ class UpdateService extends ChangeNotifier {
     _transport.close();
     super.dispose();
   }
+}
+
+/// Compares canonical paths without assuming the host's separator style.
+/// The macOS installer is exercised by cross-platform tests on Windows too.
+bool _isPathWithin(String child, String parent) {
+  String normalize(String value) {
+    var normalized = value.replaceAll('\\', '/');
+    normalized = normalized.replaceAll(RegExp(r'/+'), '/');
+    if (Platform.isWindows) normalized = normalized.toLowerCase();
+    if (normalized.length > 1 && normalized.endsWith('/')) {
+      normalized = normalized.substring(0, normalized.length - 1);
+    }
+    return normalized;
+  }
+
+  final normalizedChild = normalize(child);
+  final normalizedParent = normalize(parent);
+  if (normalizedChild == normalizedParent) return false;
+  final prefix = normalizedParent.endsWith('/')
+      ? normalizedParent
+      : '$normalizedParent/';
+  return normalizedChild.startsWith(prefix);
 }
