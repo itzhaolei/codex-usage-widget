@@ -106,10 +106,20 @@ if [ -n "$INSTALLER_URL" ]; then
     curl -fsSL "$INSTALLER_URL" -o "$INSTALLER_ZIP"
     ditto -x -k "$INSTALLER_ZIP" "$INSTALLER_DIR"
     /bin/bash "$INSTALLER_DIR/Install Quota Bubble.app/Contents/Resources/install-packaged.sh"
-elif command -v swiftc >/dev/null 2>&1; then
-    bash "$PLUGIN_DIR/scripts/install.sh"
+elif command -v flutter >/dev/null 2>&1; then
+    LOCAL_VERSION="$(/usr/bin/python3 - "$PLUGIN_DIR/pubspec.yaml" <<'PY'
+import re, sys
+text = open(sys.argv[1], encoding="utf-8").read()
+match = re.search(r"^version:\s*([^+\s]+)", text, re.MULTILINE)
+print(match.group(1) if match else "0.0.0")
+PY
+)"
+    bash "$PLUGIN_DIR/scripts/package-flutter-macos.sh" "$LOCAL_VERSION"
+    mkdir -p "$INSTALLER_DIR"
+    ditto -x -k "$PLUGIN_DIR/dist/QuotaBubble-$LOCAL_VERSION-macOS-Installer.zip" "$INSTALLER_DIR"
+    /bin/bash "$INSTALLER_DIR/Install Quota Bubble.app/Contents/Resources/install-packaged.sh"
 else
-    echo "Could not download the prebuilt macOS installer, and swiftc is unavailable." >&2
+    echo "Could not download the prebuilt macOS installer, and Flutter is unavailable." >&2
     exit 1
 fi
 

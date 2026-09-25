@@ -4,6 +4,18 @@ All notable changes to Quota Bubble are documented here.
 
 ## Unreleased
 
+## 4.0.0 - 2026-09-26
+
+### Changed
+
+- Migrated the macOS and Windows interface and quota logic to one shared Flutter desktop codebase while retaining the existing macOS bundle identifier and installer paths.
+- Recreated the compact quota display, plan badges, color palette, progress effects, and staged recharge animation in Flutter.
+- Pauses window detail rendering and animation when hidden while keeping the macOS menu-bar percentage or Windows tray tooltip current.
+- Standardized account, subscription, reset-credit, and system-capacity presentation across macOS and Windows.
+- Preserves the Free, Plus, Pro 5x/20x, Business/Business 5x/20x, Enterprise, and Edu badges and uses one macOS-style vector-symbol set on both platforms.
+- Keeps the Windows taskbar entry available and uses the macOS status-bar window level when pinned.
+- Builds graphical installers for both platforms from the Flutter application.
+
 ## 3.1.29 - 2026-09-25
 
 ### Fixed

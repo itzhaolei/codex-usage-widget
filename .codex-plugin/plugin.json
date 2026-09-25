@@ -1,7 +1,7 @@
 {
   "name": "codex-usage-widget",
-  "version": "3.1.29",
-  "description": "A floating quota widget for Codex usage limits on macOS and Windows.",
+  "version": "4.0.0",
+  "description": "A shared Flutter desktop widget for Codex usage limits on macOS and Windows.",
   "author": {
     "name": "itzhaolei"
   },
@@ -11,15 +11,15 @@
   "apps": "./.app.json",
   "interface": {
     "displayName": "Quota Bubble",
-    "shortDescription": "Show Codex quota usage in a floating desktop widget.",
-    "longDescription": "Quota Bubble installs a local desktop HUD that stays optionally pinned, remembers its position, and displays Codex quota, balance, reset-credit, account, and subscription information.",
+    "shortDescription": "Track Codex quota in a Flutter desktop widget.",
+    "longDescription": "Quota Bubble provides one local Flutter desktop HUD for macOS and Windows. It can stay pinned, remembers its position, hides without quitting, and displays Codex quota, balance, reset-credit, account, and subscription information.",
     "developerName": "itzhaolei",
     "category": "Productivity",
     "capabilities": ["Write", "Automation"],
     "defaultPrompt": [
       "Install the Quota Bubble.",
       "Restart the Quota Bubble.",
-      "Stop the Quota Bubble."
+      "Uninstall the Quota Bubble."
     ],
     "brandColor": "#16A34A",
     "composerIcon": "./assets/icon.png",
