@@ -1,5 +1,5 @@
 {
-  "tag": "v3.1.26",
-  "windows_installer_url": "https://github.com/itzhaolei/codex-usage-widget/releases/download/v3.1.26/QuotaBubble-3.1.26-Windows-Setup.exe",
-  "macos_installer_url": "https://github.com/itzhaolei/codex-usage-widget/releases/download/v3.1.26/QuotaBubble-3.1.26-macOS-Installer.zip"
+  "tag": "v4.0.0",
+  "windows_installer_url": "https://github.com/itzhaolei/codex-usage-widget/releases/download/v4.0.0/QuotaBubble-4.0.0-Windows-Setup.exe",
+  "macos_installer_url": "https://github.com/itzhaolei/codex-usage-widget/releases/download/v4.0.0/QuotaBubble-4.0.0-macOS-Installer.zip"
 }
