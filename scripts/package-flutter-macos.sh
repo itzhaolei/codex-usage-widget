@@ -255,7 +255,22 @@ if not inserted:
     new_apps.append(canonical)
 
 recent = data.get("recent-apps", [])
-new_recent = [item for item in recent if not is_quota_item(item)]
+# Dock may retain duplicate recent tiles after an app bundle is replaced.
+# Collapse only exact bundle/path identities and preserve other recent apps.
+new_recent = []
+seen_recent = set()
+for item in recent:
+    if is_quota_item(item):
+        continue
+    tile = item.get("tile-data", {})
+    bundle_id = tile.get("bundle-identifier", "")
+    path = item_path(item)
+    identity = (bundle_id, path) if bundle_id or path else None
+    if identity is not None:
+        if identity in seen_recent:
+            continue
+        seen_recent.add(identity)
+    new_recent.append(item)
 if new_apps != apps or new_recent != recent or not plist_path.exists():
     data["persistent-apps"] = new_apps
     data["recent-apps"] = new_recent

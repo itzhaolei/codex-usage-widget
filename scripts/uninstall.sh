@@ -62,7 +62,21 @@ if p.exists():
                 bundle_id(app_path) in legacy_ids)
     new = [item for item in apps if not is_quota(item)]
     recent = data.get("recent-apps", [])
-    new_recent = [item for item in recent if not is_quota(item)]
+    # Collapse only exact bundle/path identities; preserve other recent apps.
+    new_recent = []
+    seen_recent = set()
+    for item in recent:
+        if is_quota(item):
+            continue
+        tile = item.get("tile-data", {})
+        bundle_id = tile.get("bundle-identifier", "")
+        app_path = path(item)
+        identity = (bundle_id, app_path) if bundle_id or app_path else None
+        if identity is not None:
+            if identity in seen_recent:
+                continue
+            seen_recent.add(identity)
+        new_recent.append(item)
     if new != apps or new_recent != recent:
         data["persistent-apps"] = new
         data["recent-apps"] = new_recent
