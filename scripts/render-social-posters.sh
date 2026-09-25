@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 PAGE="file://$ROOT/assets/social/posters.html"
 
-for item in "1:quota-live" "2:privacy" "3:native-glass"; do
+for item in "1:quota-live" "2:privacy" "3:flutter-light"; do
   index="${item%%:*}"
   name="${item#*:}"
   "$CHROME" --headless=new --hide-scrollbars --disable-gpu \

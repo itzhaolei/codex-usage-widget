@@ -1,48 +1,20 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BUILD_DIR="${TMPDIR:-/tmp}/quota-bubble-tests"
-mkdir -p "$BUILD_DIR"
-export CLANG_MODULE_CACHE_PATH="$BUILD_DIR/clang-module-cache"
-export SWIFT_MODULECACHE_PATH="$BUILD_DIR/swift-module-cache"
-mkdir -p "$CLANG_MODULE_CACHE_PATH" "$SWIFT_MODULECACHE_PATH"
+FLUTTER_BIN="${FLUTTER_BIN:-flutter}"
 
-bash -n "$ROOT"/scripts/{install,package-installer,restart,ensure-usage-widget,start-usage-widget,status,uninstall}.sh
+bash -n "$ROOT"/scripts/{bootstrap-install,ensure-usage-widget,install,package-flutter-macos,restart,start-usage-widget,status,uninstall}.sh
 
-swiftc -parse-as-library -o "$BUILD_DIR/QuotaModelsTests" \
-    "$ROOT/sources/QuotaModels.swift" "$ROOT/tests/QuotaModelsTests.swift"
-"$BUILD_DIR/QuotaModelsTests"
+grep -q 'persistent-apps' "$ROOT/scripts/package-flutter-macos.sh"
+grep -q 'local.codex.quota-bubble' "$ROOT/scripts/package-flutter-macos.sh"
+grep -q 'killall Dock' "$ROOT/scripts/package-flutter-macos.sh"
+grep -q 'persistent-apps' "$ROOT/scripts/uninstall.sh"
 
-swiftc -parse-as-library -o "$BUILD_DIR/QuotaStoreTests" \
-    "$ROOT/sources/QuotaModels.swift" "$ROOT/sources/QuotaSnapshotService.swift" "$ROOT/sources/QuotaStore.swift" "$ROOT/tests/QuotaStoreTests.swift" \
-    -framework Cocoa -framework Combine
-"$BUILD_DIR/QuotaStoreTests"
+cd "$ROOT"
+"$FLUTTER_BIN" pub get
+"$FLUTTER_BIN" analyze
+"$FLUTTER_BIN" test
+"$FLUTTER_BIN" build macos --debug --no-pub
 
-swiftc -parse-as-library -o "$BUILD_DIR/QuotaSnapshotServiceTests" \
-    "$ROOT/sources/QuotaModels.swift" "$ROOT/sources/QuotaSnapshotService.swift" "$ROOT/tests/QuotaSnapshotServiceTests.swift"
-"$BUILD_DIR/QuotaSnapshotServiceTests"
-
-swiftc -parse-as-library -o "$BUILD_DIR/QuotaBubble" \
-    "$ROOT/sources/QuotaModels.swift" "$ROOT/sources/QuotaSnapshotService.swift" "$ROOT/sources/QuotaStore.swift" "$ROOT/sources/QuotaBubbleApp.swift" \
-    -framework Cocoa -framework SwiftUI -framework Combine
-
-grep -q 'applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }' "$ROOT/sources/QuotaBubbleApp.swift"
-grep -q 'Window("Quota Bubble", id: "main")' "$ROOT/sources/QuotaBubbleApp.swift"
-if grep -Eq 'WindowGroup\(|\\.openWindow|openWindow\(' "$ROOT/sources/QuotaBubbleApp.swift"; then
-    echo "macOS must remain a strict single-window application." >&2
-    exit 1
-fi
-grep -A5 'func close(window: NSWindow?)' "$ROOT/sources/QuotaBubbleApp.swift" | grep -q 'target.orderOut(nil)'
-if grep -A5 'func close(window: NSWindow?)' "$ROOT/sources/QuotaBubbleApp.swift" | grep -q 'NSApp.terminate'; then
-    echo "macOS close control must hide the window without terminating the app." >&2
-    exit 1
-fi
-grep -A8 'private func restartAfterUpdate()' "$ROOT/sources/QuotaBubbleApp.swift" | grep -q 'lsregister'
-grep -A8 'private func restartAfterUpdate()' "$ROOT/sources/QuotaBubbleApp.swift" | grep -q 'killall Dock'
-grep -A12 'func applicationDidFinishLaunching' "$ROOT/sources/QuotaBubbleApp.swift" | grep -q 'applicationIconImage'
-grep -q 'ICON_BASENAME="AppIcon-$VERSION"' "$ROOT/scripts/package-installer.sh"
-grep -q 'CFBundleIconFile</key><string>$ICON_BASENAME.icns' "$ROOT/scripts/package-installer.sh"
-grep -q 'if \[ "${QUOTA_BUBBLE_SKIP_DOCK:-0}" != "1" \]; then' "$ROOT/scripts/package-installer.sh"
-grep -A2 'if \[ "${QUOTA_BUBBLE_SKIP_DOCK:-0}" != "1" \]; then' "$ROOT/scripts/package-installer.sh" | grep -q 'killall Dock'
-
-echo "macOS SwiftUI build tests passed."
+echo "macOS Flutter checks passed."

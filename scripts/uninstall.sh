@@ -5,7 +5,8 @@ APP="/Applications/Quota Bubble.app"
 LEGACY_USER_APP="$HOME/Applications/Quota Bubble.app"
 LAUNCH_AGENT="$HOME/Library/LaunchAgents/com.codex.usage-widget.autostart.plist"
 launchctl bootout "gui/$(id -u)" "$LAUNCH_AGENT" >/dev/null 2>&1 || true
-pkill -f "Quota Bubble.app/Contents/MacOS/Quota Bubble" >/dev/null 2>&1 || true
+PATTERN='(Quota Bubble|quota_bubble|QuotaBubble)[.]app/Contents/MacOS/(Quota Bubble|quota_bubble|QuotaBubble)([[:space:]]|$)'
+pkill -f "$PATTERN" >/dev/null 2>&1 || true
 pkill -f "UsageWidget.app/Contents/MacOS/UsageWidget" >/dev/null 2>&1 || true
 rm -f "$LAUNCH_AGENT"
 rm -rf "$LEGACY_USER_APP" "$HOME/Applications/Codex Usage Widget.app" "$CODEX_HOME/usage-widget"
@@ -34,7 +35,22 @@ if p.exists():
         value = item.get("tile-data", {}).get("file-data", {}).get("_CFURLString", "")
         parsed = urlparse(value)
         return (url2pathname(unquote(parsed.path)) if parsed.scheme == "file" else unquote(value).replace("file://", "")).rstrip("/")
-    new = [item for item in apps if not path(item).endswith(("/Quota Bubble.app", "/Codex Usage Widget.app"))]
+    legacy_ids = {
+        "local.codex.quota-bubble",
+        "local.codex.quota-bubble.installer",
+        "com.itzhaolei.quotaBubble",
+    }
+    legacy_names = {
+        "Quota Bubble.app",
+        "QuotaBubble.app",
+        "quota_bubble.app",
+        "Codex Usage Widget.app",
+        "UsageWidget.app",
+    }
+    def is_quota(item):
+        tile = item.get("tile-data", {})
+        return tile.get("bundle-identifier") in legacy_ids or Path(path(item)).name in legacy_names
+    new = [item for item in apps if not is_quota(item)]
     if new != apps:
         data["persistent-apps"] = new
         plistlib.dump(data, p.open("wb"))

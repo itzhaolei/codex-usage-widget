@@ -2,7 +2,7 @@
 set -euo pipefail
 APP="/Applications/Quota Bubble.app"
 [ -d "$APP" ] || APP="$HOME/Applications/Quota Bubble.app"
-PATTERN="Quota Bubble.app/Contents/MacOS/Quota Bubble"
+PATTERN='(Quota Bubble|quota_bubble|QuotaBubble)[.]app/Contents/MacOS/(Quota Bubble|quota_bubble|QuotaBubble)([[:space:]]|$)'
 if pgrep -f "$PATTERN" >/dev/null 2>&1; then
     osascript -e 'tell application id "local.codex.quota-bubble" to quit' >/dev/null 2>&1 || pkill -f "$PATTERN" >/dev/null 2>&1 || true
 fi

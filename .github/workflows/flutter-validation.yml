@@ -1,0 +1,99 @@
+name: Validate Flutter desktop
+
+on:
+  push:
+    branches:
+      - codex/flutter-4-native-icons
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    name: Flutter macOS application
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Analyze Flutter application
+        run: flutter analyze
+
+      - name: Test Flutter application
+        run: flutter test
+
+      - name: Build macOS application
+        run: flutter build macos --release
+
+      - name: Archive macOS application for validation
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            build/macos/Build/Products/Release/quota_bubble.app \
+            build/quota-bubble-macos-validation.zip
+
+      - name: Keep macOS validation build
+        uses: actions/upload-artifact@v4
+        with:
+          name: quota-bubble-macos-validation
+          path: build/quota-bubble-macos-validation.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  windows:
+    name: Flutter Windows application
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+
+      - name: Get Flutter dependencies
+        shell: pwsh
+        run: |
+          flutter pub get
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Analyze Flutter application
+        shell: pwsh
+        run: |
+          flutter analyze
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Test Flutter application
+        shell: pwsh
+        run: |
+          flutter test
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build Windows application
+        shell: pwsh
+        run: |
+          flutter build windows --release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Keep Windows validation build
+        uses: actions/upload-artifact@v4
+        with:
+          name: quota-bubble-windows-validation
+          path: build/windows/x64/runner/Release/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,15 +1,15 @@
 ---
 name: codex-usage-widget
-description: Install, restart, stop, or inspect the local macOS Quota Bubble. Use when the user asks for a floating quota window, Codex usage HUD, reset-credit display, or wants to manage this plugin's widget.
+description: Install, restart, uninstall, or inspect Quota Bubble. Use when the user asks for the Flutter Codex quota window, usage HUD, reset-credit display, or wants to manage this plugin's desktop installation.
 ---
 
 # Quota Bubble
 
-This plugin provides a local macOS floating widget for Codex quota visibility.
+This plugin provides a Flutter desktop widget for local Codex quota visibility on macOS and Windows. The commands below manage the macOS installation; Windows users use the graphical installer from the official website.
 
 ## What It Installs
 
-- `/Applications/Quota Bubble.app`: the single SwiftUI macOS app that owns the HUD, Dock icon, and menus.
+- `/Applications/Quota Bubble.app`: the single Flutter macOS app that owns the HUD, Dock icon, and menus.
 - `~/.codex/usage-widget/ensure-usage-widget.sh`: opens the single app when explicitly invoked.
 - `~/Library/LaunchAgents/com.codex.usage-widget.autostart.plist`: opens the app once at user login.
 
@@ -25,7 +25,7 @@ bash scripts/install.sh
 
 End users install from the official website, which detects macOS or Windows and directly downloads the latest graphical installer. Do not instruct end users to run terminal commands.
 
-Install also adds `Quota Bubble.app` to the Dock and removes duplicate legacy entries.
+Install places `Quota Bubble.app` in Applications, enables login startup, and launches it.
 
 Restart the widget:
 
@@ -33,7 +33,7 @@ Restart the widget:
 bash scripts/restart.sh
 ```
 
-Stop the widget and unload the LaunchAgent:
+Uninstall the widget and unload the LaunchAgent:
 
 ```bash
 bash scripts/uninstall.sh
@@ -51,9 +51,10 @@ bash scripts/status.sh
 - The Dock app can be clicked to activate the same running HUD process.
 - Closing Codex does not close Quota Bubble.
 - Only one widget instance is kept alive.
-- The close button terminates the app, so its Dock running state clears immediately.
-- The widget refreshes the visible countdown every second and fetches quota data natively in Swift.
-- The macOS app does not require Node.js, npm, Codex CLI, Xcode, or command-line tools at runtime.
+- The close button hides the window; use the menu-bar menu to quit the process.
+- The widget refreshes visible countdown details every second. While hidden, it pauses window rendering and keeps the menu-bar quota percentage current.
+- The shared Flutter/Dart application service fetches quota data locally.
+- The installed app does not require Node.js, npm, Codex CLI, Xcode, or command-line tools at runtime.
 - Quota stabilization and reset-credit caching are scoped to a redacted Codex account fingerprint.
 
 ## Notes For Codex

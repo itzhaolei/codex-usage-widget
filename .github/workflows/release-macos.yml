@@ -9,47 +9,154 @@ on:
       version:
         description: Version without the v prefix
         required: true
+      validate_only:
+        description: Build and test without publishing a release
+        type: boolean
+        default: true
 
 permissions:
   contents: write
+
+concurrency:
+  group: release-macos-${{ github.event_name == 'workflow_dispatch' && format('v{0}', inputs.version) || github.ref_name }}
+  cancel-in-progress: false
 
 jobs:
   release:
     runs-on: macos-26
     env:
-      VERSION: ${{ inputs.version || github.ref_name }}
+      REQUESTED_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
     steps:
+      - name: Resolve release version
+        run: |
+          set -euo pipefail
+          SEMVER_RE='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            VERSION="$REQUESTED_VERSION"
+          else
+            case "$REQUESTED_VERSION" in
+              v*) VERSION="${REQUESTED_VERSION#v}" ;;
+              *) echo "Release tag must be vMAJOR.MINOR.PATCH: $REQUESTED_VERSION" >&2; exit 1 ;;
+            esac
+          fi
+          if [[ ! "$VERSION" =~ $SEMVER_RE ]]; then
+            echo "Release version must be a complete MAJOR.MINOR.PATCH value: $VERSION" >&2
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=v$VERSION" >> "$GITHUB_ENV"
+
       - name: Check out tagged source
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/v{0}', inputs.version) || github.ref }}
+          fetch-depth: 0
 
-      - name: Select Liquid Glass toolchain
+      - name: Verify release tag and source versions
+        run: |
+          set -euo pipefail
+          TAG_COMMIT="$(git rev-parse "$RELEASE_TAG^{commit}")"
+          HEAD_COMMIT="$(git rev-parse HEAD)"
+          if [ "$TAG_COMMIT" != "$HEAD_COMMIT" ]; then
+            echo "Checked out commit $HEAD_COMMIT does not match $RELEASE_TAG ($TAG_COMMIT)." >&2
+            exit 1
+          fi
+
+          PUBSPEC_VERSION="$(awk '/^version:[[:space:]]*/ { split($2, parts, "+"); print parts[1]; exit }' pubspec.yaml)"
+          APP_VERSION="$(sed -nE "s/^[[:space:]]*const[[:space:]]+appVersion[[:space:]]*=[[:space:]]*'([^']+)'[[:space:]]*;[[:space:]]*$/\1/p" lib/desktop_app.dart)"
+          PLUGIN_VERSION="$(/usr/bin/python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          print(json.loads(Path('.codex-plugin/plugin.json').read_text(encoding='utf-8'))['version'])
+          PY
+          )"
+          for SOURCE_VERSION in "$PUBSPEC_VERSION" "$APP_VERSION" "$PLUGIN_VERSION"; do
+            if [ "$SOURCE_VERSION" != "$VERSION" ]; then
+              echo "Release $RELEASE_TAG does not match source versions: pubspec=$PUBSPEC_VERSION appVersion=$APP_VERSION plugin=$PLUGIN_VERSION" >&2
+              exit 1
+            fi
+          done
+
+      - name: Select Xcode toolchain
         run: |
           sudo xcode-select -s /Applications/Xcode_26.6.app
           xcodebuild -version
-          swiftc --version
 
-      - name: Build universal installer
-        env:
-          QUOTA_BUBBLE_UNIVERSAL: "1"
-          QUOTA_BUBBLE_REQUIRE_LIQUID_GLASS: "1"
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+
+      - name: Verify Flutter project
         run: |
-          VERSION="${VERSION#v}"
-          bash scripts/package-installer.sh "$VERSION"
+          flutter --version
+          flutter pub get
+          flutter analyze
+          flutter test
+
+      - name: Build Flutter universal installer
+        run: |
+          bash scripts/package-flutter-macos.sh "$VERSION"
           file "dist/QuotaBubble-$VERSION-macOS-Installer.zip"
           shasum -a 256 "dist/QuotaBubble-$VERSION-macOS-Installer.zip"
 
-      - name: Create GitHub Release
+      - name: Verify installer payload
+        run: |
+          CHECK_DIR="$(mktemp -d)"
+          unzip -q "dist/QuotaBubble-$VERSION-macOS-Installer.zip" -d "$CHECK_DIR"
+          APP="$CHECK_DIR/Install Quota Bubble.app/Contents/Resources/payload/Quota Bubble.app"
+          EXECUTABLE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Contents/Info.plist")"
+          BINARY="$APP/Contents/MacOS/$EXECUTABLE"
+          test -x "$BINARY"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist")" = 'local.codex.quota-bubble'
+          ARCH_INFO="$(lipo -info "$BINARY")"
+          echo "$ARCH_INFO"
+          case "$ARCH_INFO" in
+            *arm64*x86_64*|*x86_64*arm64*) ;;
+            *) echo "The Flutter macOS bundle is not universal: $ARCH_INFO" >&2; exit 1 ;;
+          esac
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")" = "$VERSION"
+
+      - name: Keep macOS installer for validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: quota-bubble-macos-installer
+          path: dist/*-macOS-Installer.zip
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish macOS asset to GitHub Release
+        if: github.event_name == 'push' || inputs.validate_only == false
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION="${VERSION#v}"
-          TAG="v$VERSION"
+          set -euo pipefail
+          TAG="$RELEASE_TAG"
           ASSET="dist/QuotaBubble-$VERSION-macOS-Installer.zip"
           NOTES="docs/releases/$VERSION.md"
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$ASSET" --clobber
-          elif [ -f "$NOTES" ]; then
-            gh release create "$TAG" "$ASSET" --title "Quota Bubble $TAG" --notes-file "$NOTES" --verify-tag
-          else
-            gh release create "$TAG" "$ASSET" --title "Quota Bubble $TAG" --generate-notes --verify-tag
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            if [ -f "$NOTES" ]; then
+              gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "Quota Bubble $TAG" --notes-file "$NOTES" --verify-tag || CREATE_FAILED=1
+            else
+              gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "Quota Bubble $TAG" --generate-notes --verify-tag || CREATE_FAILED=1
+            fi
+            if [ "${CREATE_FAILED:-0}" = "1" ]; then
+              RELEASE_FOUND=0
+              for ATTEMPT in 1 2 3 4 5; do
+                if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+                  RELEASE_FOUND=1
+                  break
+                fi
+                sleep 2
+              done
+              if [ "$RELEASE_FOUND" != "1" ]; then
+                echo "Could not create or find GitHub Release $TAG." >&2
+                exit 1
+              fi
+            fi
           fi
+          gh release upload "$TAG" "$ASSET" --repo "$GITHUB_REPOSITORY" --clobber

@@ -17,34 +17,75 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-windows-${{ github.event_name == 'workflow_dispatch' && format('v{0}', inputs.version) || github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: windows-latest
     env:
-      VERSION: ${{ inputs.version || github.ref_name }}
+      REQUESTED_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
     steps:
-      - name: Check out source
-        uses: actions/checkout@v4
-
       - name: Resolve version
         shell: pwsh
         run: |
-          $version = "$env:VERSION".TrimStart('v')
+          $semver = '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
+          if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch') {
+            $version = $env:REQUESTED_VERSION
+          } else {
+            if ($env:REQUESTED_VERSION -notmatch '^v(?<version>.+)$') {
+              throw "Release tag must be vMAJOR.MINOR.PATCH: $env:REQUESTED_VERSION"
+            }
+            $version = $Matches.version
+          }
+          if ($version -notmatch $semver) {
+            throw "Release version must be a complete MAJOR.MINOR.PATCH value: $version"
+          }
           "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "RELEASE_TAG=v$version" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      - name: Set up .NET 8
-        uses: actions/setup-dotnet@v4
+      - name: Check out tagged source
+        uses: actions/checkout@v4
         with:
-          dotnet-version: 8.0.x
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/v{0}', inputs.version) || github.ref }}
+          fetch-depth: 0
 
-      - name: Run Windows static tests
-        shell: bash
-        run: |
-          node tests/WindowsStaticTests.mjs
-
-      - name: Build native Windows application
+      - name: Verify release tag and source versions
         shell: pwsh
-        run: dotnet build windows/QuotaBubble/QuotaBubble.csproj --configuration Release -p:Version=$env:VERSION
+        run: |
+          $tagCommit = (git rev-parse "$($env:RELEASE_TAG)^{commit}").Trim()
+          if ($LASTEXITCODE -ne 0) { throw "Could not resolve $env:RELEASE_TAG" }
+          $headCommit = (git rev-parse HEAD).Trim()
+          if ($tagCommit -ne $headCommit) {
+            throw "Checked out commit $headCommit does not match $env:RELEASE_TAG ($tagCommit)."
+          }
+
+          $pubspec = Get-Content pubspec.yaml -Raw
+          if ($pubspec -notmatch '(?m)^version:\s*([^\s+]+)(?:\+\S+)?\s*$') { throw 'Could not read pubspec.yaml version' }
+          $pubspecVersion = $Matches[1]
+          $appSource = Get-Content lib/desktop_app.dart -Raw
+          if ($appSource -notmatch "(?m)^\s*const\s+appVersion\s*=\s*'([^']+)'\s*;\s*$") { throw 'Could not read appVersion' }
+          $appVersion = $Matches[1]
+          $pluginVersion = (Get-Content .codex-plugin/plugin.json -Raw | ConvertFrom-Json).version
+          if ($pubspecVersion -ne $env:VERSION -or $appVersion -ne $env:VERSION -or $pluginVersion -ne $env:VERSION) {
+            throw "Release $env:RELEASE_TAG does not match source versions: pubspec=$pubspecVersion appVersion=$appVersion plugin=$pluginVersion"
+          }
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+
+      - name: Verify Flutter project
+        shell: pwsh
+        run: |
+          flutter --version
+          flutter pub get
+          flutter analyze
+          flutter test
 
       - name: Install packaging tools
         shell: pwsh
@@ -58,26 +99,25 @@ jobs:
 
       - name: Generate Windows application icon
         shell: pwsh
-        run: magick assets/icon.png -define icon:auto-resize=256,128,64,48,32,16 windows/QuotaBubble.ico
+        run: |
+          magick assets/icon.png -define icon:auto-resize=256,128,64,48,32,16 windows/runner/resources/app_icon.ico
+          magick assets/icon.png -define icon:auto-resize=256,128,64,48,32,16 windows/QuotaBubble.ico
 
-      - name: Publish self-contained Windows application
+      - name: Build Flutter Windows application
         shell: pwsh
         run: |
-          dotnet publish windows/QuotaBubble/QuotaBubble.csproj `
-            --configuration Release --runtime win-x64 --self-contained true `
-            -p:Version=$env:VERSION -p:PublishSingleFile=true `
-            --output windows/publish
+          & powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-flutter-windows.ps1 $env:VERSION
           if (-not (Test-Path windows/publish/QuotaBubble.exe)) { throw "QuotaBubble.exe was not published" }
 
-      - name: Smoke launch native application
+      - name: Smoke launch Flutter application
         shell: pwsh
         run: |
-          $smokeHome = Join-Path $env:RUNNER_TEMP "quota-bubble-native-smoke"
+          $smokeHome = Join-Path $env:RUNNER_TEMP "quota-bubble-flutter-smoke"
           New-Item -ItemType Directory -Path $smokeHome -Force | Out-Null
           $env:CODEX_HOME = $smokeHome
           $process = Start-Process windows/publish/QuotaBubble.exe -PassThru
           Start-Sleep -Seconds 5
-          if ($process.HasExited) { throw "Native Quota Bubble exited during smoke launch" }
+          if ($process.HasExited) { throw "Flutter Quota Bubble exited during smoke launch" }
           Stop-Process -Id $process.Id -Force
 
       - name: Build graphical installer
@@ -150,18 +190,47 @@ jobs:
           $result = Start-Process $uninstaller -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART" -Wait -PassThru
           if ($result.ExitCode -ne 0) { throw "Uninstaller exited with $($result.ExitCode)" }
 
+      - name: Keep Windows installers for validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: quota-bubble-windows-installers
+          path: |
+            dist/*-Windows-Setup.exe
+            dist/*-Windows.zip
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Upload installer to GitHub Release
         if: github.event_name == 'push' || inputs.validate_only == false
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = "v$env:VERSION"
+          $tag = $env:RELEASE_TAG
           $asset = "dist/QuotaBubble-$env:VERSION-Windows-Setup.exe"
           $bridge = "dist/QuotaBubble-$env:VERSION-Windows.zip"
-          for ($attempt = 0; $attempt -lt 60; $attempt++) {
-            gh release view $tag *> $null
-            if ($LASTEXITCODE -eq 0) { break }
-            Start-Sleep -Seconds 2
+          $notes = "docs/releases/$($env:VERSION).md"
+          gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -ne 0) {
+            $createArgs = @('release', 'create', $tag, '--repo', $env:GITHUB_REPOSITORY, '--title', "Quota Bubble $tag", '--verify-tag')
+            if (Test-Path $notes) {
+              $createArgs += @('--notes-file', $notes)
+            } else {
+              $createArgs += '--generate-notes'
+            }
+            & gh @createArgs
+            if ($LASTEXITCODE -ne 0) {
+              $releaseFound = $false
+              foreach ($attempt in 1..5) {
+                gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
+                if ($LASTEXITCODE -eq 0) {
+                  $releaseFound = $true
+                  break
+                }
+                Start-Sleep -Seconds 2
+              }
+              if (-not $releaseFound) { throw "Could not create or find GitHub Release $tag." }
+            }
           }
-          gh release upload $tag $asset $bridge --clobber
+          gh release upload $tag $asset $bridge --repo $env:GITHUB_REPOSITORY --clobber
+          if ($LASTEXITCODE -ne 0) { throw "Could not upload Windows assets to $tag." }
