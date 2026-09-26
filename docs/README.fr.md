@@ -17,13 +17,13 @@ Une fenêtre flottante issue d’une base Flutter/Dart commune à macOS et Windo
 - Affiche localement sous macOS et Windows le compte actuel et l’expiration de l’abonnement sans enregistrer les identifiants dans l’instantané de quota.
 - Affiche le stockage système et la mémoire physique disponibles ; sous Windows, l’espace libre du lecteur C est indiqué.
 - Stabilise les quotas en direct et empêche l’affichage des données du compte précédent après un changement de compte.
-- Fonctionne indépendamment et lit les données locales de quota Codex.
+- Fonctionne indépendamment de Codex Desktop, lit la connexion locale et demande les données de quota actuelles au backend Codex.
 - Mémorise la position, le thème et l’état épinglé.
 - Une base Flutter commune gère le HUD, l’icône du Dock ou de la zone de notification, les menus et le cycle de vie sous macOS et Windows.
 - Limite l’application à une seule instance et une seule fenêtre de quota, qui peut être restaurée depuis la barre des menus ou la zone de notification après avoir été masquée.
 - Conserve l’entrée de la barre des tâches sous Windows et utilise le niveau de fenêtre de la barre d’état lorsqu’elle est épinglée sous macOS.
 - Utilise les mêmes icônes vectorielles de style macOS sur les deux plateformes.
-- Ajoute dans la barre des menus ou la zone de notification des actions pour mettre à jour, désinstaller et changer de langue.
+- Ajoute dans la barre des menus ou la zone de notification des actions pour mettre à jour, ouvrir le site officiel et partager, désinstaller et changer de langue.
 - Affiche un petit point rouge à côté de la version lorsqu’une nouvelle release GitHub est disponible.
 - Prend en charge les thèmes clair et sombre.
 - Suit automatiquement la langue du système.

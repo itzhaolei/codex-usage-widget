@@ -17,13 +17,13 @@ Una finestra mobile basata su un’unica codebase Flutter/Dart per macOS e Windo
 - Su macOS e Windows mostra localmente l’account corrente e la scadenza dell’abbonamento senza salvare credenziali nello snapshot della quota.
 - Mostra lo spazio di sistema e la memoria fisica disponibili; su Windows indica lo spazio libero dell’unità C.
 - Mantiene stabili le quote live e impedisce la visualizzazione dei dati dell’account precedente dopo un cambio account.
-- Funziona in modo indipendente e legge i dati locali della quota Codex.
+- Funziona indipendentemente da Codex Desktop, legge l’accesso locale e richiede i dati aggiornati della quota al backend Codex.
 - Ricorda posizione, tema e stato fissato.
 - Una base Flutter condivisa gestisce HUD, icona Dock o area di notifica, menu e ciclo di vita su macOS e Windows.
 - Limita l’app a una sola istanza e una sola finestra quota, ripristinabile dalla barra dei menu o dall’area di notifica dopo essere stata nascosta.
 - Mantiene la voce nella barra delle applicazioni di Windows e usa il livello finestra della barra di stato quando è fissata su macOS.
 - Usa lo stesso set di icone vettoriali in stile macOS su entrambe le piattaforme.
-- Aggiunge azioni nella barra dei menu o nell’area di notifica per aggiornare, disinstallare e cambiare lingua.
+- Aggiunge azioni nella barra dei menu o nell’area di notifica per aggiornare, aprire il sito ufficiale e condividere, disinstallare e cambiare lingua.
 - Mostra un piccolo punto rosso accanto alla versione quando è disponibile una release GitHub più recente.
 - Supporta tema chiaro e scuro.
 - Segue automaticamente la lingua di sistema.

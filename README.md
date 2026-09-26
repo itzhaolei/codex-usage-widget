@@ -15,7 +15,7 @@
 
 [English](README.md) | [中文](docs/README.zh-CN.md) | [日本語](docs/README.ja.md) | [한국어](docs/README.ko.md) | [Deutsch](docs/README.de.md) | [Français](docs/README.fr.md) | [Español](docs/README.es.md) | [Português](docs/README.pt.md) | [Italiano](docs/README.it.md) | [Nederlands](docs/README.nl.md)
 
-A compact Flutter desktop widget for watching Codex usage limits on macOS and Windows without opening settings. One shared Dart codebase powers both platforms.
+A compact Flutter desktop companion for watching current Codex usage limits on macOS and Windows without opening settings. It reads the signed-in account locally, requests the latest quota data from Codex, and keeps one shared Dart codebase across both platforms.
 
 Website source lives in `public/` and is ready for Cloudflare Pages. Recommended Pages settings: project name `quota-bubble`, production branch `main`, build command `exit 0`, output directory `public`. Suggested free domain: `quotabubble.dpdns.org` after dpdns approval.
 
@@ -39,7 +39,7 @@ Website source lives in `public/` and is ready for Cloudflare Pages. Recommended
 - Enforces one application instance and one quota window, which can be restored from the menu bar or system tray after it is hidden.
 - Keeps the Windows taskbar entry available and uses the macOS status-bar window level when pinned.
 - Uses one consistent set of macOS-style vector symbols on both platforms.
-- Adds menu-bar and system-tray actions for updates, uninstall, and language switching.
+- Adds menu-bar and system-tray actions for updates, the official website and sharing, uninstall, and language switching.
 - Shows a small red dot next to the version label when a newer GitHub release is available.
 - Supports dark and light themes.
 - Automatically follows the system language.

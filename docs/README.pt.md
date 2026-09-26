@@ -17,13 +17,13 @@ Uma janela flutuante feita com uma base Flutter/Dart compartilhada para macOS e 
 - No macOS e no Windows, mostra localmente a conta atual e o vencimento da assinatura sem salvar credenciais no snapshot de cota.
 - Mostra o armazenamento do sistema e a memória física disponíveis; no Windows, exibe o espaço livre da unidade C.
 - Mantém os valores de cota ao vivo estáveis e impede a exibição de dados da conta anterior após a troca de conta.
-- Roda de forma independente e lê dados locais de cota do Codex.
+- Funciona de forma independente do Codex Desktop, lê o login local e solicita os dados atuais de cota ao backend do Codex.
 - Lembra posição, tema e estado fixado.
 - Uma base Flutter compartilhada gerencia o HUD, o ícone do Dock ou da bandeja, os menus e o ciclo de vida no macOS e no Windows.
 - Limita o app a uma instância e uma janela de cota, que pode ser restaurada pela barra de menus ou bandeja do sistema depois de ocultada.
 - Mantém a entrada na barra de tarefas do Windows e usa o nível de janela da barra de status quando fixado no macOS.
 - Usa o mesmo conjunto de ícones vetoriais no estilo macOS nas duas plataformas.
-- Adiciona ações na barra de menus ou na bandeja do sistema para atualizar, desinstalar e trocar idioma.
+- Adiciona ações na barra de menus ou na bandeja do sistema para atualizar, abrir o site oficial e compartilhar, desinstalar e trocar o idioma.
 - Mostra um pequeno ponto vermelho ao lado da versão quando há uma versão mais recente no GitHub.
 - Suporta tema claro e escuro.
 - Segue automaticamente o idioma do sistema.

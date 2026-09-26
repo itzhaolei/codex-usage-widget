@@ -3,7 +3,8 @@ name: Validate Flutter desktop
 on:
   push:
     branches:
-      - codex/flutter-4-native-icons
+      - main
+      - 'codex/**'
   workflow_dispatch:
 
 permissions:

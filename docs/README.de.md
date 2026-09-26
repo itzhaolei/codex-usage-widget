@@ -17,13 +17,13 @@ Ein schwebendes Fenster aus einer gemeinsamen Flutter/Dart-Codebasis für Codex-
 - Zeigt unter macOS und Windows das aktuelle Konto und das Ablaufdatum des Abonnements lokal an, ohne Anmeldedaten im Kontingent-Snapshot zu speichern.
 - Zeigt verfügbaren Systemspeicher und physischen Arbeitsspeicher; unter Windows wird der freie Speicher auf Laufwerk C angezeigt.
 - Hält Live-Kontingentwerte stabil und verhindert nach einem Kontowechsel die Anzeige von Daten des vorherigen Kontos.
-- Läuft unabhängig und liest lokale Codex-Kontingentdaten.
+- Läuft unabhängig von Codex Desktop, liest die lokale Anmeldung und ruft aktuelle Kontingentdaten beim Codex-Backend ab.
 - Speichert Fensterposition, Theme und Anheftstatus.
 - Eine gemeinsame Flutter-Desktop-Codebasis verwaltet HUD, Dock- oder Tray-Symbol, Menüs und Lebenszyklus unter macOS und Windows.
 - Beschränkt die App auf eine Instanz und ein Kontingentfenster, das nach dem Ausblenden über Menüleiste oder Infobereich wieder geöffnet werden kann.
 - Behält unter Windows den Taskleisteneintrag bei und nutzt unter macOS im angehefteten Zustand die Statusleisten-Fensterebene.
 - Verwendet auf beiden Plattformen einheitliche Vektorsymbole im macOS-Stil.
-- Bietet in Menüleiste oder Infobereich Aktionen für Updates, Deinstallation und Sprachwechsel.
+- Bietet in Menüleiste oder Infobereich Aktionen für Updates, die offizielle Website und Teilen, Deinstallation und Sprachwechsel.
 - Zeigt einen kleinen roten Punkt neben der Versionsnummer, wenn auf GitHub eine neuere Version verfügbar ist.
 - Unterstützt dunkles und helles Theme.
 - Folgt automatisch der Systemsprache.

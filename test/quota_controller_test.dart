@@ -272,15 +272,38 @@ void main() {
       expect(event.toPercentage, 100);
       await controller.refresh(force: true);
       expect(controller.rechargeEvent, same(event));
-      expect(
-        capacity.calls,
-        1,
-        reason: 'capacity has a separate 30-second cache',
-      );
+      expect(capacity.calls, 1);
       controller.setWindowVisible(false);
       expect(controller.rechargeEvent, isNull);
     },
   );
+
+  test('visible refreshes update capacity once per second', () async {
+    var now = DateTime(2026, 9, 26, 12);
+    final capacity = _Capacity();
+    final controller =
+        QuotaController(
+            authRepository: _Auth(),
+            usageApi: _Api()..next = _quota(),
+            snapshotRepository: _Snapshots(),
+            capacityService: capacity,
+            clock: () => now,
+          )
+          ..auth = _accountA
+          ..snapshot = _quota();
+    addTearDown(controller.dispose);
+
+    await controller.refresh(force: true);
+    expect(capacity.calls, 1);
+
+    now = now.add(const Duration(milliseconds: 999));
+    await controller.refresh(force: true);
+    expect(capacity.calls, 1);
+
+    now = now.add(const Duration(milliseconds: 1));
+    await controller.refresh(force: true);
+    expect(capacity.calls, 2);
+  });
 
   test('stalled capacity does not block quota or tray refreshes', () async {
     final capacityRead = Completer<SystemCapacity>();

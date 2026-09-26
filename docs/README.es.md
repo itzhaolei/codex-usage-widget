@@ -17,13 +17,13 @@ Una ventana flotante creada con una base Flutter/Dart compartida para macOS y Wi
 - En macOS y Windows muestra localmente la cuenta actual y la caducidad de la suscripción sin guardar credenciales en la instantánea de cuota.
 - Muestra el almacenamiento del sistema y la memoria física disponibles; en Windows indica el espacio libre de la unidad C.
 - Mantiene estables los valores de cuota en vivo e impide mostrar datos de la cuenta anterior después de cambiar de cuenta.
-- Se ejecuta de forma independiente y lee datos locales de cuota de Codex.
+- Funciona de forma independiente de Codex Desktop, lee el inicio de sesión local y solicita los datos actuales de cuota al backend de Codex.
 - Recuerda posición, tema y estado fijado.
 - Una base Flutter compartida gestiona el HUD, el icono del Dock o la bandeja, los menús y el ciclo de vida en macOS y Windows.
 - Limita la aplicación a una instancia y una ventana de cuota, que puede restaurarse desde la barra de menús o la bandeja del sistema después de ocultarla.
 - Mantiene la entrada de la barra de tareas en Windows y usa el nivel de ventana de la barra de estado al fijarla en macOS.
 - Usa el mismo conjunto de iconos vectoriales de estilo macOS en ambas plataformas.
-- Añade acciones en la barra de menús o la bandeja del sistema para actualizar, desinstalar y cambiar idioma.
+- Añade acciones en la barra de menús o la bandeja del sistema para actualizar, abrir el sitio oficial y compartir, desinstalar y cambiar idioma.
 - Muestra un pequeño punto rojo junto a la versión cuando hay una release más reciente en GitHub.
 - Soporta tema claro y oscuro.
 - Sigue automáticamente el idioma del sistema.

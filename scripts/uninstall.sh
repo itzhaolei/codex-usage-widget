@@ -22,6 +22,7 @@ APPLESCRIPT
     fi
 fi
 rm -f "$CODEX_HOME/scripts/codex-usage-snapshot.mjs"
+if [ -x /usr/bin/python3 ]; then
 /usr/bin/python3 - <<'PY'
 import plistlib, subprocess
 from pathlib import Path
@@ -83,4 +84,5 @@ if p.exists():
         plistlib.dump(data, p.open("wb"))
         subprocess.run(["killall", "Dock"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 PY
+fi
 echo "Quota Bubble uninstalled."

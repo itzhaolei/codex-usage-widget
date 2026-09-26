@@ -53,7 +53,7 @@ bash scripts/status.sh
 - Only one widget instance is kept alive.
 - The close button hides the window; use the menu-bar menu to quit the process.
 - The widget refreshes visible countdown details every second. While hidden, it pauses window rendering and keeps the menu-bar quota percentage current.
-- The shared Flutter/Dart application service fetches quota data locally.
+- The shared Flutter/Dart application service reads the local Codex sign-in and requests current quota data from the Codex backend.
 - The installed app does not require Node.js, npm, Codex CLI, Xcode, or command-line tools at runtime.
 - Quota stabilization and reset-credit caching are scoped to a redacted Codex account fingerprint.
 

@@ -17,13 +17,13 @@ Een zwevend venster uit één gedeelde Flutter/Dart-codebasis voor macOS en Wind
 - Toont op macOS en Windows lokaal het huidige account en de vervaldatum van het abonnement zonder aanmeldgegevens in de quota-snapshot op te slaan.
 - Toont beschikbare systeemopslag en fysiek geheugen; op Windows wordt de vrije ruimte op de C-schijf weergegeven.
 - Houdt live quotawaarden stabiel en voorkomt dat na een accountwissel gegevens van het vorige account verschijnen.
-- Draait zelfstandig en leest lokale Codex-quotagegevens.
+- Draait onafhankelijk van Codex Desktop, leest de lokale aanmelding en vraagt actuele quotagegevens op bij de Codex-backend.
 - Onthoudt positie, thema en vastzetstatus.
 - Eén gedeelde Flutter-codebasis beheert de HUD, het Dock- of systeemvakpictogram, menu's en de levenscyclus op macOS en Windows.
 - Beperkt de app tot één instantie en één quotavenster, dat na verbergen via de menubalk of het systeemvak kan worden hersteld.
 - Houdt de taakbalkingang op Windows beschikbaar en gebruikt op macOS bij vastzetten het vensterniveau van de statusbalk.
 - Gebruikt op beide platforms dezelfde vectorpictogrammen in macOS-stijl.
-- Biedt in de menubalk of het systeemvak acties voor bijwerken, verwijderen en taal wisselen.
+- Biedt in de menubalk of het systeemvak acties voor bijwerken, de officiële website openen en delen, verwijderen en taal wisselen.
 - Toont een kleine rode stip naast de versie wanneer er een nieuwere GitHub-release beschikbaar is.
 - Ondersteunt donker en licht thema.
 - Volgt automatisch de systeemtaal.

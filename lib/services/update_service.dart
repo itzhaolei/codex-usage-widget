@@ -14,6 +14,10 @@ const quotaReleases =
     'https://github.com/itzhaolei/codex-usage-widget/releases';
 const _releaseApi =
     'https://api.github.com/repos/itzhaolei/codex-usage-widget/releases?per_page=30';
+const _releaseRedirect =
+    'https://github.com/itzhaolei/codex-usage-widget/releases/latest';
+const _releaseManifest =
+    'https://cdn.jsdelivr.net/gh/itzhaolei/codex-usage-widget@main/public/update.json';
 const _maximumDownload = 512 * 1024 * 1024;
 
 enum UpdatePlatform { macOS, windows }
@@ -77,8 +81,8 @@ class UpdateRelease {
   final ReleaseVersion version;
   final String assetName;
   final Uri downloadUri;
-  final int size;
-  final String sha256Digest;
+  final int? size;
+  final String? sha256Digest;
 
   /// Uses only the exact platform asset in an official, published GitHub release.
   static UpdateRelease? fromJson(Object? value, UpdatePlatform platform) {
@@ -129,6 +133,66 @@ class UpdateRelease {
     }
     return null;
   }
+
+  /// Reads the small public manifest used when the GitHub API is unavailable.
+  /// The manifest is accepted only when its installer URL is the exact official
+  /// release asset for the declared tag and platform.
+  static UpdateRelease? fromManifest(Object? value, UpdatePlatform platform) {
+    if (value is! Map) return null;
+    final tag = value['tag'];
+    if (tag is! String ||
+        !RegExp(r'^v\d+\.\d+\.\d+(?:\.\d+)?$').hasMatch(tag)) {
+      return null;
+    }
+    final version = ReleaseVersion.parse(tag);
+    if (version == null) return null;
+    final key = platform == UpdatePlatform.macOS
+        ? 'macos_installer_url'
+        : 'windows_installer_url';
+    final expectedName =
+        'QuotaBubble-${tag.substring(1)}-${platform == UpdatePlatform.macOS ? 'macOS-Installer.zip' : 'Windows-Setup.exe'}';
+    final expectedUri = Uri.parse('$quotaReleases/download/$tag/$expectedName');
+    final uri = Uri.tryParse('${value[key]}');
+    if (uri != expectedUri) return null;
+
+    // Older manifests only contain the two download URLs. Newer manifests
+    // may add platform-specific integrity metadata without changing that
+    // format. Treat malformed optional metadata as an invalid manifest rather
+    // than silently weakening verification.
+    final platformName = platform == UpdatePlatform.macOS ? 'macos' : 'windows';
+    final rawSize = value['${platformName}_size'] ?? value['size'];
+    final size = rawSize == null ? null : _manifestSize(rawSize);
+    if (rawSize != null && size == null) return null;
+    final rawDigest =
+        value['${platformName}_sha256'] ??
+        value['${platformName}_sha256_digest'] ??
+        value['sha256'];
+    final digest = rawDigest == null ? null : _manifestDigest(rawDigest);
+    if (rawDigest != null && digest == null) return null;
+    return UpdateRelease(
+      tag: tag,
+      version: version,
+      assetName: expectedName,
+      downloadUri: uri!,
+      size: size,
+      sha256Digest: digest,
+    );
+  }
+
+  static int? _manifestSize(Object value) {
+    if (value is! int || value <= 0 || value > _maximumDownload) return null;
+    return value;
+  }
+
+  static String? _manifestDigest(Object value) {
+    if (value is! String) return null;
+    final normalized = value.startsWith('sha256:')
+        ? value.substring('sha256:'.length)
+        : value;
+    return RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(normalized)
+        ? normalized.toLowerCase()
+        : null;
+  }
 }
 
 class UpdateHttpResponse {
@@ -136,10 +200,12 @@ class UpdateHttpResponse {
     this.statusCode,
     this.body, {
     this.contentLength = -1,
+    this.effectiveUri,
   });
   final int statusCode;
   final Stream<List<int>> body;
   final int contentLength;
+  final Uri? effectiveUri;
 }
 
 abstract interface class UpdateTransport {
@@ -151,6 +217,27 @@ abstract interface class UpdateTransport {
 class HttpUpdateTransport implements UpdateTransport {
   HttpUpdateTransport({HttpClient? client}) : _client = client ?? HttpClient() {
     _client.connectionTimeout = const Duration(seconds: 15);
+    if (Platform.isWindows) {
+      // Respect the signed-in user's configured system proxy. HttpClient's
+      // environment resolver covers WinHTTP/enterprise proxy variables, and
+      // authenticateProxy lets the OS negotiate credentials when challenged.
+      _client.findProxy = HttpClient.findProxyFromEnvironment;
+      _client.authenticateProxy = (host, port, scheme, realm) async {
+        final user = Platform.environment['USERNAME'];
+        final domain = Platform.environment['USERDOMAIN'];
+        if (user == null || user.isEmpty) return false;
+        final qualified = domain == null || domain.isEmpty
+            ? user
+            : '$domain\\$user';
+        _client.addProxyCredentials(
+          host,
+          port,
+          realm ?? '',
+          HttpClientBasicCredentials(qualified, ''),
+        );
+        return true;
+      };
+    }
   }
   final HttpClient _client;
 
@@ -164,6 +251,7 @@ class HttpUpdateTransport implements UpdateTransport {
         'release-assets.githubusercontent.com',
         'objects.githubusercontent.com',
         'github-releases.githubusercontent.com',
+        'cdn.jsdelivr.net',
       }.contains(uri.host);
 
   @override
@@ -199,6 +287,7 @@ class HttpUpdateTransport implements UpdateTransport {
         response.statusCode,
         response,
         contentLength: response.contentLength,
+        effectiveUri: uri,
       );
     }
     throw const UpdateException(
@@ -332,37 +421,10 @@ class UpdateService extends ChangeNotifier {
       if (ReleaseVersion.parse(currentVersion) == null) {
         throw const UpdateException('The installed version is invalid.');
       }
-      final releases = await _retry(() async {
-        final response = await _transport.get(Uri.parse(_releaseApi));
-        if (response.statusCode != 200) {
-          throw UpdateException(
-            'Could not check for updates (HTTP ${response.statusCode}).',
-          );
-        }
-        final bytes = <int>[];
-        await for (final chunk in response.body.timeout(
-          const Duration(seconds: 20),
-        )) {
-          bytes.addAll(chunk);
-          if (bytes.length > 4 * 1024 * 1024) {
-            throw const UpdateException('The update response is too large.');
-          }
-        }
-        final json = jsonDecode(utf8.decode(bytes));
-        if (json is! List) {
-          throw const UpdateException(
-            'The update server returned an invalid release list.',
-          );
-        }
-        return json;
-      });
+      final releases = await _lookupReleases();
       if (_disposed) return latest;
-      final candidates =
-          releases
-              .map((json) => UpdateRelease.fromJson(json, platform))
-              .whereType<UpdateRelease>()
-              .toList()
-            ..sort((a, b) => b.version.compareTo(a.version));
+      final candidates = releases
+        ..sort((a, b) => b.version.compareTo(a.version));
       if (candidates.isEmpty) {
         throw const UpdateException(
           'No verified installer is available. Please try again later.',
@@ -374,6 +436,117 @@ class UpdateService extends ChangeNotifier {
       _fail(exception);
     }
     return latest;
+  }
+
+  Future<List<UpdateRelease>> _lookupReleases() async {
+    Object? lastError;
+    // GitHub's API is the only source that can provide complete release
+    // metadata, so retry it for transient failures. Fallback sources are each
+    // queried once; repeating the whole chain can multiply a single outage
+    // into a surprising number of requests.
+    try {
+      final releases = await _retry(_lookupApiReleases);
+      if (releases.isNotEmpty) return releases;
+      lastError = const UpdateException(
+        'No verified installer is available. Please try again later.',
+      );
+    } on Object catch (error) {
+      lastError = error;
+    }
+
+    for (final lookup in <Future<List<UpdateRelease>> Function()>[
+      _lookupManifestRelease,
+      _lookupRedirectRelease,
+    ]) {
+      try {
+        final releases = await lookup();
+        if (releases.isNotEmpty) return releases;
+        lastError = const UpdateException(
+          'No verified installer is available. Please try again later.',
+        );
+      } on Object catch (error) {
+        lastError = error;
+      }
+    }
+    throw lastError ?? const UpdateException('Could not check for updates.');
+  }
+
+  Future<List<UpdateRelease>> _lookupApiReleases() async {
+    final json = await _readJson(Uri.parse(_releaseApi));
+    if (json is! List) {
+      throw const UpdateException(
+        'The update server returned an invalid release list.',
+      );
+    }
+    return json
+        .map((value) => UpdateRelease.fromJson(value, platform))
+        .whereType<UpdateRelease>()
+        .toList();
+  }
+
+  Future<List<UpdateRelease>> _lookupManifestRelease() async {
+    final json = await _readJson(Uri.parse(_releaseManifest));
+    final release = UpdateRelease.fromManifest(json, platform);
+    return release == null ? const [] : [release];
+  }
+
+  Future<List<UpdateRelease>> _lookupRedirectRelease() async {
+    final response = await _transport.get(Uri.parse(_releaseRedirect));
+    if (response.statusCode != 200) {
+      throw UpdateException(
+        'Could not check for updates (HTTP ${response.statusCode}).',
+      );
+    }
+    // The transport follows redirects while retaining the final URI. Drain
+    // the HTML response so the underlying socket can be reused.
+    await response.body.drain<void>();
+    final finalUri = response.effectiveUri;
+    final segments = finalUri?.pathSegments ?? const <String>[];
+    final tag = segments.isNotEmpty && segments.last.startsWith('v')
+        ? segments.last
+        : null;
+    final release = tag == null ? null : _releaseForTag(tag);
+    return release == null ? const [] : [release];
+  }
+
+  UpdateRelease? _releaseForTag(String tag) {
+    final version = ReleaseVersion.parse(tag);
+    if (version == null) return null;
+    final suffix = platform == UpdatePlatform.macOS
+        ? 'macOS-Installer.zip'
+        : 'Windows-Setup.exe';
+    final name = 'QuotaBubble-${tag.substring(1)}-$suffix';
+    return UpdateRelease(
+      tag: tag,
+      version: version,
+      assetName: name,
+      downloadUri: Uri.parse('$quotaReleases/download/$tag/$name'),
+      size: null,
+      sha256Digest: null,
+    );
+  }
+
+  Future<Object?> _readJson(Uri uri) async {
+    final response = await _transport.get(uri);
+    if (response.statusCode != 200) {
+      throw UpdateException(
+        'Could not check for updates (HTTP ${response.statusCode}).',
+      );
+    }
+    final bytes = <int>[];
+    await for (final chunk in response.body.timeout(
+      const Duration(seconds: 20),
+    )) {
+      bytes.addAll(chunk);
+      if (bytes.length > 4 * 1024 * 1024) {
+        throw const UpdateException('The update response is too large.');
+      }
+    }
+    try {
+      return jsonDecode(utf8.decode(bytes));
+    } on FormatException {
+      throw const UpdateException('The update server returned invalid JSON.');
+    }
   }
 
   /// This is only called by an explicit user action, never the periodic check.
@@ -434,11 +607,21 @@ class UpdateService extends ChangeNotifier {
     if (response.statusCode != 200) {
       throw UpdateException('Download failed (HTTP ${response.statusCode}).');
     }
-    if (response.contentLength >= 0 && response.contentLength != release.size) {
+    final expectedSize = release.size;
+    final responseSize = response.contentLength;
+    if (responseSize > _maximumDownload) {
+      throw const UpdateException('The installer is larger than allowed.');
+    }
+    if (expectedSize != null &&
+        responseSize >= 0 &&
+        responseSize != expectedSize) {
       throw const UpdateException(
         'The installer size does not match the release.',
       );
     }
+    final totalSize = expectedSize ?? (responseSize > 0 ? responseSize : null);
+    progress = totalSize == null ? null : 0;
+    _notify();
     final output = file.openWrite();
     try {
       await for (final bytes in response.body.timeout(
@@ -446,30 +629,39 @@ class UpdateService extends ChangeNotifier {
       )) {
         if (_disposed) throw const UpdateException('The update was cancelled.');
         receivedBytes += bytes.length;
-        if (receivedBytes > release.size) {
+        if (receivedBytes > _maximumDownload ||
+            (expectedSize != null && receivedBytes > expectedSize)) {
           throw const UpdateException(
             'The installer exceeds its expected size.',
           );
         }
         output.add(bytes);
-        final previous = ((progress ?? 0) * 100).floor();
-        progress = receivedBytes / release.size;
-        if ((progress! * 100).floor() != previous) _notify();
+        if (totalSize != null) {
+          final previous = ((progress ?? 0) * 100).floor();
+          progress = (receivedBytes / totalSize).clamp(0.0, 1.0);
+          if ((progress! * 100).floor() != previous) _notify();
+        } else if (receivedBytes == bytes.length ||
+            receivedBytes ~/ (256 * 1024) !=
+                (receivedBytes - bytes.length) ~/ (256 * 1024)) {
+          _notify();
+        }
       }
       await output.flush();
     } finally {
       await output.close();
     }
-    if (receivedBytes != release.size) {
+    if (expectedSize != null && receivedBytes != expectedSize) {
       throw const UpdateException(
         'The download ended before the installer was complete.',
       );
     }
-    final digest = await sha256.bind(file.openRead()).first;
-    if (digest.toString() != release.sha256Digest) {
-      throw const UpdateException(
-        'The installer checksum does not match the release.',
-      );
+    if (release.sha256Digest != null) {
+      final digest = await sha256.bind(file.openRead()).first;
+      if (digest.toString() != release.sha256Digest) {
+        throw const UpdateException(
+          'The installer checksum does not match the release.',
+        );
+      }
     }
     final input = await file.open();
     try {
@@ -478,8 +670,9 @@ class UpdateService extends ChangeNotifier {
           ? header.length >= 4 &&
                 header[0] == 0x50 &&
                 header[1] == 0x4b &&
-                header[2] == 3 &&
-                header[3] == 4
+                ((header[2] == 3 && header[3] == 4) ||
+                    (header[2] == 5 && header[3] == 6) ||
+                    (header[2] == 7 && header[3] == 8))
           : header.length >= 64 && header[0] == 0x4d && header[1] == 0x5a;
       if (!valid) {
         throw const UpdateException(
@@ -489,7 +682,7 @@ class UpdateService extends ChangeNotifier {
       if (platform == UpdatePlatform.windows) {
         final offset =
             header[60] | header[61] << 8 | header[62] << 16 | header[63] << 24;
-        if (offset < 64 || offset > release.size - 4) {
+        if (offset < 64 || offset > receivedBytes - 4) {
           throw const UpdateException(
             'The installer executable header is invalid.',
           );

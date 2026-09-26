@@ -10,6 +10,7 @@ private struct DesktopGlass: View {
   let light: Bool
   var body: some View {
     Group {
+#if compiler(>=6.2)
       if #available(macOS 26.0, *) {
         if light {
           Color.clear.glassEffect(.clear.tint(Color.white.opacity(0.05)).interactive(), in: RoundedRectangle(cornerRadius: windowCornerRadius, style: .continuous))
@@ -21,6 +22,11 @@ private struct DesktopGlass: View {
           .overlay(light ? Color.white.opacity(0.12) : Color.black.opacity(0.38))
           .clipShape(RoundedRectangle(cornerRadius: windowCornerRadius, style: .continuous))
       }
+#else
+      LegacyGlass(light: light)
+        .overlay(light ? Color.white.opacity(0.12) : Color.black.opacity(0.38))
+        .clipShape(RoundedRectangle(cornerRadius: windowCornerRadius, style: .continuous))
+#endif
     }.environment(\.colorScheme, light ? .light : .dark)
   }
 }
@@ -97,6 +103,20 @@ class MainFlutterWindow: NSWindow {
       visibilityObservers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
         self?.publishVisibility()
       })
+    }
+    DispatchQueue.main.async { [weak self] in
+      self?.publishVisibility()
+    }
+  }
+
+  func revealFromDock() {
+    orderFrontRegardless()
+    makeKey()
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
+      orderFrontRegardless()
+      makeKey()
+      publishVisibility()
     }
   }
 

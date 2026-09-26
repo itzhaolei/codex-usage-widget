@@ -123,6 +123,43 @@ void main() {
     },
   );
 
+  test('accepts legacy and integrity-aware public manifests only for official assets', () {
+    final legacy = {
+      'tag': 'v4.0.1',
+      'windows_installer_url':
+          '$quotaReleases/download/v4.0.1/QuotaBubble-4.0.1-Windows-Setup.exe',
+      'macos_installer_url':
+          '$quotaReleases/download/v4.0.1/QuotaBubble-4.0.1-macOS-Installer.zip',
+    };
+    expect(
+      UpdateRelease.fromManifest(legacy, UpdatePlatform.windows)!.size,
+      isNull,
+    );
+    expect(
+      UpdateRelease.fromManifest(legacy, UpdatePlatform.macOS)!.sha256Digest,
+      isNull,
+    );
+
+    final secure = {...legacy, 'windows_size': 128, 'windows_sha256': 'a' * 64};
+    final release = UpdateRelease.fromManifest(secure, UpdatePlatform.windows);
+    expect(release!.size, 128);
+    expect(release.sha256Digest, 'a' * 64);
+    expect(
+      UpdateRelease.fromManifest({
+        ...secure,
+        'windows_size': 0,
+      }, UpdatePlatform.windows),
+      isNull,
+    );
+    expect(
+      UpdateRelease.fromManifest({
+        ...legacy,
+        'windows_installer_url': 'https://example.org/app.exe',
+      }, UpdatePlatform.windows),
+      isNull,
+    );
+  });
+
   test('download redirect allowlist rejects insecure hosts and user info', () {
     expect(
       HttpUpdateTransport.allowedUri(
@@ -171,12 +208,86 @@ void main() {
       now = now.add(const Duration(minutes: 1));
       fail = true;
       await service.check();
-      expect(transport.calls, 4);
+      expect(
+        transport.calls,
+        6,
+        reason: 'three API retries plus one request per fallback source',
+      );
       expect(service.state, UpdateState.failed);
       expect(service.hasUpdate, isTrue);
       expect(service.error, contains('HTTP 503'));
     },
   );
+
+  test('manifest fallback downloads an installer without legacy metadata', () async {
+    final directory = await Directory.systemTemp.createTemp(
+      'quota-update-manifest-test-',
+    );
+    addTearDown(() => directory.delete(recursive: true));
+    final bytes = _installer(UpdatePlatform.windows);
+    final commands = _Commands();
+    final transport = _Transport((uri) async {
+      if (uri.host == 'api.github.com') {
+        return UpdateHttpResponse(503, const Stream.empty());
+      }
+      if (uri.host == 'cdn.jsdelivr.net') {
+        return _json({
+          'tag': 'v4.0.1',
+          'windows_installer_url':
+              '$quotaReleases/download/v4.0.1/QuotaBubble-4.0.1-Windows-Setup.exe',
+        });
+      }
+      return UpdateHttpResponse(200, Stream.value(bytes));
+    });
+    final service = UpdateService(
+      currentVersion: '4.0.0',
+      platform: UpdatePlatform.windows,
+      transport: transport,
+      commands: commands,
+      temporaryDirectory: () async => directory,
+      delay: (_) async {},
+    );
+    addTearDown(service.dispose);
+
+    await service.check();
+    expect(service.hasUpdate, isTrue);
+    expect(await service.downloadAndInstall(onExit: () async {}), isTrue);
+    expect(commands.calls.single.$1, endsWith('Windows-Setup.exe'));
+    expect(
+      transport.calls,
+      5,
+      reason: 'three API retries, then manifest and download',
+    );
+  });
+
+  test('release redirect fallback derives the official installer URL', () async {
+    final transport = _Transport((uri) async {
+      if (uri.host == 'api.github.com' || uri.host == 'cdn.jsdelivr.net') {
+        return UpdateHttpResponse(503, const Stream.empty());
+      }
+      return UpdateHttpResponse(
+        200,
+        const Stream.empty(),
+        effectiveUri: Uri.parse(
+          'https://github.com/itzhaolei/codex-usage-widget/releases/tag/v4.0.1',
+        ),
+      );
+    });
+    final service = UpdateService(
+      currentVersion: '4.0.0',
+      platform: UpdatePlatform.macOS,
+      transport: transport,
+      delay: (_) async {},
+    );
+    addTearDown(service.dispose);
+
+    await service.check();
+    expect(
+      service.latest!.downloadUri.toString(),
+      '$quotaReleases/download/v4.0.1/QuotaBubble-4.0.1-macOS-Installer.zip',
+    );
+    expect(service.latest!.size, isNull);
+  });
 
   test('concurrent checks share the existing operation without overlapping requests', () async {
     final pending = Completer<UpdateHttpResponse>();

@@ -210,7 +210,7 @@ class QuotaController extends ChangeNotifier {
     if (!force &&
         _lastCapacityRefresh != null &&
         timestamp.difference(_lastCapacityRefresh!) <
-            const Duration(seconds: 30)) {
+            const Duration(seconds: 1)) {
       return;
     }
     _capacityLoading = true;

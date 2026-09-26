@@ -168,6 +168,10 @@ touch "$APP"
 
 # Keep one persistent Dock entry for the product. A development build or a
 # previous per-user install can otherwise leave visually identical entries.
+# In-app updates deliberately skip this step so replacing the running bundle
+# does not rewrite the user's Dock or restart it underneath the app.
+if [ "${QUOTA_BUBBLE_SKIP_DOCK:-0}" != "1" ]; then
+if [ -x /usr/bin/python3 ]; then
 /usr/bin/python3 - "$APP" <<'PY'
 import os
 import plistlib
@@ -287,7 +291,13 @@ if new_apps != apps or new_recent != recent or not plist_path.exists():
         except FileNotFoundError:
             pass
 PY
+else
+if ! /usr/bin/defaults read com.apple.dock persistent-apps 2>/dev/null | /usr/bin/grep -Eq 'Quota(%20| )Bubble\.app'; then
+  /usr/bin/defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>file:///Applications/Quota%20Bubble.app/</string><key>_CFURLStringType</key><integer>15</integer></dict><key>file-label</key><string>Quota Bubble</string></dict><key>tile-type</key><string>file-tile</string></dict>'
+fi
+fi
 /usr/bin/killall Dock >/dev/null 2>&1 || true
+fi
 
 cat > "$LAUNCH_AGENT" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>

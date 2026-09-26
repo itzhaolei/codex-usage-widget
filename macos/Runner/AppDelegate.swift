@@ -12,7 +12,7 @@ class AppDelegate: FlutterAppDelegate {
     hasVisibleWindows flag: Bool
   ) -> Bool {
     if !flag {
-      sender.windows.first(where: { $0 is MainFlutterWindow })?.makeKeyAndOrderFront(nil)
+      (sender.windows.first(where: { $0 is MainFlutterWindow }) as? MainFlutterWindow)?.revealFromDock()
     }
     sender.activate(ignoringOtherApps: true)
     return true
